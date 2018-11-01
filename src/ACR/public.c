@@ -46,7 +46,7 @@
 
 /** info string lookup table
 */
-static ACR_String_t* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
+static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
 {
     //
     // COMPARISON
@@ -108,48 +108,19 @@ static ACR_String_t* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
     ""                      // ACR_INFO_COUNT
 };
 
-/*
-int _ACR_UTF8ByteCount(ACR_Byte_t c)
-{
-    if((c & 0x80) != 0)
-    {
-        // 1???????
-        if((c & 0x40) != 0)
-        {
-            // 11??????
-            if((c & 0x20) != 0)
-            {
-                // 111?????
-                if((c & 0x10) != 0)
-                {
-                    // 1111????
-                    return 4;
-                }
-                else
-                {
-                    // 1110????
-                    return 3;
-                }
-            }
-            else
-            {
-                // 110?????
-                return 2;
-            }
-        }
-        else
-        {
-            // 10??????
-            // malformed UTF8
-        }
-    }
-    else
-    {
-        // 0???????
-    }
-    return 1;
-}
+/** info string lookup table
 */
+static char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
+{
+    ACR_DAY_STR_SUNDAY,     // ACR_DAY_SUNDAY
+    ACR_DAY_STR_MONDAY,     // ACR_DAY_MONDAY
+    ACR_DAY_STR_TUESDAY,    // ACR_DAY_TUESDAY
+    ACR_DAY_STR_WEDNESDAY,  // ACR_DAY_WEDNESDAY
+    ACR_DAY_STR_THURSDAY,   // ACR_DAY_THURSDAY
+    ACR_DAY_STR_FRIDAY,     // ACR_DAY_FRIDAY
+    ACR_DAY_STR_SATURDAY,   // ACR_DAY_SATURDAY 
+    ""                      // ACR_DAY_COUNT
+};
 
 ////////////////////////////////////////////////////////////
 //
@@ -162,14 +133,141 @@ int _ACR_UTF8ByteCount(ACR_Byte_t c)
 */
 ACR_Info_t ACR_Test(void)
 {
-    ACR_String_t s = ACR_StringFromMemory("up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
-    ACR_Info_t i = ACR_InfoFromString(s);
-    if(i == ACR_INFO_UP)
+    // ENDIANNESS
+    unsigned short systemEndianValue = 0x0001;
+    unsigned short bigEndian = ACR_BYTE_ORDER_16(systemEndianValue);
+    // BYTES
+    ACR_Byte_t byte = ACR_MAX_BYTE;
+    // MEMORY LENGTHS
+    ACR_Length_t length = ACR_MAX_LENGTH;
+    // COUNTS
+    ACR_Count_t count = ACR_MAX_COUNT;
+    // TIME VALUES
+    ACR_DayOfWeek_t freedomFriday = ACR_DAY_TUESDAY;
+    ACR_String_t dayOfWeekString = ACR_DayOfWeekToString(freedomFriday);
+    // SIMPLE MEMORY BUFFER
+    ACR_BUFFER(buffer);
+    // DECIMAL VALUES
+    ACR_Decimal_t realNumber = 5.1999;
+    // SIMPLE UTF8 STRINGS
+    ACR_String_t stringForInfoUp = ACR_StringFromMemory("up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
+    ACR_String_t stringForEmojiSmile = ACR_StringFromMemory("😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+
+    //
+    // ENDIANNESS
+    //
+    if(ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
-        return ACR_INFO_OK;
+        // system is little endian
+        if(systemEndianValue == bigEndian)
+        {
+            // ACR_IS_BIG_ENDIAN is not set properly or
+            // ACR_BYTE_ORDER_16 is not working properly
+            return ACR_INFO_ERROR;
+        }
+    }
+    else
+    {
+        // system is big endian
+        if(systemEndianValue != bigEndian)
+        {
+            // ACR_IS_BIG_ENDIAN is not set properly or
+            // ACR_BYTE_ORDER_16 is not working properly
+            return ACR_INFO_ERROR;
+        }
+    }
+    systemEndianValue = ACR_BYTE_ORDER_16(bigEndian);
+    if(systemEndianValue != 0x0001)
+    {
+        // ACR_BYTE_ORDER_16 is not working properly
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // BYTES
+    //
+    byte += 1;
+    if(byte != 0)
+    {
+        // ACR_MAX_BYTE value is incorrect
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // MEMORY LENGTHS
+    //
+    length += 1;
+    if(length != 0)
+    {
+        // ACR_MAX_LENGTH value is incorrect
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // COUNTS
+    //
+    count += 1;
+    if(count != 0)
+    {
+        // ACR_MAX_COUNT value is incorrect
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // TIME VALUES
+    //
+    if(ACR_DayOfWeekFromString(dayOfWeekString) != ACR_DAY_TUESDAY)
+    {
+        // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
+        // or someone didn't know that Freedom Friday is still on a Tuesday
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // SIMPLE MEMORY BUFFER
+    //
+    if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+    {
+        // buffer length should have initialized to zero
+        return ACR_INFO_ERROR;
+    }
+    ACR_BUFFER_ALLOC(buffer, 1000);
+    if(ACR_BUFFER_GET_LENGTH(buffer) == 0)
+    {
+        // failed to allocate the buffer
+        return ACR_INFO_ERROR;
+    }
+    ACR_BUFFER_FREE(buffer);
+    
+    //
+    // DECIMAL VALUES
+    //
+    if(ACR_DECIMAL_COMPARE(realNumber, 5.2) != ACR_INFO_EQUAL)
+    {
+        // 5.1999 and 5.2 should have been equal using the default tolerance
+        return ACR_INFO_ERROR;
+    }
+
+    //
+    // SIMPLE UTF8 STRINGS
+    //
+    if(infoFromUp != ACR_INFO_UP)
+    {
+        // incorrect value returned from "up"
+        return ACR_INFO_ERROR;
+    }
+
+    if(stringForEmojiSmile.m_Count != 1)
+    {
+        // incorrect character count for string with emoki smile
+        return ACR_INFO_ERROR;
     }
     
-    return ACR_INFO_ERROR;
+    //
+    // ALL TESTS COMPLETE
+    //
+    return ACR_INFO_OK;
 }
 
 ////////////////////////////////////////////////////////////
@@ -194,12 +292,42 @@ ACR_Info_t ACR_InfoFromString(
         x = ACR_StringCompareToMemory(src, g_ACRInfoStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
         if(x == ACR_INFO_EQUAL)
         {
-            return i;
+            return (ACR_Info_t)i;
         }
         i++;
     }
     while(i < ACR_INFO_COUNT);
     return ACR_INFO_UNKNOWN;
+}
+
+////////////////////////////////////////////////////////////
+//
+// PUBLIC FUNCTIONS - TIME VALUES
+//
+////////////////////////////////////////////////////////////
+
+ACR_String_t ACR_DayOfWeekToString(
+    ACR_DayOfWeek_t dayOfWeek)
+{
+    return ACR_StringFromMemory(g_ACRDayOfWeekStringLookup[dayOfWeek], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+}
+
+ACR_DayOfWeek_t ACR_DayOfWeekFromString(
+    ACR_String_t src)
+{
+    ACR_Count_t i = 0;
+    ACR_Info_t x;
+    do
+    {
+        x = ACR_StringCompareToMemory(src, g_ACRDayOfWeekStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
+        if(x == ACR_INFO_EQUAL)
+        {
+            return (ACR_DayOfWeek_t)i;
+        }
+        i++;
+    }
+    while(i < ACR_INFO_COUNT);
+    return ACR_DAY_OF_WEEK_UNKNOWN;
 }
 
 ////////////////////////////////////////////////////////////
@@ -286,7 +414,7 @@ ACR_Info_t ACR_StringCompareToMemory(
         int bytes[2];
         int strIndex;
         ACR_Unicode_t c[2];
-        while((srcLength > 0) && ((*srcPtr) != 0))
+        while((srcLength > 0) && ((srcPtr[1][0]) != 0))
         {
             if(count == maxCharacters)
             {
@@ -342,6 +470,13 @@ ACR_Info_t ACR_StringCompareToMemory(
             // src has less characters than string
             return ACR_INFO_LESS;
         }
+        return ACR_INFO_EQUAL;
     }
     return ACR_INFO_INVALID;
 }
+
+////////////////////////////////////////////////////////////
+//
+// PUBLIC FUNCTIONS - OTHER
+//
+////////////////////////////////////////////////////////////

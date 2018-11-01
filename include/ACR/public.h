@@ -43,22 +43,34 @@
     common functions and typedefs will also be predefined
     by this header.
 
-    Top reasons to use this header:
+    Top uses:
 
-    ACR_Buffer_t    -   a simple struct with macros to handle
-                        allocation and freeing of memory safely.
+    ACR_BYTE_ORDER_16   -   ensures a value is stored
+                            in big endian byte order
+    ACR_BYTE_ORDER_32   -   \see ACR_IS_BIG_ENDIAN
 
-    ACR_VarBuffer_t -   a simple struct with macros to 
-                        handle allocation of memory safely
-                        while freeing memory only when
-                        necessary to grow the memory area.
+    ACR_Buffer_t        -   a simple struct with macros
+                            to handle allocation and freeing
+                            of memory safely.
 
-    ACR_String_t    -   a struct for access to strings
-                        with support for UTF8 encoding
+    ACR_VarBuffer_t     -   a simple struct with macros to 
+                            handle allocation of memory
+                            safely while freeing memory only
+                            when necessary to grow the
+                            memory area.
+
+    ACR_String_t        -   a struct for access to strings
+                            with support for UTF8 encoding
+
+    DECIMAL_COMPARE     -   compare decimal values within a
+                            tolerance
 
 */
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
+
+// included for malloc and free
+#include <stdlib.h>
 
 ////////////////////////////////////////////////////////////
 //
@@ -118,36 +130,52 @@
 //
 // Note: Big Endian means that multibyte values have the
 //       bytes stored in memory from least significant 
-//       to most significant
+//       to most significant.
 //
-// Optional: If you already know the endianess of your system
-//           it is best to set the preprocessor define:
+// Optional: If you already know the endianess of your
+//           system then set the preprocessor define as
+//           follows to improve byte order handling
+//           performance.
 //           Big Endian:    ACR_IS_BIG_ENDIAN=1
 //           Little Endian: ACR_IS_BIG_ENDIAN=0
 //
-// example:
+// Sample memory:
 //
 //   type/bytes
 //
 //   char/1     memory = [ 0x01 ---- ---- ---- ]
-//              binary little endian = MSB ------------------------00000001 LSB
+//              binary little endian =
+//                  MSB ------------------------00000001 LSB
 //              decimal big endian = 1
 //              decimal little endian = 1
 //
 //   short/2    memory = [ 0x01 0x00 ---- ---- ]
-//              binary little endian = MSB ----------------0000000100000000 LSB
+//              binary little endian = 
+//                  MSB ----------------0000000100000000 LSB
 //              decimal big endian = 1
 //              decimal little endian = 256
 //
 //   short/2    memory = [ 0x00 0x01 ---- ---- ]
-//              binary little endian = MSB ----------------0000000000000001 LSB
+//              binary little endian = 
+//                  MSB ----------------0000000000000001 LSB
 //              decimal big endian = 256
 //              decimal little endian = 1
 //
 //   long/4     memory = [ 0x00 0x01 0x00 0x00 ]
-//              binary little endian = MSB 00000000000000010000000000000000 LSB
+//              binary little endian = 
+//                  MSB 00000000000000010000000000000000 LSB
 //              decimal big endian = 256
 //              decimal little endian = 65536
+//
+// "short" Example:
+//
+//      // given a local variable with value 1
+//      short valueInSystemEndian = 1;
+//      // convert the value to big endian 
+//      short valueInBigEndian = ACR_BYTE_ORDER_16(valueInSystemEndian);
+//      // and use the same macro to convert
+//      // a big endian value back to system endianness
+//      valueInSystemEndian = ACR_BYTE_ORDER_16(valueInBigEndian);
 //
 ////////////////////////////////////////////////////////////
 
@@ -159,7 +187,24 @@
 #define ACR_IS_BIG_ENDIAN 0
 #else
 #define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
-#endif
+#define ACR_ENDIAN_DYNAMIC
+#endif // #ifdef LITTLE_ENDIAN
+#endif // #ifdef BIG_ENDIAN
+#endif // #ifndef ACR_IS_BIG_ENDIAN
+
+#define ACR_BYTE_ORDER_SWAP_16(x) (((((unsigned short)(x)) >> 8) & 0x00ff) | ((((unsigned short)(x)) & 0x00ff) << 8))
+#define ACR_BYTE_ORDER_SWAP_32(x) ((((unsigned long)(x) >> 24) & 0x000000ff) | (((unsigned long)(x) >> 8) & 0x0000ff00) | (((unsigned long)(x) << 8) & 0x00ff0000) | (((unsigned long)(x) << 24) & 0xff000000))
+
+#ifdef ACR_ENDIAN_DYNAMIC
+#define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_16(x):x)
+#define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_32(x):x)
+#else
+#if ACR_IS_BIG_ENDIAN == 0
+#define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
+#define ACR_BYTE_ORDER_32(x) (ACR_BYTE_ORDER_SWAP_32(x))
+#else
+#define ACR_BYTE_ORDER_16(x) (x)
+#define ACR_BYTE_ORDER_32(x) (x)
 #endif
 #endif
 
@@ -179,7 +224,7 @@ typedef unsigned char ACR_Byte_t;
 
 /** max value that can be stored by the ACR_Byte_t type 
 */
-#define ACR_BYTE_MAX 255 // hex value 0xFF
+#define ACR_MAX_BYTE 255 // hex value 0xFF
 
 ////////////////////////////////////////////////////////////
 //
@@ -307,17 +352,9 @@ typedef enum ACR_DayOfWeek_e
     ACR_DAY_COUNT
 } ACR_DayOfWeek_t;
 
+#define ACR_DAY_OF_WEEK_UNKNOWN ACR_DAY_COUNT
 #define ACR_DAY_PER_WEEK ACR_DAY_COUNT
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - SIMPLE FORMULAS
-//
-////////////////////////////////////////////////////////////
-
-/** the circumference of a circle with the specified radius
-*/
-#define ACR_CIRCUMFERENCE(radius) (2*ACR_PI*radius)
+#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
 
 ////////////////////////////////////////////////////////////
 //
@@ -328,8 +365,8 @@ typedef enum ACR_DayOfWeek_e
 /** type for reference to a buffer.
     - never use malloc or free directly.
     - never use void pointers.
-    - always use ACR_Buffer_t and \see ACR_BUFFER defines for
-      easy and safe usage
+    - always use ACR_Buffer_t and \see ACR_BUFFER defines 
+      for easy and safe usage
 
     example:
 
@@ -352,7 +389,8 @@ typedef struct ACR_Buffer_s
     */
     ACR_Byte_t* m_Pointer;
 
-    /** length of the memory in bytes that m_Pointer points to
+    /** length of the memory in bytes
+        that m_Pointer points to
     */
     ACR_Length_t m_Length;
 
@@ -391,8 +429,8 @@ typedef struct ACR_Buffer_s
 /** type for reference to a buffer with variable length
     - never use malloc or free directly.
     - never use void pointers.
-    - always use ACR_VarBuffer_t and \see ACR_VAR_BUFFER defines
-    - for easy and safe usage
+    - always use ACR_VarBuffer_t and \see ACR_VAR_BUFFER
+      defines for easy and safe usage
 
     example:
 
@@ -527,7 +565,8 @@ typedef struct ACRVarBuffer_s
 
         do not use 0, ACR_INFO_EQUAL, or ACR_INFO_OK as
         a program or thread return code because they are
-        either confusing or will not have the intended results
+        either confusing or will not have the intended
+        results
 
         good example:        
         
@@ -543,7 +582,8 @@ typedef struct ACRVarBuffer_s
 
         // program or thread exit with no error
         // Note: this is a bad example because this non-zero
-        //       return value will be interpreted as an error
+        //       return value will be interpreted as an
+        //       error
         return ACR_INFO_OK;
 
 */
@@ -595,6 +635,46 @@ typedef enum ACR_Info_e
     ACR_INFO_COUNT
 
 } ACR_Info_t;
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - DECIMAL VALUES
+//
+////////////////////////////////////////////////////////////
+
+/** stores a decimal value
+*/
+typedef float ACR_Decimal_t;
+
+/** default tolerance for comparison of decimal values
+    \see ACR_DecimalCompare()
+*/
+#define ACR_DEFAULT_TOLERANCE 0.0001
+
+/** compare two decimal values
+    \param a
+    \param b
+    \param t the absolute value of the difference
+            between a and b where they will be assumed
+            to be equal values. use ACR_DEFAULT_TOLERANCE
+            if unsure
+    \returns - ACR_INFO_EQUAL if the decimals are equal
+               within the specified tolerance (t)
+             - ACR_INFO_LESS if a is less than b
+             - ACR_INFO_GREATER a is greater than b
+*/
+#define ACR_DECIMAL_TOLERANCE_COMPARE(a,b,t) (((a-t)>b)?ACR_INFO_GREATER:((a+t)<b)?ACR_INFO_LESS:ACR_INFO_EQUAL)
+#define ACR_DECIMAL_COMPARE(a,b) (ACR_DECIMAL_TOLERANCE_COMPARE(a,b,ACR_DEFAULT_TOLERANCE))
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - SIMPLE FORMULAS
+//
+////////////////////////////////////////////////////////////
+
+/** the circumference of a circle with the specified radius
+*/
+#define ACR_CIRCUMFERENCE(radius) (2*ACR_PI*radius)
 
 ////////////////////////////////////////////////////////////
 //
@@ -657,6 +737,7 @@ typedef unsigned long ACR_Unicode_t;
 // *** F ***
 #define ACR_INFO_STR_FALSE "false"
 #define ACR_INFO_STR_FIRST "first"
+#define ACR_DAY_STR_FRIDAY "fri"
 
 // *** G ***
 #define ACR_INFO_STR_GO "go"
@@ -678,6 +759,7 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_LESS "less"
 
 // *** M ***
+#define ACR_DAY_STR_MONDAY "mon"
 
 // *** N ***
 #define ACR_INFO_STR_NEW "new"
@@ -701,12 +783,16 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_RIGHT "right"
 
 // *** S ***
+#define ACR_DAY_STR_SATURDAY "sat"
 #define ACR_INFO_STR_START "start"
 #define ACR_INFO_STR_STOP "stop"
+#define ACR_DAY_STR_SUNDAY "sun"
 
 // *** T ***
+#define ACR_DAY_STR_THURSDAY "thurs"
 #define ACR_INFO_STR_TOP "top"
 #define ACR_INFO_STR_TRUE "true"
+#define ACR_DAY_STR_TUESDAY "tues"
 
 // *** U ***
 #define ACR_INFO_STR_UNKNOWN "unknown"
@@ -717,6 +803,7 @@ typedef unsigned long ACR_Unicode_t;
 
 // *** W ***
 #define ACR_INFO_STR_WAIT "wait"
+#define ACR_DAY_STR_WEDNESDAY "wed"
 
 // *** X ***
 // *** Y ***
@@ -730,7 +817,7 @@ typedef unsigned long ACR_Unicode_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** internal test of quick test of ACR library functions
+/** internal test of ACR library functions
     \returns ACR_INFO_OK or ACR_INFO_ERROR
 */
 ACR_Info_t ACR_Test(void);
@@ -758,20 +845,45 @@ ACR_Info_t ACR_InfoFromString(
 
 ////////////////////////////////////////////////////////////
 //
+// PUBLIC FUNCTIONS - TIME VALUES
+//
+////////////////////////////////////////////////////////////
+
+/** get the day of week value as a string
+    \param dayOfWeek the day of week value
+           \see enum ACR_DayOfWeek_e
+    \returns a reference to a string
+*/
+ACR_String_t ACR_DayOfWeekToString(
+    ACR_DayOfWeek_t dayOfWeek);
+
+/** get the day of week value from a string
+    \param src a reference to a string
+    \returns an info value from \see enum ACR_DayOfWeek_e or
+             ACR_DAY_OF_WEEK_UNKNOWN if not found
+*/
+ACR_DayOfWeek_t ACR_DayOfWeekFromString(
+    ACR_String_t src);
+
+////////////////////////////////////////////////////////////
+//
 // PUBLIC FUNCTIONS - SIMPLE UTF8 STRINGS
 //                    AND UNICODE CHARACTERS
 //
 ////////////////////////////////////////////////////////////
 
-/** convert a unicode charcter to its lower-case representation
+/** convert a unicode charcter to its lower-case
+    representation
 */
 ACR_Unicode_t ACR_UnicodeToLower(
     ACR_Unicode_t u);
 
 /** convert UTF8 encoded data to a unicode value
-    \param mem a valid pointer to the UTF8 encoded character in memory
-    \param bytes the number of bytes for this UTF8 encoded unicode value.
-            use ACR_UTF8_BYTE_COUNT(mem[0]) if unsure
+    \param mem a valid pointer to the UTF8 encoded character
+           in memory
+    \param bytes the number of bytes for this UTF8 encoded
+           unicode value. use ACR_UTF8_BYTE_COUNT(mem[0])
+           if unsure
     \returns the unicode value
 */
 ACR_Unicode_t ACR_Utf8ToUnicode(
@@ -780,9 +892,11 @@ ACR_Unicode_t ACR_Utf8ToUnicode(
 
 /** get a reference to a null-terminated string in memory 
     with support for UTF8 encoding
-    \param src a pointer to a null-terminated string in memory
+    \param src a pointer to a null-terminated string in
+           memory
     \param srcLength the max number of bytes from src this
-           function will search. use ACR_MAX_LENGTH if unsure
+           function will search. use ACR_MAX_LENGTH if
+           unsure
     \param maxCharacters the max number of characters this
            function will count. use ACR_MAX_COUNT if unsure
     \returns a string referennce
@@ -795,19 +909,23 @@ ACR_String_t ACR_StringFromMemory(
 /** compare a string to a null-terminated string in memory
     with support for UTF8 encoding
     \param string the known string to compare to
-    \param src a pointer to a null-terminated string in memory
+    \param src a pointer to a null-terminated string in
+           memory
     \param srcLength the max number of bytes from mem this
-           function will search. use ACR_MAX_LENGTH if unsure
+           function will search. use ACR_MAX_LENGTH if 
+           unsure
     \param maxCharacters the max number of characters this
-           function will compare. use ACR_MAX_COUNT if unsure
-    \param caseSensitive set to ACR_INFO_YES for case sensitive 
-           comparison (faster) or ACR_INFO_NO for case insensitive (slower)
+           function will compare. use ACR_MAX_COUNT if 
+           unsure
+    \param caseSensitive set to ACR_INFO_YES for 
+           case-sensitive comparison (faster) or ACR_INFO_NO
+           for case-insensitive (slower)
     \returns - ACR_INFO_EQUAL if the strings are equal up
                to maxCharacters
              - ACR_INFO_LESS if src has less characters or
                is less than string
-             - ACR_INFO_GREATER if src has more characters or
-               is greater than string
+             - ACR_INFO_GREATER if src has more characters
+               or is greater than string
              - ACR_INFO_INVALID if src is invalid
 */
 ACR_Info_t ACR_StringCompareToMemory(
@@ -816,5 +934,12 @@ ACR_Info_t ACR_StringCompareToMemory(
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters,
     ACR_Info_t caseSensitive);
+
+////////////////////////////////////////////////////////////
+//
+// PUBLIC FUNCTIONS - OTHER
+//
+////////////////////////////////////////////////////////////
+
 
 #endif
