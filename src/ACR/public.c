@@ -44,6 +44,9 @@
 */
 #include "ACR/public.h"
 
+/// \todo make utf8 emojis work
+#include <locale.h>
+
 /** info string lookup table
 */
 static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
@@ -152,7 +155,11 @@ ACR_Info_t ACR_Test(void)
     // SIMPLE UTF8 STRINGS
     ACR_String_t stringForInfoUp = ACR_StringFromMemory("up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
-    ACR_String_t stringForEmojiSmile = ACR_StringFromMemory("😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    ACR_String_t stringForEmojiSmile;
+
+    /// \todo make utf8 emojis work
+    //setlocale(LC_ALL, "en_US.utf8");
+    stringForEmojiSmile = ACR_StringFromMemory("😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
 
     //
     // ENDIANNESS
@@ -164,7 +171,12 @@ ACR_Info_t ACR_Test(void)
         {
             // ACR_IS_BIG_ENDIAN is not set properly or
             // ACR_BYTE_ORDER_16 is not working properly
+            ACR_DEBUG_PRINT(1, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
             return ACR_INFO_ERROR;
+        }
+        else
+        {
+            ACR_DEBUG_PRINT(2, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     else
@@ -174,13 +186,19 @@ ACR_Info_t ACR_Test(void)
         {
             // ACR_IS_BIG_ENDIAN is not set properly or
             // ACR_BYTE_ORDER_16 is not working properly
+            ACR_DEBUG_PRINT(3, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
             return ACR_INFO_ERROR;
+        }
+        else
+        {
+            ACR_DEBUG_PRINT(4, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     systemEndianValue = ACR_BYTE_ORDER_16(bigEndian);
     if(systemEndianValue != 0x0001)
     {
         // ACR_BYTE_ORDER_16 is not working properly
+        ACR_DEBUG_PRINT(5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         return ACR_INFO_ERROR;
     }
 
@@ -191,7 +209,12 @@ ACR_Info_t ACR_Test(void)
     if(byte != 0)
     {
         // ACR_MAX_BYTE value is incorrect
+        ACR_DEBUG_PRINT(6, "ERROR: ACR_MAX_BYTE value is incorrect");
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(7, "OK: ACR_MAX_BYTE value is %u", ACR_MAX_BYTE);
     }
 
     //
@@ -201,7 +224,12 @@ ACR_Info_t ACR_Test(void)
     if(length != 0)
     {
         // ACR_MAX_LENGTH value is incorrect
+        ACR_DEBUG_PRINT(8, "ERROR: ACR_MAX_LENGTH value is incorrect");
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(9, "OK: ACR_MAX_LENGTH value is %lu", ACR_MAX_LENGTH);
     }
 
     //
@@ -211,7 +239,12 @@ ACR_Info_t ACR_Test(void)
     if(count != 0)
     {
         // ACR_MAX_COUNT value is incorrect
+        ACR_DEBUG_PRINT(10, "ERROR: ACR_MAX_COUNT value is incorrect");
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(11, "OK: ACR_MAX_COUNT value is %lu", ACR_MAX_COUNT);
     }
 
     //
@@ -221,7 +254,12 @@ ACR_Info_t ACR_Test(void)
     {
         // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
         // or someone didn't know that Freedom Friday is still on a Tuesday
+        ACR_DEBUG_PRINT(12, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(13, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
     }
 
     //
@@ -230,23 +268,50 @@ ACR_Info_t ACR_Test(void)
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
     {
         // buffer length should have initialized to zero
+        ACR_DEBUG_PRINT(14, "ERROR: buffer length is %lu when it should be 0", buffer.m_Length);
         return ACR_INFO_ERROR;
     }
     ACR_BUFFER_ALLOC(buffer, 1000);
     if(ACR_BUFFER_GET_LENGTH(buffer) == 0)
     {
         // failed to allocate the buffer
-        return ACR_INFO_ERROR;
+        if(ACR_HAS_MALLOC != ACR_BOOL_FALSE)
+        {
+            ACR_DEBUG_PRINT(15, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
+            return ACR_INFO_ERROR;
+        }
+        else
+        {
+            ACR_DEBUG_PRINT(16, "OK: ACR_HAS_MALLOC is not defined so buffer length is 0");
+        }
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(17, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", buffer.m_Length);
     }
     ACR_BUFFER_FREE(buffer);
+    if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+    {
+        ACR_DEBUG_PRINT(18, "ERROR: ACR_BUFFER_FREE failed to free buffer memory");
+        return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(19, "OK: ACR_BUFFER_FREE freed buffer memory");
+    }
     
     //
     // DECIMAL VALUES
     //
-    if(ACR_DECIMAL_COMPARE(realNumber, 5.2) != ACR_INFO_EQUAL)
+    if(ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, 5.2, 0.0001) != ACR_INFO_EQUAL)
     {
-        // 5.1999 and 5.2 should have been equal using the default tolerance
+        // 5.1999 and 5.2 should have been equal using the tolerance
+        ACR_DEBUG_PRINT(20, "ERROR: ACR_DECIMAL_COMPARE should have found %0.4f to be equal to %0.4f", realNumber, 5.2);
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(21, "OK: ACR_DECIMAL_COMPARE found %0.4f is within %0.4f of %0.4f", realNumber, 0.0001, 5.2);
     }
 
     //
@@ -255,18 +320,29 @@ ACR_Info_t ACR_Test(void)
     if(infoFromUp != ACR_INFO_UP)
     {
         // incorrect value returned from "up"
+        ACR_DEBUG_PRINT(22, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(23, "OK: %.*s is ACR_INFO_UP", stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
     }
 
     if(stringForEmojiSmile.m_Count != 1)
     {
         // incorrect character count for string with emoki smile
+        ACR_DEBUG_PRINT(24, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
         return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(25, "OK: 😃 is a single character smile emoji");
     }
     
     //
     // ALL TESTS COMPLETE
     //
+    ACR_DEBUG_PRINT(26, "OK: All tests complete");
     return ACR_INFO_OK;
 }
 

@@ -43,34 +43,50 @@
     common functions and typedefs will also be predefined
     by this header.
 
-    Top uses:
+    --- Preprocessor Defines for Configuration Options ---
 
-    ACR_BYTE_ORDER_16   -   ensures a value is stored
-                            in big endian byte order
-    ACR_BYTE_ORDER_32   -   \see ACR_IS_BIG_ENDIAN
+    ACR_DEBUG           include debug tools
 
-    ACR_Buffer_t        -   a simple struct with macros
-                            to handle allocation and freeing
-                            of memory safely.
+    ACR_NO_MALLOC       do not include malloc or free
 
-    ACR_VarBuffer_t     -   a simple struct with macros to 
-                            handle allocation of memory
-                            safely while freeing memory only
-                            when necessary to grow the
-                            memory area.
+    ACR_BIG_ENDIAN      always use big endian without
 
-    ACR_String_t        -   a struct for access to strings
-                            with support for UTF8 encoding
+                        dynamically checking the system
+                        endianess
 
-    DECIMAL_COMPARE     -   compare decimal values within a
-                            tolerance
+    ACR_LITTLE_ENDIAN   always use little endian without
+                        dynamically checking the system
+                        endianess
+    --- Top Uses ---
+
+    ACR_DEBUG_PRINT     interface to printf() that only
+                        writes messages to stdout
+                        when ACR_DEBUG is defined in
+                        the preprocessor
+
+    ACR_BYTE_ORDER_16   ensures a value is stored
+                        in big endian byte order
+    ACR_BYTE_ORDER_32   \see ACR_IS_BIG_ENDIAN
+
+    ACR_Buffer_t        a simple struct with macros
+                        to handle allocation and freeing
+                        of memory safely.
+
+    ACR_VarBuffer_t     a simple struct with macros to 
+                        handle allocation of memory
+                        safely while freeing memory only
+                        when necessary to grow the
+                        memory area.
+
+    ACR_String_t        a struct for access to strings
+                        with support for UTF8 encoding
+
+    DECIMAL_COMPARE     compare decimal values within a
+                        tolerance
 
 */
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
-
-// included for malloc and free
-#include <stdlib.h>
 
 ////////////////////////////////////////////////////////////
 //
@@ -106,6 +122,10 @@
 */
 #define ACR_BOOL_FALSE 0
 
+/** represents a true boolean result
+*/
+#define ACR_BOOL_TRUE 1
+
 /** represents a null pointer.
     use this instead of 0 to clearly indicate the value
     is being used for a null pointer
@@ -124,6 +144,34 @@
 */
 #define ACR_NULL 0
 
+#define ACR_DEBUG
+
+// defines ACR_IS_DEBUG and ACR_DEBUG_PRINT such that
+// printed messages are only compiled if desired
+#ifdef ACR_DEBUG
+#define ACR_IS_DEBUG ACR_BOOL_TRUE
+// included for printf
+#include <stdio.h>
+#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, __VA_ARGS__)
+#else
+#define ACR_IS_DEBUG ACR_BOOL_FALSE
+#define ACR_DEBUG_PRINT(number, format, ...)
+#endif // #ifdef ACR_DEBUG
+
+// defines ACR_HAS_MALLOC and includes malloc() and free()
+// functions if desired
+#ifndef ACR_NO_MALLOC
+/** defined when malloc is available
+    Note: to remove malloc from this library define
+          ACR_NO_MALLOC in your preprocessor
+*/
+#define ACR_HAS_MALLOC ACR_BOOL_TRUE
+// included for malloc and free
+#include <stdlib.h>
+#else
+#define ACR_HAS_MALLOC ACR_BOOL_FALSE
+#endif // #ifndef ACR_NO_MALLOC
+
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - ENDIANNESS
@@ -136,8 +184,8 @@
 //           system then set the preprocessor define as
 //           follows to improve byte order handling
 //           performance.
-//           Big Endian:    ACR_IS_BIG_ENDIAN=1
-//           Little Endian: ACR_IS_BIG_ENDIAN=0
+//           Big Endian:    ACR_BIG_ENDIAN
+//           Little Endian: ACR_LITTLE_ENDIAN
 //
 // Sample memory:
 //
@@ -179,34 +227,71 @@
 //
 ////////////////////////////////////////////////////////////
 
+/** byte order swap of 16 bit value
+*/
+#define ACR_BYTE_ORDER_SWAP_16(x) (((((unsigned short)(x)) >> 8) & 0x00ff) | ((((unsigned short)(x)) & 0x00ff) << 8))
+
+/** byte order swap of 32 bit value
+*/
+#define ACR_BYTE_ORDER_SWAP_32(x) ((((unsigned long)(x) >> 24) & 0x000000ff) | (((unsigned long)(x) >> 8) & 0x0000ff00) | (((unsigned long)(x) << 8) & 0x00ff0000) | (((unsigned long)(x) << 24) & 0xff000000))
+
+//
+// defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
+// ACR_BOOL_FALSE
+//
+#ifdef ACR_BIG_ENDIAN
+/** the system is big endian because ACR_BIG_ENDIAN
+    was set in the preprocessor
+*/
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
+#else
+#ifdef ACR_LITTLE_ENDIAN
+/** the system is NOT big endian because ACR_LITTLE_ENDIAN
+    was set in the preprocessor
+*/
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
+#endif // #ifdef ACR_LITTLE_ENDIAN
+#endif // #ifdef ACR_BIG_ENDIAN
+
+//
+// defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
+// ACR_BOOL_FALSE if not previously defined
+//
 #ifndef ACR_IS_BIG_ENDIAN
 #ifdef BIG_ENDIAN
-#define ACR_IS_BIG_ENDIAN 1
+/** the system is big endian because BIG_ENDIAN
+    was set in the preprocessor
+*/
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
 #else
 #ifdef LITTLE_ENDIAN
-#define ACR_IS_BIG_ENDIAN 0
+/** the system is NOT big endian because LITTLE_ENDIAN
+    was set in the preprocessor
+*/
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
 #else
 #define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
-#define ACR_ENDIAN_DYNAMIC
+#define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
 #endif // #ifdef LITTLE_ENDIAN
 #endif // #ifdef BIG_ENDIAN
 #endif // #ifndef ACR_IS_BIG_ENDIAN
 
-#define ACR_BYTE_ORDER_SWAP_16(x) (((((unsigned short)(x)) >> 8) & 0x00ff) | ((((unsigned short)(x)) & 0x00ff) << 8))
-#define ACR_BYTE_ORDER_SWAP_32(x) ((((unsigned long)(x) >> 24) & 0x000000ff) | (((unsigned long)(x) >> 8) & 0x0000ff00) | (((unsigned long)(x) << 8) & 0x00ff0000) | (((unsigned long)(x) << 24) & 0xff000000))
-
+//
+// defines ACR_BYTE_ORDER_16 and ACR_BYTE_ORDER_32
+// to swap byte order to big endian when needed
+//
 #ifdef ACR_ENDIAN_DYNAMIC
 #define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_16(x):x)
 #define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_32(x):x)
 #else
-#if ACR_IS_BIG_ENDIAN == 0
+#if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
 #define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
 #define ACR_BYTE_ORDER_32(x) (ACR_BYTE_ORDER_SWAP_32(x))
 #else
 #define ACR_BYTE_ORDER_16(x) (x)
 #define ACR_BYTE_ORDER_32(x) (x)
-#endif
-#endif
+#endif // #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
+#endif // #ifdef ACR_ENDIAN_DYNAMIC
 
 ////////////////////////////////////////////////////////////
 //
@@ -404,21 +489,35 @@ typedef struct ACR_Buffer_s
 */
 #define ACR_BUFFER_GET_LENGTH(name) name.m_Length
 
-/** free memory used by the buffer
-*/
-#define ACR_BUFFER_FREE(name) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); name.m_Pointer = ACR_NULL; } name.m_Length = ACR_ZERO_LENGTH;
-
 /** assign memory to the buffer
     IMPORTANT: do not use ACR_BUFFER_FREE() after using
                ACR_BUFFER_REFERENCE()
 */
 #define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (ACR_Byte_t*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
 
+#ifdef ACR_HAS_MALLOC
+
+/** free memory used by the buffer
+*/
+#define ACR_BUFFER_FREE(name) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); name.m_Pointer = ACR_NULL; } name.m_Length = ACR_ZERO_LENGTH;
+
 /** allocate memory for the buffer
     IMPORTANT: do not use ACR_BUFFER_REFERENCE() after using
                ACR_BUFFER_ALLOC()
 */
 #define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = (ACR_Byte_t*)malloc(length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+
+#else
+
+/** free is not available
+*/
+#define  ACR_BUFFER_FREE(name)
+
+/** alloc is not available
+*/
+#define  ACR_BUFFER_ALLOC(name, length) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
+
+#endif // #ifdef ACR_HAS_MALLOC
 
 ////////////////////////////////////////////////////////////
 //
@@ -468,7 +567,7 @@ typedef struct ACR_Buffer_s
             return ACR_SUCCESS;
         }
 */
-typedef struct ACRVarBuffer_s
+typedef struct ACR_VarBuffer_s
 {
     ACR_Buffer_t m_Buffer;
     ACR_Length_t m_Length;
@@ -487,6 +586,8 @@ typedef struct ACRVarBuffer_s
 */
 #define ACR_VAR_BUFFER_GET_LENGTH(name) name.m_Length
 
+#ifdef ACR_HAS_MALLOC
+
 /** free memory used by the buffer
 */
 #define ACR_VAR_BUFFER_FREE(name) if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); name.m_Buffer.m_Pointer = ACR_NULL; } name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
@@ -494,6 +595,18 @@ typedef struct ACRVarBuffer_s
 /** allocate memory for the buffer only if needed
 */
 #define ACR_VAR_BUFFER_ALLOC(name, length) if(name.m_Buffer.m_Length < length){ if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); } name.m_Buffer.m_Pointer = (ACR_Byte_t*)malloc(length); if(name.m_Buffer.m_Pointer != ACR_NULL){ name.m_Buffer.m_Length = length; }else{ name.m_Buffer.m_Length = ACR_ZERO_LENGTH; } name.m_Length = name.m_Buffer.m_Length; }else{ name.m_Length = length; };
+
+#else
+
+/** free is not available
+*/
+#define  ACR_VAR_BUFFER_FREE(name)
+
+/** alloc is not available
+*/
+#define  ACR_VAR_BUFFER_ALLOC(name, length) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
+
+#endif // #ifdef ACR_HAS_MALLOC
 
 ////////////////////////////////////////////////////////////
 //
