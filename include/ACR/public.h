@@ -92,7 +92,12 @@
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
 
-#define ACR_DEBUG
+//#define ACR_DEBUG
+//#define ACR_NO_MALLOC
+//#define ACR_BIG_ENDIAN
+//#define ACR_LITTLE_ENDIAN
+//#define ACR_NO_TIME
+//#define ACR_NO_64BIT
 
 ////////////////////////////////////////////////////////////
 //
@@ -326,13 +331,22 @@
 #ifdef ACR_ENDIAN_DYNAMIC
 #define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_16(x):x)
 #define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_32(x):x)
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+#define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_64(x):x)
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 #else
 #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
 #define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
 #define ACR_BYTE_ORDER_32(x) (ACR_BYTE_ORDER_SWAP_32(x))
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+#define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 #else
 #define ACR_BYTE_ORDER_16(x) (x)
 #define ACR_BYTE_ORDER_32(x) (x)
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+#define ACR_BYTE_ORDER_64(x) (x)
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 #endif // #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
 #endif // #ifdef ACR_ENDIAN_DYNAMIC
 

@@ -161,9 +161,13 @@ ACR_Info_t ACR_Test(void)
 {
     // ENDIANNESS
     unsigned short systemEndianValue = 0x0001;
-    unsigned short systemEndianValue32 = 0x00000001;
     unsigned short bigEndian = ACR_BYTE_ORDER_16(systemEndianValue);
+    unsigned long systemEndianValue32 = 0x00000001UL;
     unsigned long bigEndian32 = ACR_BYTE_ORDER_32(systemEndianValue32);
+    #if ACR_USE_64BIT == ACR_BOOL_TRUE
+    unsigned long long systemEndianValue64 = 0x0000000000000001ULL;
+    unsigned long long bigEndian64 = ACR_BYTE_ORDER_64(systemEndianValue64);
+    #endif
     // BYTES
     ACR_Byte_t byte = ACR_MAX_BYTE;
     // MEMORY LENGTHS
@@ -185,6 +189,9 @@ ACR_Info_t ACR_Test(void)
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
     ACR_String_t stringForEmojiSmile;
 
+    // other
+    int messageNumber;
+
     #ifdef ACR_USE_UTF8_LOCALE
     setlocale(LC_ALL, "en_US.utf8");
     #endif
@@ -192,6 +199,7 @@ ACR_Info_t ACR_Test(void)
     //
     // ENDIANNESS
     //
+    messageNumber = 100;
     if(ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
         // system is little endian
@@ -199,12 +207,12 @@ ACR_Info_t ACR_Test(void)
         {
             // ACR_IS_BIG_ENDIAN is not set properly or
             // ACR_BYTE_ORDER_16 is not working properly
-            ACR_DEBUG_PRINT(1, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
             return ACR_INFO_ERROR;
         }
         else
         {
-            ACR_DEBUG_PRINT(2, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     else
@@ -214,102 +222,115 @@ ACR_Info_t ACR_Test(void)
         {
             // ACR_IS_BIG_ENDIAN is not set properly or
             // ACR_BYTE_ORDER_16 is not working properly
-            ACR_DEBUG_PRINT(3, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
             return ACR_INFO_ERROR;
         }
         else
         {
-            ACR_DEBUG_PRINT(4, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     systemEndianValue = ACR_BYTE_ORDER_16(bigEndian);
     if(systemEndianValue != 0x0001)
     {
         // ACR_BYTE_ORDER_16 is not working properly
-        ACR_DEBUG_PRINT(5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+        ACR_DEBUG_PRINT(messageNumber+5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         return ACR_INFO_ERROR;
     }
     systemEndianValue32 = ACR_BYTE_ORDER_32(bigEndian32);
-    if(systemEndianValue32 != 0x00000001)
+    if(systemEndianValue32 != 0x00000001UL)
     {
         // ACR_BYTE_ORDER_32 is not working properly
-        ACR_DEBUG_PRINT(5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_32 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+        ACR_DEBUG_PRINT(messageNumber+6, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_32 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         return ACR_INFO_ERROR;
     }
+    #if ACR_USE_64BIT == ACR_BOOL_TRUE
+    systemEndianValue64 = ACR_BYTE_ORDER_32(bigEndian64);
+    if(systemEndianValue32 != 0x0000000000000001ULL)
+    {
+        // ACR_BYTE_ORDER_64 is not working properly
+        ACR_DEBUG_PRINT(messageNumber+7, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_64 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+        return ACR_INFO_ERROR;
+    }
+    #endif
 
     //
     // BYTES
     //
+    messageNumber = 200;
     byte += 1;
     if(byte != 0)
     {
         // ACR_MAX_BYTE value is incorrect
-        ACR_DEBUG_PRINT(6, "ERROR: ACR_MAX_BYTE value is incorrect");
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_MAX_BYTE value is incorrect");
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(7, "OK: ACR_MAX_BYTE value is %u", ACR_MAX_BYTE);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_MAX_BYTE value is %u", ACR_MAX_BYTE);
     }
 
     //
     // MEMORY LENGTHS
     //
+    messageNumber = 300;
     length += 1;
     if(length != 0)
     {
         // ACR_MAX_LENGTH value is incorrect
-        ACR_DEBUG_PRINT(8, "ERROR: ACR_MAX_LENGTH value is incorrect");
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_MAX_LENGTH value is incorrect");
         return ACR_INFO_ERROR;
     }
     else
     {
         #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        ACR_DEBUG_PRINT(9, "OK: ACR_MAX_LENGTH value is %llu", ACR_MAX_LENGTH);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_MAX_LENGTH value is %llu", ACR_MAX_LENGTH);
         #else
-        ACR_DEBUG_PRINT(9, "OK: ACR_MAX_LENGTH value is %lu", ACR_MAX_LENGTH);
+        ACR_DEBUG_PRINT(messageNumber+3, "OK: ACR_MAX_LENGTH value is %lu", ACR_MAX_LENGTH);
         #endif
     }
 
     //
     // COUNTS
     //
+    messageNumber = 400;
     count += 1;
     if(count != 0)
     {
         // ACR_MAX_COUNT value is incorrect
-        ACR_DEBUG_PRINT(10, "ERROR: ACR_MAX_COUNT value is incorrect");
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_MAX_COUNT value is incorrect");
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(11, "OK: ACR_MAX_COUNT value is %lu", ACR_MAX_COUNT);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_MAX_COUNT value is %lu", ACR_MAX_COUNT);
     }
 
     //
     // DATE AND TIME VALUES
     //
+    messageNumber = 500;
     if(ACR_DayOfWeekFromString(dayOfWeekString) != ACR_DAY_TUESDAY)
     {
         // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
         // or someone didn't know that Freedom Friday is still on a Tuesday
-        ACR_DEBUG_PRINT(12, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(13, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
     }
 
     if(ACR_MonthFromString(monthString) != ACR_MONTH_MARCH)
     {
         // ACR_MonthToString() or ACR_MonthFromString() are not working
-        ACR_DEBUG_PRINT(12, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(13, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
     }
 
     ACR_DATETIME_NOW(dateTime);
@@ -318,15 +339,15 @@ ACR_Info_t ACR_Test(void)
         if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
         {
             #if ACR_HAS_RTC == ACR_BOOL_TRUE
-            ACR_DEBUG_PRINT(14, "ERROR: ACR_DATETIME_NOW did not provide time or date");
+            ACR_DEBUG_PRINT(messageNumber+5, "ERROR: ACR_DATETIME_NOW did not provide time or date");
             return ACR_INFO_ERROR;
             #else
-            ACR_DEBUG_PRINT(15, "OK: No RTC so ACR_DATETIME_NOW did not provide time or date");
+            ACR_DEBUG_PRINT(messageNumber+6, "OK: No RTC so ACR_DATETIME_NOW did not provide time or date");
             #endif
         }
         else
         {
-            ACR_DEBUG_PRINT(16, "ERROR: ACR_DATETIME_NOW did not provide time");
+            ACR_DEBUG_PRINT(messageNumber+7, "ERROR: ACR_DATETIME_NOW did not provide time");
             return ACR_INFO_ERROR;
         }
     }
@@ -334,14 +355,14 @@ ACR_Info_t ACR_Test(void)
     {
         if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
         {
-            ACR_DEBUG_PRINT(17, "ERROR: ACR_DATETIME_NOW did not provide date");
+            ACR_DEBUG_PRINT(messageNumber+8, "ERROR: ACR_DATETIME_NOW did not provide date");
             return ACR_INFO_ERROR;
         }
         else
         {
             monthString = ACR_MonthToString(ACR_DATETIME_MONTH(dateTime));
             dayOfWeekString = ACR_DayOfWeekToString(ACR_DATETIME_DAY_OF_WEEK(dateTime));
-            ACR_DEBUG_PRINT(18, "OK: ACR_DATETIME_NOW has provided date and time of %.*s %.*s %d %d %d:%02d:%02d",
+            ACR_DEBUG_PRINT(messageNumber+9, "OK: ACR_DATETIME_NOW has provided date and time of %.*s %.*s %d %d %d:%02d:%02d",
                 (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer,
                 (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer,
                 ACR_DATETIME_DAY(dateTime), ACR_DATETIME_YEAR(dateTime),
@@ -352,13 +373,14 @@ ACR_Info_t ACR_Test(void)
     //
     // SIMPLE MEMORY BUFFER
     //
+    messageNumber = 600;
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
     {
         // buffer length should have initialized to zero
         #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        ACR_DEBUG_PRINT(14, "ERROR: buffer length is %llu when it should be 0", buffer.m_Length);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: buffer length is %llu when it should be 0", buffer.m_Length);
         #else
-        ACR_DEBUG_PRINT(14, "ERROR: buffer length is %lu when it should be 0", buffer.m_Length);
+        ACR_DEBUG_PRINT(messageNumber+2, "ERROR: buffer length is %lu when it should be 0", buffer.m_Length);
         #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
         return ACR_INFO_ERROR;
     }
@@ -368,77 +390,80 @@ ACR_Info_t ACR_Test(void)
         // failed to allocate the buffer
         if(ACR_HAS_MALLOC != ACR_BOOL_FALSE)
         {
-            ACR_DEBUG_PRINT(15, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
+            ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
             return ACR_INFO_ERROR;
         }
         else
         {
-            ACR_DEBUG_PRINT(16, "OK: ACR_HAS_MALLOC is not defined so buffer length is 0");
+            ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_HAS_MALLOC is not defined so buffer length is 0");
         }
     }
     else
     {
         #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        ACR_DEBUG_PRINT(17, "OK: ACR_BUFFER_ALLOC allocated %llu bytes", buffer.m_Length);
+        ACR_DEBUG_PRINT(messageNumber+5, "OK: ACR_BUFFER_ALLOC allocated %llu bytes", buffer.m_Length);
         #else
-        ACR_DEBUG_PRINT(17, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", buffer.m_Length);
+        ACR_DEBUG_PRINT(messageNumber+6, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", buffer.m_Length);
         #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
     }
     ACR_BUFFER_FREE(buffer);
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
     {
-        ACR_DEBUG_PRINT(18, "ERROR: ACR_BUFFER_FREE failed to free buffer memory");
+        ACR_DEBUG_PRINT(messageNumber+7, "ERROR: ACR_BUFFER_FREE failed to free buffer memory");
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(19, "OK: ACR_BUFFER_FREE freed buffer memory");
+        ACR_DEBUG_PRINT(messageNumber+8, "OK: ACR_BUFFER_FREE freed buffer memory");
     }
     
     //
     // DECIMAL VALUES
     //
+    messageNumber = 700;
     if(ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, 5.2, 0.0001) != ACR_INFO_EQUAL)
     {
         // 5.1999 and 5.2 should have been equal using the tolerance
-        ACR_DEBUG_PRINT(20, "ERROR: ACR_DECIMAL_COMPARE should have found %0.4f to be equal to %0.4f", realNumber, 5.2);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_DECIMAL_COMPARE should have found %0.4f to be equal to %0.4f", realNumber, 5.2);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(21, "OK: ACR_DECIMAL_COMPARE found %0.4f is within %0.4f of %0.4f", realNumber, 0.0001, 5.2);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_DECIMAL_COMPARE found %0.4f is within %0.4f of %0.4f", realNumber, 0.0001, 5.2);
     }
 
     //
     // SIMPLE UTF8 STRINGS
     //
+    messageNumber = 800;
     if(infoFromUp != ACR_INFO_UP)
     {
         // incorrect value returned from "up"
-        ACR_DEBUG_PRINT(22, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(23, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
     }
 
     stringForEmojiSmile = ACR_StringFromMemory("Smile 😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     if(stringForEmojiSmile.m_Count != 7)
     {
         // incorrect character count for string with emoji smile
-        ACR_DEBUG_PRINT(24, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
+        ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(25, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+4, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
     }
     
     //
     // ALL TESTS COMPLETE
     //
-    ACR_DEBUG_PRINT(26, "OK: All tests complete");
+    messageNumber = 900;
+    ACR_DEBUG_PRINT(messageNumber+1, "OK: All tests complete");
     return ACR_INFO_OK;
 }
 
