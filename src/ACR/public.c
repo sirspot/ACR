@@ -264,7 +264,11 @@ ACR_Info_t ACR_Test(void)
     }
     else
     {
+        #if ACR_USE_64BIT == ACR_BOOL_TRUE
+        ACR_DEBUG_PRINT(9, "OK: ACR_MAX_LENGTH value is %llu", ACR_MAX_LENGTH);
+        #else
         ACR_DEBUG_PRINT(9, "OK: ACR_MAX_LENGTH value is %lu", ACR_MAX_LENGTH);
+        #endif
     }
 
     //
@@ -289,23 +293,23 @@ ACR_Info_t ACR_Test(void)
     {
         // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
         // or someone didn't know that Freedom Friday is still on a Tuesday
-        ACR_DEBUG_PRINT(12, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(12, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(13, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(13, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
     }
 
     if(ACR_MonthFromString(monthString) != ACR_MONTH_MARCH)
     {
         // ACR_MonthToString() or ACR_MonthFromString() are not working
-        ACR_DEBUG_PRINT(12, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(12, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(13, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(13, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
     }
 
     ACR_DATETIME_NOW(dateTime);
@@ -338,8 +342,8 @@ ACR_Info_t ACR_Test(void)
             monthString = ACR_MonthToString(ACR_DATETIME_MONTH(dateTime));
             dayOfWeekString = ACR_DayOfWeekToString(ACR_DATETIME_DAY_OF_WEEK(dateTime));
             ACR_DEBUG_PRINT(18, "OK: ACR_DATETIME_NOW has provided date and time of %.*s %.*s %d %d %d:%02d:%02d",
-                dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer,
-                monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer,
+                (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer,
+                (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer,
                 ACR_DATETIME_DAY(dateTime), ACR_DATETIME_YEAR(dateTime),
                 ACR_DATETIME_HOUR(dateTime), ACR_DATETIME_MIN(dateTime), ACR_DATETIME_SEC(dateTime));            
         }
@@ -351,7 +355,11 @@ ACR_Info_t ACR_Test(void)
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
     {
         // buffer length should have initialized to zero
+        #if ACR_USE_64BIT == ACR_BOOL_TRUE
+        ACR_DEBUG_PRINT(14, "ERROR: buffer length is %llu when it should be 0", buffer.m_Length);
+        #else
         ACR_DEBUG_PRINT(14, "ERROR: buffer length is %lu when it should be 0", buffer.m_Length);
+        #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
         return ACR_INFO_ERROR;
     }
     ACR_BUFFER_ALLOC(buffer, 1000);
@@ -370,7 +378,11 @@ ACR_Info_t ACR_Test(void)
     }
     else
     {
+        #if ACR_USE_64BIT == ACR_BOOL_TRUE
+        ACR_DEBUG_PRINT(17, "OK: ACR_BUFFER_ALLOC allocated %llu bytes", buffer.m_Length);
+        #else
         ACR_DEBUG_PRINT(17, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", buffer.m_Length);
+        #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
     }
     ACR_BUFFER_FREE(buffer);
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
@@ -403,12 +415,12 @@ ACR_Info_t ACR_Test(void)
     if(infoFromUp != ACR_INFO_UP)
     {
         // incorrect value returned from "up"
-        ACR_DEBUG_PRINT(22, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(22, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(23, "OK: %.*s is ACR_INFO_UP", stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(23, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
     }
 
     stringForEmojiSmile = ACR_StringFromMemory("Smile 😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
@@ -420,7 +432,7 @@ ACR_Info_t ACR_Test(void)
     }
     else
     {
-        ACR_DEBUG_PRINT(25, "OK: %.*s with a single character smile emoji", stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(25, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
     }
     
     //
