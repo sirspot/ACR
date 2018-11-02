@@ -183,7 +183,7 @@ ACR_Info_t ACR_Test(void)
     // SIMPLE MEMORY BUFFER
     ACR_BUFFER(buffer);
     // DECIMAL VALUES
-    ACR_Decimal_t realNumber = 5.1999;
+    ACR_Decimal_t realNumber = (ACR_Decimal_t)5.1999;
     // SIMPLE UTF8 STRINGS
     ACR_String_t stringForInfoUp = ACR_StringFromMemory("up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
@@ -200,6 +200,7 @@ ACR_Info_t ACR_Test(void)
     // ENDIANNESS
     //
     messageNumber = 100;
+	#pragma warning(suppress: 4127)
     if(ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
         // system is little endian
@@ -388,6 +389,7 @@ ACR_Info_t ACR_Test(void)
     if(ACR_BUFFER_GET_LENGTH(buffer) == 0)
     {
         // failed to allocate the buffer
+		#pragma warning(suppress: 4127)
         if(ACR_HAS_MALLOC != ACR_BOOL_FALSE)
         {
             ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
@@ -619,7 +621,7 @@ ACR_String_t ACR_StringFromMemory(
         ACR_Byte_t* srcPtr = (ACR_Byte_t*)src;
         while((remaining > 0) && (s.m_Count < maxCharacters) && ((*srcPtr) != 0))
         {
-            int bytes = ACR_UTF8_BYTE_COUNT((*srcPtr));
+			ACR_Length_t bytes = ACR_UTF8_BYTE_COUNT((*srcPtr));
             if(bytes > remaining)
             {
                 break;
@@ -645,10 +647,12 @@ ACR_Info_t ACR_StringCompareToMemory(
         ACR_Count_t count = 0;
         // 0 = string
         // 1 = src
-        ACR_Byte_t* srcPtr[2] = {string.m_Buffer.m_Pointer, (ACR_Byte_t*)src};
-        int bytes[2];
+		ACR_Byte_t* srcPtr[2];
+		ACR_Length_t bytes[2];
         int strIndex;
         ACR_Unicode_t c[2];
+		srcPtr[0] = string.m_Buffer.m_Pointer;
+		srcPtr[1] = (ACR_Byte_t*)src;
         while((srcLength > 0) && ((srcPtr[1][0]) != 0))
         {
             if(count == maxCharacters)
@@ -676,7 +680,7 @@ ACR_Info_t ACR_StringCompareToMemory(
             strIndex = 0;
             do
             {
-                c[strIndex] = ACR_Utf8ToUnicode(srcPtr[strIndex], bytes[strIndex]);
+                c[strIndex] = ACR_Utf8ToUnicode(srcPtr[strIndex], (int)bytes[strIndex]);
                 strIndex++;
             }
             while(strIndex < 2);

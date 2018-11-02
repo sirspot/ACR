@@ -1,4 +1,8 @@
 .vscode
+.vs
+*.tlog
+*.iobj
+*.ipdb
 
 # Prerequisites
 *.d

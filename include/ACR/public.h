@@ -536,7 +536,10 @@ typedef enum ACR_Month_e
 // functions if desired
 #ifndef ACR_NO_TIME
 #define ACR_HAS_RTC ACR_BOOL_TRUE
+#pragma warning(push)
+#pragma warning(disable:4820)
 #include <time.h>
+#pragma warning(pop)
 #else
 #define ACR_HAS_RTC ACR_BOOL_FALSE
 #endif
@@ -558,7 +561,7 @@ typedef struct tm ACR_DateTime_t;
     ACR_DATETIME_NOW(current);
 
 */
-#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); name = (*(gmtime(&temp)));}
+#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_s(&name,&temp);}
 
 #else
 
