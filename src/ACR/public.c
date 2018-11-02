@@ -44,8 +44,12 @@
 */
 #include "ACR/public.h"
 
-/// \todo make utf8 emojis work
+//#define ACR_USE_UTF8_LOCALE
+
+#ifdef ACR_USE_UTF8_LOCALE
+// included for setlocale
 #include <locale.h>
+#endif
 
 /** info string lookup table
 */
@@ -111,7 +115,7 @@ static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
     ""                      // ACR_INFO_COUNT
 };
 
-/** info string lookup table
+/** day of week string lookup table
 */
 static char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
 {
@@ -123,6 +127,25 @@ static char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
     ACR_DAY_STR_FRIDAY,     // ACR_DAY_FRIDAY
     ACR_DAY_STR_SATURDAY,   // ACR_DAY_SATURDAY 
     ""                      // ACR_DAY_COUNT
+};
+
+/** month string lookup table
+*/
+static char* g_ACRMonthStringLookup[ACR_MONTH_COUNT+1] =
+{
+    ACR_MONTH_STR_JANUARY,  // ACR_MONTH_JANUARY
+    ACR_MONTH_STR_FEBRUARY, // ACR_MONTH_FEBRUARY
+    ACR_MONTH_STR_MARCH,    // ACR_MONTH_MARCH
+    ACR_MONTH_STR_APRIL,    // ACR_MONTH_APRIL
+    ACR_MONTH_STR_MAY,      // ACR_MONTH_MAY
+    ACR_MONTH_STR_JUNE,     // ACR_MONTH_JUNE
+    ACR_MONTH_STR_JULY,     // ACR_MONTH_JULY
+    ACR_MONTH_STR_AUGUST,   // ACR_MONTH_AUGUST
+    ACR_MONTH_STR_SEPTEMBER,// ACR_MONTH_SEPTEMBER
+    ACR_MONTH_STR_OCTOBER,  // ACR_MONTH_OCTOBER
+    ACR_MONTH_STR_NOVEMBER, // ACR_MONTH_NOVEMBER
+    ACR_MONTH_STR_DECEMBER, // ACR_MONTH_DECEMBER
+    ""                      // ACR_MONTH_COUNT
 };
 
 ////////////////////////////////////////////////////////////
@@ -138,16 +161,21 @@ ACR_Info_t ACR_Test(void)
 {
     // ENDIANNESS
     unsigned short systemEndianValue = 0x0001;
+    unsigned short systemEndianValue32 = 0x00000001;
     unsigned short bigEndian = ACR_BYTE_ORDER_16(systemEndianValue);
+    unsigned long bigEndian32 = ACR_BYTE_ORDER_32(systemEndianValue32);
     // BYTES
     ACR_Byte_t byte = ACR_MAX_BYTE;
     // MEMORY LENGTHS
     ACR_Length_t length = ACR_MAX_LENGTH;
     // COUNTS
     ACR_Count_t count = ACR_MAX_COUNT;
-    // TIME VALUES
+    // DATE TIME VALUES
     ACR_DayOfWeek_t freedomFriday = ACR_DAY_TUESDAY;
     ACR_String_t dayOfWeekString = ACR_DayOfWeekToString(freedomFriday);
+    ACR_Month_t monthOfMarch = ACR_MONTH_MARCH;
+    ACR_String_t monthString = ACR_MonthToString(monthOfMarch);
+    ACR_DATETIME(dateTime);
     // SIMPLE MEMORY BUFFER
     ACR_BUFFER(buffer);
     // DECIMAL VALUES
@@ -157,9 +185,9 @@ ACR_Info_t ACR_Test(void)
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
     ACR_String_t stringForEmojiSmile;
 
-    /// \todo make utf8 emojis work
-    //setlocale(LC_ALL, "en_US.utf8");
-    stringForEmojiSmile = ACR_StringFromMemory("😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    #ifdef ACR_USE_UTF8_LOCALE
+    setlocale(LC_ALL, "en_US.utf8");
+    #endif
 
     //
     // ENDIANNESS
@@ -199,6 +227,13 @@ ACR_Info_t ACR_Test(void)
     {
         // ACR_BYTE_ORDER_16 is not working properly
         ACR_DEBUG_PRINT(5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_16 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+        return ACR_INFO_ERROR;
+    }
+    systemEndianValue32 = ACR_BYTE_ORDER_32(bigEndian32);
+    if(systemEndianValue32 != 0x00000001)
+    {
+        // ACR_BYTE_ORDER_32 is not working properly
+        ACR_DEBUG_PRINT(5, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_32 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         return ACR_INFO_ERROR;
     }
 
@@ -248,7 +283,7 @@ ACR_Info_t ACR_Test(void)
     }
 
     //
-    // TIME VALUES
+    // DATE AND TIME VALUES
     //
     if(ACR_DayOfWeekFromString(dayOfWeekString) != ACR_DAY_TUESDAY)
     {
@@ -260,6 +295,54 @@ ACR_Info_t ACR_Test(void)
     else
     {
         ACR_DEBUG_PRINT(13, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+    }
+
+    if(ACR_MonthFromString(monthString) != ACR_MONTH_MARCH)
+    {
+        // ACR_MonthToString() or ACR_MonthFromString() are not working
+        ACR_DEBUG_PRINT(12, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        return ACR_INFO_ERROR;
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(13, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+    }
+
+    ACR_DATETIME_NOW(dateTime);
+    if(ACR_DATETIME_HAS_TIME(dateTime) == ACR_BOOL_FALSE)
+    {
+        if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
+        {
+            #if ACR_HAS_RTC == ACR_BOOL_TRUE
+            ACR_DEBUG_PRINT(14, "ERROR: ACR_DATETIME_NOW did not provide time or date");
+            return ACR_INFO_ERROR;
+            #else
+            ACR_DEBUG_PRINT(15, "OK: No RTC so ACR_DATETIME_NOW did not provide time or date");
+            #endif
+        }
+        else
+        {
+            ACR_DEBUG_PRINT(16, "ERROR: ACR_DATETIME_NOW did not provide time");
+            return ACR_INFO_ERROR;
+        }
+    }
+    else
+    {
+        if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
+        {
+            ACR_DEBUG_PRINT(17, "ERROR: ACR_DATETIME_NOW did not provide date");
+            return ACR_INFO_ERROR;
+        }
+        else
+        {
+            monthString = ACR_MonthToString(ACR_DATETIME_MONTH(dateTime));
+            dayOfWeekString = ACR_DayOfWeekToString(ACR_DATETIME_DAY_OF_WEEK(dateTime));
+            ACR_DEBUG_PRINT(18, "OK: ACR_DATETIME_NOW has provided date and time of %.*s %.*s %d %d %d:%02d:%02d",
+                dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer,
+                monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer,
+                ACR_DATETIME_DAY(dateTime), ACR_DATETIME_YEAR(dateTime),
+                ACR_DATETIME_HOUR(dateTime), ACR_DATETIME_MIN(dateTime), ACR_DATETIME_SEC(dateTime));            
+        }
     }
 
     //
@@ -328,15 +411,16 @@ ACR_Info_t ACR_Test(void)
         ACR_DEBUG_PRINT(23, "OK: %.*s is ACR_INFO_UP", stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
     }
 
-    if(stringForEmojiSmile.m_Count != 1)
+    stringForEmojiSmile = ACR_StringFromMemory("Smile 😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    if(stringForEmojiSmile.m_Count != 7)
     {
-        // incorrect character count for string with emoki smile
+        // incorrect character count for string with emoji smile
         ACR_DEBUG_PRINT(24, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(25, "OK: 😃 is a single character smile emoji");
+        ACR_DEBUG_PRINT(25, "OK: %.*s with a single character smile emoji", stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
     }
     
     //
@@ -378,7 +462,7 @@ ACR_Info_t ACR_InfoFromString(
 
 ////////////////////////////////////////////////////////////
 //
-// PUBLIC FUNCTIONS - TIME VALUES
+// PUBLIC FUNCTIONS - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
 
@@ -406,6 +490,30 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
     return ACR_DAY_OF_WEEK_UNKNOWN;
 }
 
+ACR_String_t ACR_MonthToString(
+    ACR_Month_t month)
+{
+    return ACR_StringFromMemory(g_ACRMonthStringLookup[month], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+}
+
+ACR_Month_t ACR_MonthFromString(
+    ACR_String_t src)
+{
+    ACR_Count_t i = 0;
+    ACR_Info_t x;
+    do
+    {
+        x = ACR_StringCompareToMemory(src, g_ACRMonthStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
+        if(x == ACR_INFO_EQUAL)
+        {
+            return (ACR_Month_t)i;
+        }
+        i++;
+    }
+    while(i < ACR_INFO_COUNT);
+    return ACR_MONTH_UNKNOWN;
+}
+
 ////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS - SIMPLE UTF8 STRINGS
@@ -422,6 +530,20 @@ ACR_Unicode_t ACR_UnicodeToLower(
     if((u >= 65) && (u <= 90))
     {
         u += 32;
+    }
+
+    return u;
+}
+
+ACR_Unicode_t ACR_UnicodeToUpper(
+    ACR_Unicode_t u)
+{
+    /// \todo use a conversion table instead to handle additional unicode characters
+    
+    // handle ASCII characters
+    if((u >= 97) && (u <= 122))
+    {
+        u -= 32;
     }
 
     return u;

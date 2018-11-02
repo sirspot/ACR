@@ -47,16 +47,20 @@
 
     ACR_DEBUG           include debug tools
 
-    ACR_NO_MALLOC       do not include malloc or free
+    ACR_NO_MALLOC       do not include malloc() or free()
 
     ACR_BIG_ENDIAN      always use big endian without
-
                         dynamically checking the system
                         endianess
 
     ACR_LITTLE_ENDIAN   always use little endian without
                         dynamically checking the system
                         endianess
+
+    ACR_NO_TIME         do not include time()
+
+    ACR_NO_64BIT        do not use types of long long
+
     --- Top Uses ---
 
     ACR_DEBUG_PRINT     interface to printf() that only
@@ -88,11 +92,17 @@
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
 
+#define ACR_DEBUG
+#define ACR_NO_64BIT
+
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SYSTEM LEVEL
 //
 ////////////////////////////////////////////////////////////
+
+// included for memset()
+#include <string.h>
 
 /** represents a successful program or thread execution
 
@@ -144,7 +154,18 @@
 */
 #define ACR_NULL 0
 
-#define ACR_DEBUG
+// defines ACR_USE_64BIT
+#ifndef ACR_NO_64BIT
+#define ACR_USE_64BIT ACR_BOOL_TRUE
+#else
+#define ACR_USE_64BIT ACR_BOOL_FALSE
+#endif // #ifndef ACR_NO_64BIT
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - DEBUG
+//
+////////////////////////////////////////////////////////////
 
 // defines ACR_IS_DEBUG and ACR_DEBUG_PRINT such that
 // printed messages are only compiled if desired
@@ -157,6 +178,12 @@
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
 #define ACR_DEBUG_PRINT(number, format, ...)
 #endif // #ifdef ACR_DEBUG
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - MALLOC
+//
+////////////////////////////////////////////////////////////
 
 // defines ACR_HAS_MALLOC and includes malloc() and free()
 // functions if desired
@@ -229,11 +256,28 @@
 
 /** byte order swap of 16 bit value
 */
-#define ACR_BYTE_ORDER_SWAP_16(x) (((((unsigned short)(x)) >> 8) & 0x00ff) | ((((unsigned short)(x)) & 0x00ff) << 8))
+#define ACR_BYTE_ORDER_SWAP_16(x)   (((((unsigned short)(x)) & 0x00ff) << 8) | \
+                                     ((((unsigned short)(x)) & 0xff00) >> 8))
 
 /** byte order swap of 32 bit value
 */
-#define ACR_BYTE_ORDER_SWAP_32(x) ((((unsigned long)(x) >> 24) & 0x000000ff) | (((unsigned long)(x) >> 8) & 0x0000ff00) | (((unsigned long)(x) << 8) & 0x00ff0000) | (((unsigned long)(x) << 24) & 0xff000000))
+#define ACR_BYTE_ORDER_SWAP_32(x)   ((((unsigned long)(x) & 0x000000ffUL) << 24) | \
+                                     (((unsigned long)(x) & 0x0000ff00UL) <<  8) | \
+                                     (((unsigned long)(x) & 0x00ff0000UL) >>  8) | \
+                                     (((unsigned long)(x) & 0xff000000UL) >> 24))
+
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+
+#define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
+                                     (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
+                                     (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
+                                     (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
+                                     (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
+                                     (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
+                                     (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
+                                     (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
+
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 //
 // defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
@@ -321,7 +365,13 @@ typedef unsigned char ACR_Byte_t;
     \see ACR_MAX_LENGTH for the maximum value that can be
     stored by this data type
 */
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+// 64bit
+typedef unsigned long long ACR_Length_t;
+#else
+// 32bit
 typedef unsigned long ACR_Length_t;
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 /** represents zero length.
     use this instead of 0 to clearly indicate the value
@@ -343,7 +393,13 @@ typedef unsigned long ACR_Length_t;
 
 /** max value that can be stored by the ACR_Length_t type 
 */
-#define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFF
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+// 64bit
+#define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
+#else
+// 32bit
+#define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 ////////////////////////////////////////////////////////////
 //
@@ -441,6 +497,124 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_DAY_PER_WEEK ACR_DAY_COUNT
 #define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
 
+/** months of the year
+*/
+typedef enum ACR_Month_e
+{
+    ACR_MONTH_JANUARY = 0,
+    ACR_MONTH_FEBRUARY,
+    ACR_MONTH_MARCH,
+    ACR_MONTH_APRIL,
+    ACR_MONTH_MAY,
+    ACR_MONTH_JUNE,
+    ACR_MONTH_JULY,
+    ACR_MONTH_AUGUST,
+    ACR_MONTH_SEPTEMBER,
+    ACR_MONTH_OCTOBER,
+    ACR_MONTH_NOVEMBER,
+    ACR_MONTH_DECEMBER,
+    ACR_MONTH_COUNT
+} ACR_Month_t;
+
+#define ACR_MONTH_UNKNOWN ACR_MONTH_COUNT
+#define ACR_MONTH_PER_YEAR ACR_MONTH_COUNT
+
+// defines ACR_HAS_RTC and includes time()
+// functions if desired
+#ifndef ACR_NO_TIME
+#define ACR_HAS_RTC ACR_BOOL_TRUE
+#include <time.h>
+#else
+#define ACR_HAS_RTC ACR_BOOL_FALSE
+#endif
+
+#if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+/** time value
+*/
+typedef time_t ACR_Time_t;
+
+/** standard date time structure
+*/
+typedef struct tm ACR_DateTime_t;
+
+/** set the specified date time to the current date and time
+
+    example:
+    ACR_DATETIME(current);
+    ACR_DATETIME_NOW(current);
+
+*/
+#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); name = (*(gmtime(&temp)));}
+
+#else
+
+/** time value
+*/
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+// 64bit
+typedef unsigned long long ACR_Time_t;
+#else
+// 32bit
+typedef unsigned long ACR_Time_t;
+#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
+
+/** standard date time structure
+*/
+typedef struct ACR_DateTime_s {
+   int tm_sec;         /* seconds,  range 0 to 59          */
+   int tm_min;         /* minutes, range 0 to 59           */
+   int tm_hour;        /* hours, range 0 to 23             */
+   int tm_mday;        /* day of the month, range 1 to 31  */
+   int tm_mon;         /* month, range 0 to 11             */
+   int tm_year;        /* The number of years since 1900   */
+   int tm_wday;        /* day of the week, range 0 to 6    */
+   int tm_yday;        /* day in the year, range 0 to 365  */
+   int tm_isdst;       /* daylight saving time             */	
+} ACR_DateTime_t;
+
+/** RTC is not available so this macro just clears the date time
+*/
+#define ACR_DATETIME_NOW(name) memset(&name,ACR_EMPTY_VALUE,sizeof(ACR_DateTime_t));
+
+#endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+/** define an empty date time on the stack
+*/
+#define ACR_DATETIME(name) ACR_DateTime_t name = {ACR_EMPTY_VALUE};
+
+/** determine if the specified date time has the time data set
+
+    example:
+
+    ACR_DATETIME(dateTime);
+    if(ACR_DATETIME_HAS_TIME(dateTime) == ACR_BOOL_FALSE)
+    {
+        // no time value set
+    }
+*/
+#define ACR_DATETIME_HAS_TIME(name) ((name.tm_sec|name.tm_min|name.tm_hour) != 0)
+
+/** determine if the specified date time has the date data set
+
+    example:
+
+    ACR_DATETIME(dateTime);
+    if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
+    {
+        // no time value set
+    }
+*/
+#define ACR_DATETIME_HAS_DATE(name) ((name.tm_year|name.tm_mon|name.tm_mday) != 0)
+
+#define ACR_DATETIME_YEAR(name) (1900 + name.tm_year)
+#define ACR_DATETIME_MONTH(name) ((ACR_Month_t)name.tm_mon)
+#define ACR_DATETIME_DAY(name) (name.tm_mday)
+#define ACR_DATETIME_DAY_OF_WEEK(name) ((ACR_DayOfWeek_t)name.tm_wday)
+#define ACR_DATETIME_HOUR(name) (name.tm_hour)
+#define ACR_DATETIME_MIN(name) (name.tm_min)
+#define ACR_DATETIME_SEC(name) (name.tm_sec)
+
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SIMPLE MEMORY BUFFER
@@ -495,7 +669,7 @@ typedef struct ACR_Buffer_s
 */
 #define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (ACR_Byte_t*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
 
-#ifdef ACR_HAS_MALLOC
+#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 /** free memory used by the buffer
 */
@@ -511,13 +685,13 @@ typedef struct ACR_Buffer_s
 
 /** free is not available
 */
-#define  ACR_BUFFER_FREE(name)
+#define  ACR_BUFFER_FREE(name) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
 
 /** alloc is not available
 */
 #define  ACR_BUFFER_ALLOC(name, length) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
 
-#endif // #ifdef ACR_HAS_MALLOC
+#endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 ////////////////////////////////////////////////////////////
 //
@@ -586,7 +760,7 @@ typedef struct ACR_VarBuffer_s
 */
 #define ACR_VAR_BUFFER_GET_LENGTH(name) name.m_Length
 
-#ifdef ACR_HAS_MALLOC
+#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 /** free memory used by the buffer
 */
@@ -600,13 +774,13 @@ typedef struct ACR_VarBuffer_s
 
 /** free is not available
 */
-#define  ACR_VAR_BUFFER_FREE(name)
+#define  ACR_VAR_BUFFER_FREE(name) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
 
 /** alloc is not available
 */
 #define  ACR_VAR_BUFFER_ALLOC(name, length) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
 
-#endif // #ifdef ACR_HAS_MALLOC
+#endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 ////////////////////////////////////////////////////////////
 //
@@ -794,6 +968,16 @@ typedef float ACR_Decimal_t;
 // TYPES AND DEFINES - SIMPLE UTF8 STRINGS 
 //                     AND UNICODE CHARACTERS
 //
+// Note: for UTF8 to display properly in a Windows
+//       terminal you must use 
+//       "Windowes Powershell ISE"
+//       and first run this command:
+//       chcp
+//       followed by:
+//       $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+//       confirm the command worked:
+//       chcp (again) should return 65001
+//
 ////////////////////////////////////////////////////////////
 
 /** type for string data
@@ -829,6 +1013,8 @@ typedef unsigned long ACR_Unicode_t;
 
 // *** A ***
 #define ACR_INFO_STR_ACCEPT "accept"
+#define ACR_MONTH_STR_APRIL "april"
+#define ACR_MONTH_STR_AUGUST "august"
 
 // *** B ***
 #define ACR_INFO_STR_BEGIN "begin"
@@ -838,6 +1024,7 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_CURRENT "current"
 
 // *** D ***
+#define ACR_MONTH_STR_DECEMBER "december"
 #define ACR_INFO_STR_DISABLED "disabled"
 #define ACR_INFO_STR_DOWN "down"
 
@@ -849,8 +1036,9 @@ typedef unsigned long ACR_Unicode_t;
 
 // *** F ***
 #define ACR_INFO_STR_FALSE "false"
+#define ACR_MONTH_STR_FEBRUARY "february"
 #define ACR_INFO_STR_FIRST "first"
-#define ACR_DAY_STR_FRIDAY "fri"
+#define ACR_DAY_STR_FRIDAY "friday"
 
 // *** G ***
 #define ACR_INFO_STR_GO "go"
@@ -863,6 +1051,9 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_INVALID "invalid"
 
 // *** J ***
+#define ACR_MONTH_STR_JANUARY "january"
+#define ACR_MONTH_STR_JULY "july"
+#define ACR_MONTH_STR_JUNE "june"
 
 // *** K ***
 
@@ -872,15 +1063,19 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_LESS "less"
 
 // *** M ***
-#define ACR_DAY_STR_MONDAY "mon"
+#define ACR_MONTH_STR_MARCH "march"
+#define ACR_MONTH_STR_MAY "may"
+#define ACR_DAY_STR_MONDAY "monday"
 
 // *** N ***
 #define ACR_INFO_STR_NEW "new"
 #define ACR_INFO_STR_NEXT "next"
 #define ACR_INFO_STR_NO "no"
 #define ACR_INFO_STR_NOT_EQUAL "not_equal"
+#define ACR_MONTH_STR_NOVEMBER "november"
 
 // *** O ***
+#define ACR_MONTH_STR_OCTOBER "october"
 #define ACR_INFO_STR_OFF "off"
 #define ACR_INFO_STR_OK "ok"
 #define ACR_INFO_STR_OLD "old"
@@ -896,16 +1091,17 @@ typedef unsigned long ACR_Unicode_t;
 #define ACR_INFO_STR_RIGHT "right"
 
 // *** S ***
-#define ACR_DAY_STR_SATURDAY "sat"
+#define ACR_DAY_STR_SATURDAY "saturday"
+#define ACR_MONTH_STR_SEPTEMBER "september"
 #define ACR_INFO_STR_START "start"
 #define ACR_INFO_STR_STOP "stop"
-#define ACR_DAY_STR_SUNDAY "sun"
+#define ACR_DAY_STR_SUNDAY "sunday"
 
 // *** T ***
-#define ACR_DAY_STR_THURSDAY "thurs"
+#define ACR_DAY_STR_THURSDAY "thursday"
 #define ACR_INFO_STR_TOP "top"
 #define ACR_INFO_STR_TRUE "true"
-#define ACR_DAY_STR_TUESDAY "tues"
+#define ACR_DAY_STR_TUESDAY "tuesday"
 
 // *** U ***
 #define ACR_INFO_STR_UNKNOWN "unknown"
@@ -916,7 +1112,7 @@ typedef unsigned long ACR_Unicode_t;
 
 // *** W ***
 #define ACR_INFO_STR_WAIT "wait"
-#define ACR_DAY_STR_WEDNESDAY "wed"
+#define ACR_DAY_STR_WEDNESDAY "wednesday"
 
 // *** X ***
 // *** Y ***
@@ -958,7 +1154,7 @@ ACR_Info_t ACR_InfoFromString(
 
 ////////////////////////////////////////////////////////////
 //
-// PUBLIC FUNCTIONS - TIME VALUES
+// PUBLIC FUNCTIONS - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
 
@@ -972,10 +1168,26 @@ ACR_String_t ACR_DayOfWeekToString(
 
 /** get the day of week value from a string
     \param src a reference to a string
-    \returns an info value from \see enum ACR_DayOfWeek_e or
+    \returns a value from \see enum ACR_DayOfWeek_e or
              ACR_DAY_OF_WEEK_UNKNOWN if not found
 */
 ACR_DayOfWeek_t ACR_DayOfWeekFromString(
+    ACR_String_t src);
+
+/** get the month value as a string
+    \param month the month
+           \see enum ACR_Month_e
+    \returns a reference to a string
+*/
+ACR_String_t ACR_MonthToString(
+    ACR_Month_t month);
+
+/** get the month value from a string
+    \param src a reference to a string
+    \returns a value from \see enum ACR_Month_e or
+             ACR_MONTH_UNKNOWN if not found
+*/
+ACR_Month_t ACR_MonthFromString(
     ACR_String_t src);
 
 ////////////////////////////////////////////////////////////
@@ -989,6 +1201,12 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
     representation
 */
 ACR_Unicode_t ACR_UnicodeToLower(
+    ACR_Unicode_t u);
+
+/** convert a unicode charcter to its upper-case
+    representation
+*/
+ACR_Unicode_t ACR_UnicodeToUpper(
     ACR_Unicode_t u);
 
 /** convert UTF8 encoded data to a unicode value
