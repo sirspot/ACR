@@ -185,7 +185,7 @@ ACR_Info_t ACR_Test(void)
     // DECIMAL VALUES
     ACR_Decimal_t realNumber = (ACR_Decimal_t)5.1999;
     // SIMPLE UTF8 STRINGS
-    ACR_String_t stringForInfoUp = ACR_StringFromMemory("up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    ACR_String_t stringForInfoUp = ACR_StringFromMemory((ACR_Byte_t*)"up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
     ACR_String_t stringForEmojiSmile;
 
@@ -423,7 +423,7 @@ ACR_Info_t ACR_Test(void)
     // DECIMAL VALUES
     //
     messageNumber = 700;
-    if(ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, 5.2, 0.0001) != ACR_INFO_EQUAL)
+    if(ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, (ACR_Decimal_t)5.2, (ACR_Decimal_t)0.0001) != ACR_INFO_EQUAL)
     {
         // 5.1999 and 5.2 should have been equal using the tolerance
         ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_DECIMAL_COMPARE should have found %0.4f to be equal to %0.4f", realNumber, 5.2);
@@ -449,7 +449,7 @@ ACR_Info_t ACR_Test(void)
         ACR_DEBUG_PRINT(messageNumber+2, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
     }
 
-    stringForEmojiSmile = ACR_StringFromMemory("Smile 😃", ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    stringForEmojiSmile = ACR_StringFromMemory((ACR_Byte_t*)"Smile 🙂", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     if(stringForEmojiSmile.m_Count != 7)
     {
         // incorrect character count for string with emoji smile
@@ -478,7 +478,7 @@ ACR_Info_t ACR_Test(void)
 ACR_String_t ACR_InfoToString(
     ACR_Info_t info)
 {
-    return ACR_StringFromMemory(g_ACRInfoStringLookup[info], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRInfoStringLookup[info], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_Info_t ACR_InfoFromString(
@@ -488,7 +488,7 @@ ACR_Info_t ACR_InfoFromString(
     ACR_Info_t x;
     do
     {
-        x = ACR_StringCompareToMemory(src, g_ACRInfoStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
+        x = ACR_StringCompareToMemory(src, (const ACR_Byte_t*)g_ACRInfoStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
         if(x == ACR_INFO_EQUAL)
         {
             return (ACR_Info_t)i;
@@ -508,7 +508,7 @@ ACR_Info_t ACR_InfoFromString(
 ACR_String_t ACR_DayOfWeekToString(
     ACR_DayOfWeek_t dayOfWeek)
 {
-    return ACR_StringFromMemory(g_ACRDayOfWeekStringLookup[dayOfWeek], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRDayOfWeekStringLookup[dayOfWeek], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_DayOfWeek_t ACR_DayOfWeekFromString(
@@ -518,7 +518,7 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
     ACR_Info_t x;
     do
     {
-        x = ACR_StringCompareToMemory(src, g_ACRDayOfWeekStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
+        x = ACR_StringCompareToMemory(src, (const ACR_Byte_t*)g_ACRDayOfWeekStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
         if(x == ACR_INFO_EQUAL)
         {
             return (ACR_DayOfWeek_t)i;
@@ -532,7 +532,7 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
 ACR_String_t ACR_MonthToString(
     ACR_Month_t month)
 {
-    return ACR_StringFromMemory(g_ACRMonthStringLookup[month], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRMonthStringLookup[month], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_Month_t ACR_MonthFromString(
@@ -542,7 +542,7 @@ ACR_Month_t ACR_MonthFromString(
     ACR_Info_t x;
     do
     {
-        x = ACR_StringCompareToMemory(src, g_ACRMonthStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
+        x = ACR_StringCompareToMemory(src, (const ACR_Byte_t*)g_ACRMonthStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
         if(x == ACR_INFO_EQUAL)
         {
             return (ACR_Month_t)i;
@@ -559,6 +559,66 @@ ACR_Month_t ACR_MonthFromString(
 //                    AND UNICODE CHARACTERS
 //
 ////////////////////////////////////////////////////////////
+
+ACR_Info_t ACR_Utf8NextChar(
+        const ACR_Byte_t* mem,
+        ACR_Length_t memLength,
+        ACR_Length_t* pos)
+{
+    if((*pos) < memLength)
+    {
+        ACR_Byte_t c = mem[(*pos)];
+        if(c != 0)
+        {
+            ACR_Length_t p = (*pos) + ACR_UTF8_BYTE_COUNT(c);
+            if(p < memLength)
+            {
+                (*pos) = p;
+                return ACR_INFO_OK;
+            }
+        }
+        else
+        {
+            // already at end of string
+        }
+    }
+    return ACR_INFO_ERROR;
+}
+
+ACR_Info_t ACR_Utf8PrevChar(
+        const ACR_Byte_t* mem,
+        ACR_Length_t memLength,
+        ACR_Length_t* pos)
+{
+    if(((*pos) > 0) && ((*pos) < memLength))
+    {
+        ACR_Byte_t c;
+        (*pos) -= 1;
+        c = mem[(*pos)];
+        if((c & 0x80) == 0)
+        {
+            // [0xxxxxxx]
+            return ACR_INFO_OK;
+        }
+        else
+        {
+            // [1xxxxxxx]
+            while((c & 0x40) == 0)
+            {
+                // [?0xxxxxx]
+                if((*pos) == 0)
+                {
+                    return ACR_INFO_ERROR;
+                }
+                (*pos) -= 1;
+                c = mem[(*pos)];
+            }
+            // [?1xxxxxx]
+            return ACR_INFO_OK;
+        }
+    }
+    return ACR_INFO_ERROR;
+}
 
 ACR_Unicode_t ACR_UnicodeToLower(
     ACR_Unicode_t u)
@@ -589,7 +649,7 @@ ACR_Unicode_t ACR_UnicodeToUpper(
 }
 
 ACR_Unicode_t ACR_Utf8ToUnicode(
-    ACR_Byte_t* mem,
+    const ACR_Byte_t* mem,
     int bytes)
 {
     int offset = (bytes-1);
@@ -610,7 +670,7 @@ ACR_Unicode_t ACR_Utf8ToUnicode(
 }
 
 ACR_String_t ACR_StringFromMemory(
-    void* src,
+    ACR_Byte_t* src,
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters)
 {
@@ -618,7 +678,7 @@ ACR_String_t ACR_StringFromMemory(
     if(src != ACR_NULL)
     {
         ACR_Length_t remaining = srcLength;
-        ACR_Byte_t* srcPtr = (ACR_Byte_t*)src;
+        ACR_Byte_t* srcPtr = src;
         while((remaining > 0) && (s.m_Count < maxCharacters) && ((*srcPtr) != 0))
         {
 			ACR_Length_t bytes = ACR_UTF8_BYTE_COUNT((*srcPtr));
@@ -637,7 +697,7 @@ ACR_String_t ACR_StringFromMemory(
 
 ACR_Info_t ACR_StringCompareToMemory(
     ACR_String_t string,
-    void* src,
+    const ACR_Byte_t* src,
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters,
     ACR_Info_t caseSensitive)

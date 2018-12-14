@@ -679,6 +679,10 @@ typedef struct ACR_Buffer_s
 */
 #define ACR_BUFFER_GET_LENGTH(name) name.m_Length
 
+/** clear the buffer
+*/
+#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, ACR_EMPTY_VALUE, name.m_Length);
+
 /** assign memory to the buffer
     IMPORTANT: do not use ACR_BUFFER_FREE() after using
                ACR_BUFFER_REFERENCE()
@@ -1008,6 +1012,10 @@ typedef struct ACR_String_s
 */
 #define ACR_STRING(name) ACR_String_t name = {ACR_EMPTY_VALUE};
 
+/** assign memory to the string
+*/
+#define ACR_STRING_REFERENCE(name, memory, length, count) ACR_BUFFER_REFERENCE(name.m_Buffer, memory, length); name.m_Count = count;
+
 /** type for unicode characters
 */
 typedef unsigned long ACR_Unicode_t;
@@ -1137,6 +1145,14 @@ typedef unsigned long ACR_Unicode_t;
 // *** Z ***
 
 ////////////////////////////////////////////////////////////
+// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
+////////////////////////////////////////////////////////////
+#ifdef __cplusplus                                        //
+extern "C" {                                              //
+#endif                                                    //
+////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS - TEST
 //
@@ -1213,6 +1229,32 @@ ACR_Month_t ACR_MonthFromString(
 //
 ////////////////////////////////////////////////////////////
 
+/** selects the position of the next character
+  \param mem the start of the UTF8 encoded string data
+  \param memLength the length of mem (use ACR_MAX_LENGTH if unsure)
+  \param pos current byte offset into the string, which
+         will be updated to that of the next character if
+         successful
+  \returns ACR_INFO_OK or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_Utf8NextChar(
+        const ACR_Byte_t* mem,
+        ACR_Length_t memLength,
+        ACR_Length_t* pos);
+
+/** selects the position of the previous character
+  \param mem start of the UTF8 encoded string data
+  \param memLength the length of mem (use ACR_MAX_LENGTH if unsure)
+  \param pos current byte offset in the string, which will
+         be updated to that of the previous character if
+         successful
+  \returns ACR_INFO_OK or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_Utf8PrevChar(
+        const ACR_Byte_t* mem,
+        ACR_Length_t memLength,
+        ACR_Length_t* pos);
+
 /** convert a unicode charcter to its lower-case
     representation
 */
@@ -1234,7 +1276,7 @@ ACR_Unicode_t ACR_UnicodeToUpper(
     \returns the unicode value
 */
 ACR_Unicode_t ACR_Utf8ToUnicode(
-    ACR_Byte_t* mem,
+    const ACR_Byte_t* mem,
     int bytes);
 
 /** get a reference to a null-terminated string in memory 
@@ -1249,7 +1291,7 @@ ACR_Unicode_t ACR_Utf8ToUnicode(
     \returns a string referennce
 */
 ACR_String_t ACR_StringFromMemory(
-    void* src,
+    ACR_Byte_t* src,
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters);
 
@@ -1277,7 +1319,7 @@ ACR_String_t ACR_StringFromMemory(
 */
 ACR_Info_t ACR_StringCompareToMemory(
     ACR_String_t string,
-    void* src,
+    const ACR_Byte_t* src,
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters,
     ACR_Info_t caseSensitive);
@@ -1288,5 +1330,12 @@ ACR_Info_t ACR_StringCompareToMemory(
 //
 ////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////
+// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
+////////////////////////////////////////////////////////////
+#ifdef __cplusplus                                        //
+}                                                         //
+#endif                                                    //
+////////////////////////////////////////////////////////////
 
 #endif
