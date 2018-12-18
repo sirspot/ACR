@@ -315,23 +315,23 @@ ACR_Info_t ACR_Test(void)
     {
         // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
         // or someone didn't know that Freedom Friday is still on a Tuesday
-        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_DayOfWeekFromString(%.*s) did not return ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, (const char*)dayOfWeekString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_DayOfWeekFromString(%.*s) is ACR_DAY_TUESDAY", (int)dayOfWeekString.m_Buffer.m_Length, (const char*)dayOfWeekString.m_Buffer.m_Pointer);
     }
 
     if(ACR_MonthFromString(monthString) != ACR_MONTH_MARCH)
     {
         // ACR_MonthToString() or ACR_MonthFromString() are not working
-        ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_MonthFromString(%.*s) did not return ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, (const char*)monthString.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_MonthFromString(%.*s) is ACR_MONTH_MARCH", (int)monthString.m_Buffer.m_Length, (const char*)monthString.m_Buffer.m_Pointer);
     }
 
     ACR_DATETIME_NOW(dateTime);
@@ -364,8 +364,8 @@ ACR_Info_t ACR_Test(void)
             monthString = ACR_MonthToString(ACR_DATETIME_MONTH(dateTime));
             dayOfWeekString = ACR_DayOfWeekToString(ACR_DATETIME_DAY_OF_WEEK(dateTime));
             ACR_DEBUG_PRINT(messageNumber+9, "OK: ACR_DATETIME_NOW has provided date and time of %.*s %.*s %d %d %d:%02d:%02d",
-                (int)dayOfWeekString.m_Buffer.m_Length, dayOfWeekString.m_Buffer.m_Pointer,
-                (int)monthString.m_Buffer.m_Length, monthString.m_Buffer.m_Pointer,
+                (int)dayOfWeekString.m_Buffer.m_Length, (const char*)dayOfWeekString.m_Buffer.m_Pointer,
+                (int)monthString.m_Buffer.m_Length, (const char*)monthString.m_Buffer.m_Pointer,
                 ACR_DATETIME_DAY(dateTime), ACR_DATETIME_YEAR(dateTime),
                 ACR_DATETIME_HOUR(dateTime), ACR_DATETIME_MIN(dateTime), ACR_DATETIME_SEC(dateTime));            
         }
@@ -441,12 +441,12 @@ ACR_Info_t ACR_Test(void)
     if(infoFromUp != ACR_INFO_UP)
     {
         // incorrect value returned from "up"
-        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_InfoFromString(%.*s) did not find ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, (const char*)stringForInfoUp.m_Buffer.m_Pointer);
         return ACR_INFO_ERROR;
     }
     else
     {
-        ACR_DEBUG_PRINT(messageNumber+2, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, stringForInfoUp.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+2, "OK: %.*s is ACR_INFO_UP", (int)stringForInfoUp.m_Buffer.m_Length, (const char*)stringForInfoUp.m_Buffer.m_Pointer);
     }
 
     stringForEmojiSmile = ACR_StringFromMemory((ACR_Byte_t*)"Smile 🙂", ACR_MAX_LENGTH, ACR_MAX_COUNT);
@@ -458,7 +458,7 @@ ACR_Info_t ACR_Test(void)
     }
     else
     {
-        ACR_DEBUG_PRINT(messageNumber+4, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, stringForEmojiSmile.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(messageNumber+4, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, (const char*)stringForEmojiSmile.m_Buffer.m_Pointer);
     }
     
     //
@@ -590,7 +590,7 @@ ACR_Info_t ACR_Utf8PrevChar(
         ACR_Length_t memLength,
         ACR_Length_t* pos)
 {
-    if(((*pos) > 0) && ((*pos) < memLength))
+    if(((*pos) > 0) && ((*pos) <= memLength))
     {
         ACR_Byte_t c;
         (*pos) -= 1;
@@ -711,7 +711,7 @@ ACR_Info_t ACR_StringCompareToMemory(
 		ACR_Length_t bytes[2];
         int strIndex;
         ACR_Unicode_t c[2];
-		srcPtr[0] = string.m_Buffer.m_Pointer;
+        srcPtr[0] = (ACR_Byte_t*)string.m_Buffer.m_Pointer;
 		srcPtr[1] = (ACR_Byte_t*)src;
         while((srcLength > 0) && ((srcPtr[1][0]) != 0))
         {

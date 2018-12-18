@@ -156,7 +156,13 @@
         }
 
 */
+#ifdef __cplusplus
+#define ACR_NULL nullptr
+#endif
+
+#ifndef ACR_NULL
 #define ACR_NULL 0
+#endif
 
 // defines ACR_USE_64BIT
 #ifndef ACR_NO_64BIT
@@ -175,8 +181,12 @@
 // printed messages are only compiled if desired
 #ifdef ACR_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE
+#pragma warning(push)
+// disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
+#pragma warning(disable:4710)
 // included for printf
 #include <stdio.h>
+#pragma warning(pop)
 #define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, __VA_ARGS__)
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
@@ -537,6 +547,7 @@ typedef enum ACR_Month_e
 #ifndef ACR_NO_TIME
 #define ACR_HAS_RTC ACR_BOOL_TRUE
 #pragma warning(push)
+// disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
 #pragma warning(disable:4820)
 #include <time.h>
 #pragma warning(pop)
@@ -591,13 +602,13 @@ typedef struct ACR_DateTime_s {
 
 /** RTC is not available so this macro just clears the date time
 */
-#define ACR_DATETIME_NOW(name) memset(&name,ACR_EMPTY_VALUE,sizeof(ACR_DateTime_t));
+#define ACR_DATETIME_NOW(name) memset(&name,0,sizeof(ACR_DateTime_t));
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
 /** define an empty date time on the stack
 */
-#define ACR_DATETIME(name) ACR_DateTime_t name = {ACR_EMPTY_VALUE};
+#define ACR_DATETIME(name) ACR_DateTime_t name = {0};
 
 /** determine if the specified date time has the time data set
 
@@ -662,7 +673,7 @@ typedef struct ACR_Buffer_s
 {
     /** points to a memory location or ACR_NULL
     */
-    ACR_Byte_t* m_Pointer;
+    void* m_Pointer;
 
     /** length of the memory in bytes
         that m_Pointer points to
@@ -673,7 +684,7 @@ typedef struct ACR_Buffer_s
 
 /** define a buffer on the stack with the specified name
 */
-#define ACR_BUFFER(name) ACR_Buffer_t name = {ACR_EMPTY_VALUE};
+#define ACR_BUFFER(name) ACR_Buffer_t name = {0};
 
 /** get the length of the buffer
 */
@@ -681,13 +692,15 @@ typedef struct ACR_Buffer_s
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, ACR_EMPTY_VALUE, name.m_Length);
+#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, 0, name.m_Length);
 
 /** assign memory to the buffer
     IMPORTANT: do not use ACR_BUFFER_FREE() after using
-               ACR_BUFFER_REFERENCE()
+               ACR_BUFFER_REFERENCE() unless you want to
+               use it to free memory that you know was
+               previously allocated
 */
-#define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (ACR_Byte_t*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+#define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (void*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
@@ -697,9 +710,11 @@ typedef struct ACR_Buffer_s
 
 /** allocate memory for the buffer
     IMPORTANT: do not use ACR_BUFFER_REFERENCE() after using
-               ACR_BUFFER_ALLOC()
+               ACR_BUFFER_ALLOC() unless you want to
+               use it to free memory that you know was
+               previously allocated
 */
-#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = (ACR_Byte_t*)malloc(length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = (ACR_Length_t*)malloc(length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
 
 #else
 
@@ -741,7 +756,7 @@ typedef struct ACR_Buffer_s
                 // this buffer is safe to use with up to ACR_VAR_BUFFER_GET_MAX_LENGTH() bytes
                 // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
                 // copy some data to the buffer
-                text.m_Buffer.m_Pointer[0] = 'a';
+                /// \todo copy data to the buffer example
             }
 
             // now use 2 bytes without changing allocated memory
@@ -751,8 +766,7 @@ typedef struct ACR_Buffer_s
                 // this buffer is safe to use with up to ACR_VAR_BUFFER_GET_MAX_LENGTH() bytes
                 // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
                 // copy some data to the buffer
-                text.m_Buffer.m_Pointer[0] = 'a';
-                text.m_Buffer.m_Pointer[1] = 'b';
+                /// \todo copy data to the buffer example
             }
 
             // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
@@ -770,7 +784,7 @@ typedef struct ACR_VarBuffer_s
 /** define a variable sized buffer on the stack with the
     specified name
 */
-#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {ACR_EMPTY_VALUE};
+#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {0};
 
 /** get the max length of the buffer
 */
@@ -788,7 +802,7 @@ typedef struct ACR_VarBuffer_s
 
 /** allocate memory for the buffer only if needed
 */
-#define ACR_VAR_BUFFER_ALLOC(name, length) if(name.m_Buffer.m_Length < length){ if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); } name.m_Buffer.m_Pointer = (ACR_Byte_t*)malloc(length); if(name.m_Buffer.m_Pointer != ACR_NULL){ name.m_Buffer.m_Length = length; }else{ name.m_Buffer.m_Length = ACR_ZERO_LENGTH; } name.m_Length = name.m_Buffer.m_Length; }else{ name.m_Length = length; };
+#define ACR_VAR_BUFFER_ALLOC(name, length) if(name.m_Buffer.m_Length < length){ if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); } name.m_Buffer.m_Pointer = (void*)malloc(length); if(name.m_Buffer.m_Pointer != ACR_NULL){ name.m_Buffer.m_Length = length; }else{ name.m_Buffer.m_Length = ACR_ZERO_LENGTH; } name.m_Length = name.m_Buffer.m_Length; }else{ name.m_Length = length; };
 
 #else
 
@@ -1010,7 +1024,7 @@ typedef struct ACR_String_s
 
 /** define a string on the stack with the specified name
 */
-#define ACR_STRING(name) ACR_String_t name = {ACR_EMPTY_VALUE};
+#define ACR_STRING(name) ACR_String_t name = {0};
 
 /** assign memory to the string
 */
