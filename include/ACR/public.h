@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 Adam C. Rosenberg
+    Copyright (C) 2018 - 2019 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -92,13 +92,6 @@
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
 
-//#define ACR_DEBUG
-//#define ACR_NO_MALLOC
-//#define ACR_BIG_ENDIAN
-//#define ACR_LITTLE_ENDIAN
-//#define ACR_NO_TIME
-//#define ACR_NO_64BIT
-
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SYSTEM LEVEL
@@ -110,15 +103,25 @@
 
 /** represents a successful program or thread execution
 
-    example:
+	example:
 
-    int main()
-    {
-        return ACR_SUCCESS;
-    }
-    
+	int main()
+	{
+		return ACR_SUCCESS;
+	}
 */
 #define ACR_SUCCESS 0
+
+/** represents a failed program or thread execution
+
+	example:
+
+	int main()
+	{
+		return ACR_FAILURE;
+	}
+*/
+#define ACR_FAILURE -1
 
 /** represents a false boolean result
 
@@ -165,10 +168,10 @@
 #endif
 
 // defines ACR_USE_64BIT
-#ifndef ACR_NO_64BIT
-#define ACR_USE_64BIT ACR_BOOL_TRUE
-#else
+#ifdef ACR_NO_64BIT
 #define ACR_USE_64BIT ACR_BOOL_FALSE
+#else
+#define ACR_USE_64BIT ACR_BOOL_TRUE
 #endif // #ifndef ACR_NO_64BIT
 
 ////////////////////////////////////////////////////////////
@@ -328,6 +331,8 @@
 */
 #define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
 #else
+// Note: warning C4906: string literal cast to 'unsigned short *' must be
+//       ignored in project settings to use dynamic endianess detection
 #define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
 #define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
 #endif // #ifdef LITTLE_ENDIAN
@@ -648,6 +653,9 @@ typedef struct ACR_DateTime_s {
 //
 ////////////////////////////////////////////////////////////
 
+#pragma warning(push)
+// disable warning C4820: padding added after data member
+#pragma warning(disable:4820)
 /** type for reference to a buffer.
     - never use malloc or free directly.
     - never use void pointers.
@@ -681,10 +689,15 @@ typedef struct ACR_Buffer_s
     ACR_Length_t m_Length;
 
 } ACR_Buffer_t;
+#pragma warning(pop)
 
 /** define a buffer on the stack with the specified name
 */
 #define ACR_BUFFER(name) ACR_Buffer_t name = {0};
+
+/** determine if the buffer is valid
+*/
+#define ACR_BUFFER_IS_VALID(name) ((name.m_Pointer != ACR_NULL) && (name.m_Length > 0))
 
 /** get the length of the buffer
 */
@@ -692,7 +705,7 @@ typedef struct ACR_Buffer_s
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, 0, name.m_Length);
+#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, 0, (size_t)name.m_Length);
 
 /** assign memory to the buffer
     IMPORTANT: do not use ACR_BUFFER_FREE() after using
@@ -714,17 +727,17 @@ typedef struct ACR_Buffer_s
                use it to free memory that you know was
                previously allocated
 */
-#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = (ACR_Length_t*)malloc(length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = malloc((size_t)length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
 
 #else
 
 /** free is not available
 */
-#define  ACR_BUFFER_FREE(name) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
+#define ACR_BUFFER_FREE(name) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
 
 /** alloc is not available
 */
-#define  ACR_BUFFER_ALLOC(name, length) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
+#define ACR_BUFFER_ALLOC(name, length) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH;
 
 #endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
@@ -1014,6 +1027,9 @@ typedef float ACR_Decimal_t;
 //
 ////////////////////////////////////////////////////////////
 
+#pragma warning(push)
+// disable warning C4820: padding added after data member
+#pragma warning(disable:4820)
 /** type for string data
 */
 typedef struct ACR_String_s
@@ -1021,6 +1037,7 @@ typedef struct ACR_String_s
     ACR_Buffer_t m_Buffer;
     ACR_Count_t m_Count;
 } ACR_String_t;
+#pragma warning(pop)
 
 /** define a string on the stack with the specified name
 */
@@ -1168,14 +1185,17 @@ extern "C" {                                              //
 
 ////////////////////////////////////////////////////////////
 //
-// PUBLIC FUNCTIONS - TEST
+// PUBLIC FUNCTIONS
+//
+// Note: warning C4711: function selected for automatic inline expansion can be
+//       ignored in project settings to avoid unnecessary warnings for these function
 //
 ////////////////////////////////////////////////////////////
 
 /** internal test of ACR library functions
-    \returns ACR_INFO_OK or ACR_INFO_ERROR
+    \returns ACR_SUCCESS or ACR_FAILURE
 */
-ACR_Info_t ACR_Test(void);
+int ACR_Test(void);
 
 ////////////////////////////////////////////////////////////
 //

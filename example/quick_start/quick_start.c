@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 Adam C. Rosenberg
+    Copyright (C) 2018 - 2019 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -46,10 +46,6 @@
 
 int main(int argc, char** argv)
 {
-    if(ACR_Test() != ACR_INFO_OK)
-    {
-        // test failed
-    }
-
-    return ACR_SUCCESS;
+	int result = ACR_Test();
+    return result;
 }

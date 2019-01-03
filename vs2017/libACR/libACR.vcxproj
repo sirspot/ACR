@@ -77,9 +77,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <PreprocessorDefinitions>ACR_LITTLE_ENDIAN;ACR_NO_64BIT;ACR_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4711</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,7 +104,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>ACR_LITTLE_ENDIAN;ACR_NO_64BIT;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4711</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
