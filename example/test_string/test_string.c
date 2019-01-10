@@ -37,19 +37,15 @@
     ******************************************************
 
 */
-/** \file quick_start.c
-
-    application to run the built-in test function
+/** \file test_string.c
     
 */
-#include "ACR/public.h"
+#include "ACR/string.h"
 
 int main(int argc, char** argv)
 {
-	int result = ACR_Test();
-
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);
 
-    return result;
+	return ACR_SUCCESS;
 }

@@ -24,9 +24,27 @@
     <ClInclude Include="..\..\include\ACR\public.h">
       <Filter>Header Files\ACR</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\ACR\buffer.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\varbuffer.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\string.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ACR\public.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\buffer.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\varbuffer.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\string.c">
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
   </ItemGroup>

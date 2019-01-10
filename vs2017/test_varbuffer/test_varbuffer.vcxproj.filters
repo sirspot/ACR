@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="quick_start.c">
+    <ClCompile Include="..\..\example\test_varbuffer\test_varbuffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

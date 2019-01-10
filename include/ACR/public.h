@@ -140,6 +140,18 @@
 #define ACR_BOOL_FALSE 0
 
 /** represents a true boolean result
+
+	example:
+
+	if(ACR_BOOL_TRUE)
+	{
+		// always reaches this code
+	}
+	else
+	{
+		// never reaches this code
+	}
+
 */
 #define ACR_BOOL_TRUE 1
 
@@ -166,6 +178,10 @@
 #ifndef ACR_NULL
 #define ACR_NULL 0
 #endif
+
+/** explicitly states that a variable or parameter is not used
+*/
+#define ACR_UNUSED(arg) (void)arg
 
 // defines ACR_USE_64BIT
 #ifdef ACR_NO_64BIT
@@ -389,7 +405,7 @@ typedef unsigned char ACR_Byte_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** type for a typical length
+/** type for a typical length such as the size of a file
     \see ACR_MAX_LENGTH for the maximum value that can be
     stored by this data type
 */
@@ -435,7 +451,8 @@ typedef unsigned long ACR_Length_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** type for a typical count
+/** type for a typical count such as the number of items
+    in an array
     \see ACR_MAX_COUNT for the maximum value that can be
     stored by this data type
 */
@@ -656,26 +673,11 @@ typedef struct ACR_DateTime_s {
 #pragma warning(push)
 // disable warning C4820: padding added after data member
 #pragma warning(disable:4820)
-/** type for reference to a buffer.
-    - never use malloc or free directly.
-    - never use void pointers.
-    - always use ACR_Buffer_t and \see ACR_BUFFER defines 
-      for easy and safe usage
-
-    example:
-
-        int main()
-        {
-            ACR_BUFFER(text);
-            ACR_BUFFER_ALLOC(text, 255);
-            if(ACR_BUFFER_GET_LENGTH(text) > ACR_ZERO_LENGTH)
-            {
-                // this buffer is safe to use with
-                // up to ACR_BUFFER_GET_LENGTH() bytes
-            }
-            ACR_BUFFER_FREE(text);
-            return ACR_SUCCESS;
-        }
+/** type for reference to a memory area.
+    - prevents use of malloc and free directly.
+    - prevents use of void pointers without associated memory length
+	- include "ACR/buffer.h" for easy and safe functions
+	- see ACR_BUFFER defines for safe access via macros
 */
 typedef struct ACR_Buffer_s
 {
@@ -713,7 +715,7 @@ typedef struct ACR_Buffer_s
                use it to free memory that you know was
                previously allocated
 */
-#define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (void*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+#define ACR_BUFFER_REFERENCE(name, memory, length) name.m_Pointer = (void*)memory; if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; }
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
@@ -727,7 +729,7 @@ typedef struct ACR_Buffer_s
                use it to free memory that you know was
                previously allocated
 */
-#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = malloc((size_t)length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; };
+#define ACR_BUFFER_ALLOC(name, length) if(name.m_Pointer != ACR_NULL){ free(name.m_Pointer); } name.m_Pointer = malloc((size_t)length); if(name.m_Pointer != ACR_NULL){ name.m_Length = length; }else{ name.m_Length = ACR_ZERO_LENGTH; }
 
 #else
 
@@ -747,51 +749,16 @@ typedef struct ACR_Buffer_s
 //
 ////////////////////////////////////////////////////////////
 
-/** type for reference to a buffer with variable length
-    - never use malloc or free directly.
-    - never use void pointers.
-    - always use ACR_VarBuffer_t and \see ACR_VAR_BUFFER
-      defines for easy and safe usage
-
-    example:
-
-        int main()
-        {
-            ACR_VAR_BUFFER(text);
-
-            // example text length will never exceed 32 bytes
-            ACR_VAR_BUFFER_ALLOC(text, 32);
-            
-            // just use 1 byte without changing allocated memory
-            ACR_VAR_BUFFER_ALLOC(text, 1);
-            if(ACR_VAR_BUFFER_GET_MAX_LENGTH(text) >= 1)
-            {
-                // this buffer is safe to use with up to ACR_VAR_BUFFER_GET_MAX_LENGTH() bytes
-                // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
-                // copy some data to the buffer
-                /// \todo copy data to the buffer example
-            }
-
-            // now use 2 bytes without changing allocated memory
-            ACR_VAR_BUFFER_ALLOC(text, 2);
-            if(ACR_VAR_BUFFER_GET_MAX_LENGTH(text) >= 2)
-            {
-                // this buffer is safe to use with up to ACR_VAR_BUFFER_GET_MAX_LENGTH() bytes
-                // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
-                // copy some data to the buffer
-                /// \todo copy data to the buffer example
-            }
-
-            // use ACR_VAR_BUFFER_GET_LENGTH() to get the number of bytes in the buffer
-
-            ACR_BUFFER_FREE(text);
-            return ACR_SUCCESS;
-        }
+/** type for reference to a memory area with variable length
+	- prevents use of malloc and free directly.
+	- prevents use of void pointers without associated memory length
+	- include "ACR/varbuffer.h" for easy and safe functions
+	- see ACR_VAR_BUFFER defines for safe access via macros
 */
 typedef struct ACR_VarBuffer_s
 {
     ACR_Buffer_t m_Buffer;
-    ACR_Length_t m_Length;
+    ACR_Length_t m_MaxLength;
 } ACR_VarBuffer_t;
 
 /** define a variable sized buffer on the stack with the
@@ -801,31 +768,47 @@ typedef struct ACR_VarBuffer_s
 
 /** get the max length of the buffer
 */
-#define ACR_VAR_BUFFER_GET_MAX_LENGTH(name) name.m_Buffer.m_Length
+#define ACR_VAR_BUFFER_GET_MAX_LENGTH(name) name.m_MaxLength
 
 /** get the length of the buffer
 */
-#define ACR_VAR_BUFFER_GET_LENGTH(name) name.m_Length
+#define ACR_VAR_BUFFER_GET_LENGTH(name) name.m_Buffer.m_Length
+
+/** reset the buffer length to zero
+*/
+#define ACR_VAR_BUFFER_RESET(name) name.m_Buffer.m_Length = ACR_ZERO_LENGTH;
+
+/** set the length of the buffer up to the max length
+*/
+#define ACR_VAR_BUFFER_SET_LENGTH(name, length) if(length <= name.m_MaxLength){name.m_Buffer.m_Length = length;}
+
+/** append data to the buffer up to the max length
+*/
+#define ACR_VAR_BUFFER_APPEND(name, srcPtr, length) if(length <= (name.m_MaxLength - name.m_Buffer.m_Length)) { memcpy(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length, srcPtr, (size_t)length); name.m_Buffer.m_Length += length;}
+
+/** determine if the variable length buffer is valid
+*/
+#define ACR_VAR_BUFFER_IS_VALID(name) ((name.m_Buffer.m_Pointer != ACR_NULL) && (name.m_MaxLength > 0))
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 /** free memory used by the buffer
 */
-#define ACR_VAR_BUFFER_FREE(name) if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); name.m_Buffer.m_Pointer = ACR_NULL; } name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
+#define ACR_VAR_BUFFER_FREE(name) if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); name.m_Buffer.m_Pointer = ACR_NULL; } name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_MaxLength = ACR_ZERO_LENGTH;
 
 /** allocate memory for the buffer only if needed
 */
-#define ACR_VAR_BUFFER_ALLOC(name, length) if(name.m_Buffer.m_Length < length){ if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); } name.m_Buffer.m_Pointer = (void*)malloc(length); if(name.m_Buffer.m_Pointer != ACR_NULL){ name.m_Buffer.m_Length = length; }else{ name.m_Buffer.m_Length = ACR_ZERO_LENGTH; } name.m_Length = name.m_Buffer.m_Length; }else{ name.m_Length = length; };
+#define ACR_VAR_BUFFER_ALLOC(name, length) if(name.m_MaxLength < length){ if(name.m_Buffer.m_Pointer != ACR_NULL){ free(name.m_Buffer.m_Pointer); } name.m_Buffer.m_Pointer = (void*)malloc((size_t)length); if(name.m_Buffer.m_Pointer != ACR_NULL){ name.m_MaxLength = length; }else{ name.m_MaxLength = ACR_ZERO_LENGTH; } } name.m_Buffer.m_Length = ACR_ZERO_LENGTH;
 
 #else
 
 /** free is not available
 */
-#define  ACR_VAR_BUFFER_FREE(name) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
+#define  ACR_VAR_BUFFER_FREE(name) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_MaxLength = ACR_ZERO_LENGTH;
 
 /** alloc is not available
 */
-#define  ACR_VAR_BUFFER_ALLOC(name, length) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_Length = ACR_ZERO_LENGTH;
+#define  ACR_VAR_BUFFER_ALLOC(name, length) name.m_Buffer.m_Pointer = ACR_NULL; name.m_Buffer.m_Length = ACR_ZERO_LENGTH; name.m_MaxLength = ACR_ZERO_LENGTH;
 
 #endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 

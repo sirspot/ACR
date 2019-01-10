@@ -37,26 +37,26 @@
     ******************************************************
 
 */
-/** \file test_buffer.c
+/** \file test_varbuffer.c
 
     application to test buffer struct, macros, and functions
 
 */
-#include "ACR/buffer.h"
+#include "ACR/varbuffer.h"
 
 //
 // PROTOTYPES
 //
 
-/** simple example to use a buffer on the stack
+/** simple example to use a variable length buffer on the stack
 */
 int StackTest(void);
 
-/** simple example to use a buffer on the heap
+/** simple example to use a variable length buffer on the heap
 */
 int HeapTest(void);
 
-/** simple example to use a buffer at a low level
+/** simple example to use a variable length buffer at a low level
 */
 int LowLevelTest(void);
 
@@ -93,24 +93,29 @@ int main(int argc, char** argv)
 int StackTest(void)
 {
 	int result = ACR_SUCCESS;
-	ACR_Buffer_t buffer;
+	ACR_VarBuffer_t varbuffer;
 
-	ACR_BufferInit(&buffer);
-	if(ACR_BufferAllocate(&buffer, 5000) == ACR_INFO_OK)
+	ACR_VarBufferInit(&varbuffer);
+	if(ACR_VarBufferAllocate(&varbuffer, 5000) == ACR_INFO_OK)
 	{
 		//
-		// OK - 5000 byte buffer ready for use
+		// OK - 5000 byte buffer allocated
 		//
 
-		// optional step to clear the buffer
-		ACR_BufferClear(&buffer);
+		// set the length and clear the buffer
+		ACR_VarBufferSetLength(&varbuffer, 1000);
+		ACR_VarBufferClear(&varbuffer);
+
+		// set the length and append some data
+		ACR_VarBufferSetLength(&varbuffer, 0);
+		ACR_VarBufferAppend(&varbuffer, "data", 4);
 	}
 	else
 	{
 		// failed to allocate 5000 bytes
 		result = ACR_FAILURE;
 	}
-	ACR_BufferDeInit(&buffer);
+	ACR_VarBufferDeInit(&varbuffer);
 
 	return result;
 }
@@ -119,24 +124,29 @@ int StackTest(void)
 int HeapTest(void)
 {
 	int result = ACR_SUCCESS;
-	ACR_Buffer_t* bufferPtr;
+	ACR_VarBuffer_t* varbufferPtr;
 
-	ACR_BufferNew(&bufferPtr);
-	if(ACR_BufferAllocate(bufferPtr, 5000) == ACR_INFO_OK)
+	ACR_VarBufferNew(&varbufferPtr);
+	if(ACR_VarBufferAllocate(varbufferPtr, 5000) == ACR_INFO_OK)
 	{
 		//
 		// OK - 5000 byte buffer ready for use
 		//
 
-		// optional step to clear the buffer
-		ACR_BufferClear(bufferPtr);
+		// set the length and clear the buffer
+		ACR_VarBufferSetLength(varbufferPtr, 1000);
+		ACR_VarBufferClear(varbufferPtr);
+
+		// set the length and append some data
+		ACR_VarBufferSetLength(varbufferPtr, 0);
+		ACR_VarBufferAppend(varbufferPtr, "data", 4);
 	}
 	else
 	{
 		// failed to allocate 5000 bytes
 		result = ACR_FAILURE;
 	}
-	ACR_BufferDelete(&bufferPtr);
+	ACR_VarBufferDelete(&varbufferPtr);
 
 	return result;
 }
@@ -144,20 +154,25 @@ int HeapTest(void)
 /**********************************************************/
 int LowLevelTest(void)
 {
-	ACR_BUFFER(buffer);
+	ACR_VAR_BUFFER(varbuffer);
 
-	ACR_BUFFER_ALLOC(buffer, 5000);
-	if(ACR_BUFFER_IS_VALID(buffer))
+	ACR_VAR_BUFFER_ALLOC(varbuffer, 5000);
+	if(ACR_VAR_BUFFER_IS_VALID(varbuffer))
 	{
 		//
 		// OK - 5000 byte buffer ready for use
 		//
 
-		// optional step to clear the buffer
-		ACR_BUFFER_CLEAR(buffer);
+		// set the length and clear the buffer
+		ACR_VAR_BUFFER_SET_LENGTH(varbuffer, 1000);
+		ACR_BUFFER_CLEAR(varbuffer.m_Buffer);
+
+		// reset the length and append some data
+		ACR_VAR_BUFFER_RESET(varbuffer);
+		ACR_VAR_BUFFER_APPEND(varbuffer, "data", 4);
 
 		// done with the buffer
-		ACR_BUFFER_FREE(buffer);
+		ACR_VAR_BUFFER_FREE(varbuffer);
 	}
 	else
 	{
@@ -171,25 +186,26 @@ int LowLevelTest(void)
 /**********************************************************/
 int VerboseTest(void)
 {
-	ACR_BUFFER(buffer);
+	ACR_VAR_BUFFER(varbuffer);
 	ACR_Length_t testAllocateBytes = 5000;
 
 	ACR_DEBUG_PRINT(1, "TEST allocate %d bytes", (int)testAllocateBytes);
-	ACR_BUFFER_ALLOC(buffer, testAllocateBytes);
+	ACR_VAR_BUFFER_ALLOC(varbuffer, testAllocateBytes);
+
 	#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
-		if(ACR_BUFFER_GET_LENGTH(buffer) != testAllocateBytes)
+		if(ACR_VAR_BUFFER_GET_MAX_LENGTH(varbuffer) != testAllocateBytes)
 		{
-			ACR_DEBUG_PRINT(2, "FAIL buffer length is %d", (int)buffer.m_Length);
+			ACR_DEBUG_PRINT(2, "FAIL varbuffer max length is %d", (int)varbuffer.m_MaxLength);
 			return ACR_FAILURE;
 		}
 		else
 		{
-			ACR_DEBUG_PRINT(3, "PASS allocated %d bytes", (int)buffer.m_Length);
+			ACR_DEBUG_PRINT(3, "PASS allocated %d bytes", (int)varbuffer.m_MaxLength);
 		}
 	#else
-		if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+		if(ACR_VAR_BUFFER_GET_MAX_LENGTH(varbuffer) != 0)
 		{
-			ACR_DEBUG_PRINT(4, "FAIL buffer length is %d", (int)buffer.m_Length);
+			ACR_DEBUG_PRINT(4, "FAIL varbuffer max length is %d", (int)varbuffer.m_MaxLength);
 			return ACR_FAILURE;
 		}
 		else
@@ -197,17 +213,18 @@ int VerboseTest(void)
 			ACR_DEBUG_PRINT(5, "PASS malloc is not available");
 		}
 	#endif
-	ACR_DEBUG_PRINT(6, "TEST free %d bytes", (int)buffer.m_Length);
-	ACR_BUFFER_FREE(buffer);
 
-	if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+	ACR_DEBUG_PRINT(6, "TEST free %d bytes", (int)varbuffer.m_MaxLength);
+	ACR_VAR_BUFFER_FREE(varbuffer);
+
+	if(ACR_VAR_BUFFER_GET_MAX_LENGTH(varbuffer) != 0)
 	{
-		ACR_DEBUG_PRINT(7, "FAIL buffer length is %d", (int)buffer.m_Length);
+		ACR_DEBUG_PRINT(7, "FAIL varbuffer max length is %d", (int)varbuffer.m_MaxLength);
 		return ACR_FAILURE;
 	}
 	else
 	{
-		ACR_DEBUG_PRINT(8, "PASS buffer length is zero");
+		ACR_DEBUG_PRINT(8, "PASS varbuffer max length is zero");
 	}
 
 	return ACR_SUCCESS;
