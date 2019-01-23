@@ -80,7 +80,7 @@ void ACR_VarBufferDelete(
 
 		ACR_VarBufferDeInit((*mePtr));
 		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_VarBuffer_t));
-		ACR_BUFFER_FREE(buffer);
+		ACR_BUFFER_FORCE_FREE(buffer);
 		(*mePtr) = ACR_NULL;
 	}
 }
@@ -149,19 +149,26 @@ ACR_Info_t ACR_VarBufferAllocate(
 }
 
 /**********************************************************/
-ACR_Info_t ACR_VarBufferAppend(
+ACR_Info_t ACR_VarBufferRef(
 	ACR_VarBuffer_t* me,
-	void* srcPtr,
+	void* ptr,
 	ACR_Length_t length)
 {
-	if(me != ACR_NULL)
+	if(me == ACR_NULL)
 	{
-		if(length <= (me->m_MaxLength - me->m_Buffer.m_Length))
-		{
-			memcpy(((ACR_Byte_t*)me->m_Buffer.m_Pointer) + me->m_Buffer.m_Length, srcPtr, (size_t)length);
-			me->m_Buffer.m_Length += length;
-			return ACR_INFO_OK;
-		}
+		return ACR_INFO_ERROR;
+	}
+
+	if(length == 0)
+	{
+		ACR_VAR_BUFFER_FREE((*me));
+		return ACR_INFO_ERROR;
+	}
+
+	ACR_VAR_BUFFER_REFERENCE((*me), ptr, length);
+	if(ACR_VAR_BUFFER_IS_VALID((*me)))
+	{
+		return ACR_INFO_OK;
 	}
 
 	return ACR_INFO_ERROR;
@@ -184,6 +191,59 @@ ACR_Info_t ACR_VarBufferSetLength(
 
 	me->m_Buffer.m_Length = length;
 	return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t ACR_VarBufferAppend(
+	ACR_VarBuffer_t* me,
+	void* srcPtr,
+	ACR_Length_t length)
+{
+	if(me != ACR_NULL)
+	{
+		// do what ACR_VAR_BUFFER_APPEND does but with error checking
+		if(length <= (me->m_MaxLength - me->m_Buffer.m_Length))
+		{
+			if(srcPtr != ACR_NULL)
+			{
+				memcpy(((ACR_Byte_t*)me->m_Buffer.m_Pointer) + me->m_Buffer.m_Length, srcPtr, (size_t)length);
+			}
+			me->m_Buffer.m_Length += length;
+			return ACR_INFO_OK;
+		}
+	}
+
+	return ACR_INFO_ERROR;
+}
+
+/**********************************************************/
+ACR_Info_t ACR_VarBufferPrepend(
+	ACR_VarBuffer_t* me,
+	void* srcPtr,
+	ACR_Length_t length)
+{
+	if(me != ACR_NULL)
+	{
+		if(length <= (me->m_MaxLength - me->m_Buffer.m_Length))
+		{
+			if(me->m_Buffer.m_Length > 0)
+			{
+				me->m_Buffer.m_Length += length;
+				/// \todo shift
+			}
+			else
+			{
+				me->m_Buffer.m_Length += length;
+			}
+			if(srcPtr != ACR_NULL)
+			{
+				memcpy(((ACR_Byte_t*)me->m_Buffer.m_Pointer), srcPtr, (size_t)length);
+			}
+			return ACR_INFO_OK;
+		}
+	}
+
+	return ACR_INFO_ERROR;
 }
 
 /**********************************************************/

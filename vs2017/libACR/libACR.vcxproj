@@ -133,12 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\ACR\alignedbuffer.h" />
     <ClInclude Include="..\..\include\ACR\buffer.h" />
     <ClInclude Include="..\..\include\ACR\public.h" />
     <ClInclude Include="..\..\include\ACR\string.h" />
     <ClInclude Include="..\..\include\ACR\varbuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\ACR\alignedbuffer.c" />
     <ClCompile Include="..\..\src\ACR\buffer.c" />
     <ClCompile Include="..\..\src\ACR\public.c" />
     <ClCompile Include="..\..\src\ACR\string.c" />

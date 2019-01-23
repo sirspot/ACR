@@ -169,7 +169,7 @@ int LowLevelTest(void)
 
 		// reset the length and append some data
 		ACR_VAR_BUFFER_RESET(varbuffer);
-		ACR_VAR_BUFFER_APPEND(varbuffer, "data", 4);
+		ACR_VAR_BUFFER_APPEND(varbuffer, (void*)"data", 4);
 
 		// done with the buffer
 		ACR_VAR_BUFFER_FREE(varbuffer);

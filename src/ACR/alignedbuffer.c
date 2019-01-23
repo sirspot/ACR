@@ -37,12 +37,12 @@
     ******************************************************
 
 */
-/** \file string.c
+/** \file alignedbuffer.c
 
-    functions for access to the ACR_String_t type
+    functions for access to the ACR_AlignedBuffer_t type
 
 */
-#include "ACR/string.h"
+#include "ACR/alignedbuffer.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -51,62 +51,109 @@
 ////////////////////////////////////////////////////////////
 
 /**********************************************************/
-ACR_Info_t ACR_StringNew(
-	ACR_String_t** mePtr)
+ACR_Info_t ACR_AlignedBufferNew(
+	ACR_AlignedBuffer_t** mePtr)
 {
 	ACR_Info_t result = ACR_INFO_ERROR;
 	if(mePtr != ACR_NULL)
 	{
 		ACR_BUFFER(buffer);
 
-		ACR_BUFFER_ALLOC(buffer, sizeof(ACR_String_t));
+		ACR_BUFFER_ALLOC(buffer, sizeof(ACR_AlignedBuffer_t));
 		if(ACR_BUFFER_IS_VALID(buffer))
 		{
-			ACR_StringInit((ACR_String_t*)buffer.m_Pointer);
+			ACR_AlignedBufferInit((ACR_AlignedBuffer_t*)buffer.m_Pointer);
 			result = ACR_INFO_OK;
 		}
-		(*mePtr) = (ACR_String_t*)buffer.m_Pointer;
+		(*mePtr) = (ACR_AlignedBuffer_t*)buffer.m_Pointer;
 	}
 	return result;
 }
 
 /**********************************************************/
-void ACR_StringDelete(
-	ACR_String_t** mePtr)
+void ACR_AlignedBufferDelete(
+	ACR_AlignedBuffer_t** mePtr)
 {
 	if(mePtr != ACR_NULL)
 	{
 		ACR_BUFFER(buffer);
 
-		ACR_StringDeInit((*mePtr));
-		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_String_t));
+		ACR_AlignedBufferDeInit((*mePtr));
+		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_AlignedBuffer_t));
 		ACR_BUFFER_FORCE_FREE(buffer);
 		(*mePtr) = ACR_NULL;
 	}
 }
 
 /**********************************************************/
-void ACR_StringInit(
-	ACR_String_t* me)
+void ACR_AlignedBufferInit(
+	ACR_AlignedBuffer_t* me)
 {
 	if(me == ACR_NULL)
 	{
 		return;
 	}
 
-	me->m_Count = ACR_EMPTY_VALUE;
-	me->m_Buffer.m_Pointer = ACR_NULL;
-	me->m_Buffer.m_Length = ACR_ZERO_LENGTH;
+	me->m_UnalignedBuffer.m_Length = ACR_ZERO_LENGTH;
+	me->m_UnalignedBuffer.m_Pointer = ACR_NULL;
+	me->m_UnalignedBuffer.m_Flags = ACR_BUFFER_FLAGS_NONE;
+	me->m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH;
+	me->m_AlignedBuffer.m_Pointer = ACR_NULL;
+	me->m_AlignedBuffer.m_Flags = ACR_BUFFER_FLAGS_NONE;
 }
 
 /**********************************************************/
-void ACR_StringDeInit(
-	ACR_String_t* me)
+void ACR_AlignedBufferDeInit(
+	ACR_AlignedBuffer_t* me)
 {
 	if(me == ACR_NULL)
 	{
 		return;
 	}
 
-	ACR_BUFFER_FREE(me->m_Buffer);
+	ACR_ALIGNED_BUFFER_FREE((*me));
+}
+
+/**********************************************************/
+ACR_Info_t ACR_AlignedBufferRef(
+	ACR_AlignedBuffer_t* me,
+	void* ptr,
+	ACR_Length_t length)
+{
+	if(me == ACR_NULL)
+	{
+		return ACR_INFO_ERROR;
+	}
+
+	ACR_ALIGNED_BUFFER_REFERENCE((*me), ptr, length);
+	if(ACR_ALIGNED_BUFFER_IS_VALID((*me)))
+	{
+		return ACR_INFO_OK;
+	}
+
+	return ACR_INFO_ERROR;
+}
+
+/**********************************************************/
+ACR_Info_t ACR_AlignedBufferGet(
+	ACR_AlignedBuffer_t* me,
+	ACR_Buffer_t* buffer)
+{
+	if(me == ACR_NULL)
+	{
+		return ACR_INFO_ERROR;
+	}
+
+	if(buffer == ACR_NULL)
+	{
+		return ACR_INFO_ERROR;
+	}
+
+	if(ACR_ALIGNED_BUFFER_IS_VALID((*me)))
+	{
+		(*buffer) = me->m_AlignedBuffer;
+		return ACR_INFO_OK;
+	}
+
+	return ACR_INFO_ERROR;
 }

@@ -80,7 +80,7 @@ void ACR_BufferDelete(
 
 		ACR_BufferDeInit((*mePtr));
 		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_Buffer_t));
-		ACR_BUFFER_FREE(buffer);
+		ACR_BUFFER_FORCE_FREE(buffer);
 		(*mePtr) = ACR_NULL;
 	}
 }
@@ -96,6 +96,7 @@ void ACR_BufferInit(
 
 	me->m_Length = ACR_ZERO_LENGTH;
 	me->m_Pointer = ACR_NULL;
+	me->m_Flags = ACR_BUFFER_FLAGS_NONE;
 }
 
 /**********************************************************/
@@ -136,6 +137,32 @@ ACR_Info_t ACR_BufferAllocate(
 }
 
 /**********************************************************/
+ACR_Info_t ACR_BufferRef(
+	ACR_Buffer_t* me,
+	void* ptr,
+	ACR_Length_t length)
+{
+	if(me == ACR_NULL)
+	{
+		return ACR_INFO_ERROR;
+	}
+
+	if(length == 0)
+	{
+		ACR_BUFFER_FREE((*me));
+		return ACR_INFO_ERROR;
+	}
+
+	ACR_BUFFER_REFERENCE((*me), ptr, length);
+	if(ACR_BUFFER_IS_VALID((*me)))
+	{
+		return ACR_INFO_OK;
+	}
+
+	return ACR_INFO_ERROR;
+}
+
+/**********************************************************/
 void ACR_BufferClear(
 	ACR_Buffer_t* me)
 {
@@ -145,4 +172,38 @@ void ACR_BufferClear(
 	}
 
 	ACR_BUFFER_CLEAR((*me));
+}
+
+/**********************************************************/
+void ACR_BufferShiftLeft(
+	ACR_Buffer_t* me,
+	ACR_Length_t length)
+{
+	if(me == ACR_NULL)
+	{
+		return;
+	}
+
+	length = (length % me->m_Length);
+	if(length > 0)
+	{
+
+	}
+}
+
+/**********************************************************/
+void ACR_BufferShiftRight(
+	ACR_Buffer_t* me,
+	ACR_Length_t length)
+{
+	if(me == ACR_NULL)
+	{
+		return;
+	}
+
+	length = (length % me->m_Length);
+	if(length > 0)
+	{
+		
+	}
 }

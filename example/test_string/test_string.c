@@ -42,10 +42,43 @@
 */
 #include "ACR/string.h"
 
+//
+// PROTOTYPES
+//
+
+/** simple example to use a string on the stack
+*/
+int StackTest(void);
+
+//
+// MAIN
+//
+
 int main(int argc, char** argv)
 {
+	int result = ACR_SUCCESS;
+
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);
 
-	return ACR_SUCCESS;
+	result |= StackTest();
+
+	return result;
 }
+
+//
+// IMPLEMENTATION
+//
+
+/**********************************************************/
+int StackTest(void)
+{
+	int result = ACR_SUCCESS;
+	ACR_String_t str;
+
+	ACR_StringInit(&str);
+	ACR_StringDeInit(&str);
+
+	return result;
+}
+

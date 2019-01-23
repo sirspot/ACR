@@ -37,13 +37,13 @@
     ******************************************************
 
 */
-/** \file buffer.h
+/** \file alignedbuffer.h
 
-    functions for access to the ACR_Buffer_t type
+    functions for access to the ACR_AlignedBuffer_t type
 
 */
-#ifndef _ACR_BUFFER_H_
-#define _ACR_BUFFER_H_
+#ifndef _ACR_ALIGNEDBUFFER_H_
+#define _ACR_ALIGNEDBUFFER_H_
 
 #include "ACR/public.h"
 
@@ -61,86 +61,71 @@ extern "C" {                                              //
 //
 ////////////////////////////////////////////////////////////
 
-/** prepare a buffer allocated on the heap
-	Note: this automatically calls ACR_BufferInit() on the
+/** prepare an aligned buffer allocated on the heap
+	Note: this automatically calls ACR_AlignedBufferInit() on the
 	      new buffer after allocating its memory
 	\param mePtr location to store the pointer for the new buffer
 	\returns ACR_INFO_OK or ACR_INFO_ERROR
 
-	Note: memory for the buffer must be allocated
-		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferRef()
-		  before the buffer can be used effectively.
+	Note: this creates the buffer object but the
+	      memory for the buffer must be allocated
+		  by calling ACR_AlignedBufferAllocate() or
+		  referenced by calling ACR_AlignedBufferRef()
+		  before it can be used effectively.
 */
-ACR_Info_t ACR_BufferNew(
-	ACR_Buffer_t** mePtr);
+ACR_Info_t ACR_AlignedBufferNew(
+	ACR_AlignedBuffer_t** mePtr);
 
-/** free a buffer allocated on the heap
-    Note: this automatically calls ACR_BufferDeInit() on
-	      the buffer before freeing its memory
+/** free an aligned buffer allocated on the heap
 	\param mePtr location of the pointer for the buffer, which will
 	       be set to ACR_NULL after the memory is freed
+
+	Note: this automatically calls ACR_AlignedBufferDeInit() on
+		  the buffer before freeing its memory
 */
-void ACR_BufferDelete(
-	ACR_Buffer_t** mePtr);
+void ACR_AlignedBufferDelete(
+	ACR_AlignedBuffer_t** mePtr);
 
-/** prepare a buffer
-
+/** prepare an aligned buffer
+	
 	Note: memory for the buffer must be allocated
-		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferRef()
-		  before the buffer can be used effectively.
+	      by calling ACR_AlignedBufferAllocate() or
+		  referenced by calling ACR_AlignedBufferReference()
+		  before it can be used effectively.
 */
-void ACR_BufferInit(
-	ACR_Buffer_t* me);
+void ACR_AlignedBufferInit(
+	ACR_AlignedBuffer_t* me);
 
-/** free buffer memory
+/** free aligned buffer memory
 */
-void ACR_BufferDeInit(
-	ACR_Buffer_t* me);
+void ACR_AlignedBufferDeInit(
+	ACR_AlignedBuffer_t* me);
 
-/** allocate memory for the buffer
-	\param me the buffer
-	\param length value 1 to ACR_MAX_LENGTH
-	\returns ACR_INFO_OK or ACR_INFO_ERROR
-
-	IMPORTANT: if the buffer already has memory allocated,
-	           the memory will be freed before any new memory is allocated
-*/
-ACR_Info_t ACR_BufferAllocate(
-	ACR_Buffer_t* me,
-	ACR_Length_t length);
-
-/** use the specified memory for the buffer
-	\param me the buffer
+/** set aligned memory by reference
 	\param ptr pointer to the start of the memory to access
 	\length the length of the memory at ptr 1 to ACR_MAX_LENGTH
 	\returns ACR_INFO_OK or ACR_INFO_ERROR
 
-	IMPORTANT: if the buffer has memory allocated,
-			   the memory will be freed before the reference is set
+	Note: if the buffer already has memory allocated,
+	      the memory will be freed before the reference is set
 */
-ACR_Info_t ACR_BufferRef(
-	ACR_Buffer_t* me,
+ACR_Info_t ACR_AlignedBufferRef(
+	ACR_AlignedBuffer_t* me,
 	void* ptr,
 	ACR_Length_t length);
 
-/** clear the buffer by filling with ACR_EMPTY_VALUE
-*/
-void ACR_BufferClear(
-	ACR_Buffer_t* me);
+/** get a reference to the aligned buffer
+	\param me
+	\param buffer location to store a reference to the aligned memory
+	\returns ACR_INFO_OK or ACR_INFO_ERROR
 
-/** shift all data in the buffer to the left by the specified length
+	Note: the reference is only valid as long as the aligned buffer remains valid
+	      so it is best to call ACR_AlignedBufferGet() each time access to the
+		  aligned buffer is needed
 */
-void ACR_BufferShiftLeft(
-	ACR_Buffer_t* me,
-	ACR_Length_t length);
-
-/** shift all data in the buffer to the right by the specified length
-*/
-void ACR_BufferShiftRight(
-	ACR_Buffer_t* me,
-	ACR_Length_t length);
+ACR_Info_t ACR_AlignedBufferGet(
+	ACR_AlignedBuffer_t* me,
+	ACR_Buffer_t* buffer);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
