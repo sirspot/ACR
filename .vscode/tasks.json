@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "gcc build active file",
+            "label": "build active file",
             "command": "/usr/bin/gcc",
             "args": [
                 "-g",
@@ -18,17 +18,22 @@
         },
         {
             "type": "shell",
-            "label": "build quickstart",
+            "label": "build example quick_start debug",
             "command": "/usr/bin/gcc",
             "args": [
-                "-D", "GITPOD",
-                "-I", "${workspaceFolder}/include",
+                "-ggdb",
+                "-D",
+                "ACR_PLATFORM_GITPOD",
+                "-D",
+                "ACR_DEBUG",
+                "-I",
+                "${workspaceFolder}/include",
                 "${workspaceFolder}/src/ACR/public.c",
                 "${workspaceFolder}/example/quick_start/quick_start.c",
-                "-o", "${workspaceFolder}/quick_start"
+                "-o",
+                "${workspaceFolder}/bin/debug_quick_start"
             ]
         }
     ],
     "version": "2.0.0"
-    
 }

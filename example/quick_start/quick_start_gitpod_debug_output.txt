@@ -1,0 +1,13 @@
+ 104 OK: ACR_IS_BIG_ENDIAN is true
+ 202 OK: ACR_MAX_BYTE value is 255
+ 302 OK: ACR_MAX_LENGTH value is 18446744073709551615
+ 402 OK: ACR_MAX_COUNT value is 4294967294
+ 502 OK: ACR_DayOfWeekFromString(tuesday) is ACR_DAY_TUESDAY
+ 504 OK: ACR_MonthFromString(march) is ACR_MONTH_MARCH
+ 509 OK: ACR_DATETIME_NOW has provided date and time of tuesday may 19 2020 14:09:19
+ 605 OK: ACR_BUFFER_ALLOC allocated 1000 bytes
+ 608 OK: ACR_BUFFER_FREE freed buffer memory
+ 702 OK: ACR_DECIMAL_COMPARE found 5.1999 is within 0.0001 of 5.2000
+ 802 OK: up is ACR_INFO_UP
+ 804 OK: Smile 🙂 with a single character smile emoji
+ 901 OK: All tests complete

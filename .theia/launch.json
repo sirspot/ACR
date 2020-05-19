@@ -4,10 +4,10 @@
   "version": "0.2.0",
   "configurations": [
       {
-          "name": "(gdb) Quick Start",
+          "name": "debug example quick_start",
           "type": "cppdbg",
           "request": "launch",
-          "program": "${workspaceFolder}/quick_start",
+          "program": "${workspaceFolder}/bin/debug_quick_start",
           "args": [],
           "stopAtEntry": false,
           "cwd": "${workspaceFolder}",
@@ -20,7 +20,8 @@
                   "text": "-enable-pretty-printing",
                   "ignoreFailures": true
               }
-          ]
+          ],
+          "preLaunchTask": "build example quick_start debug",
       }
   ]
 }

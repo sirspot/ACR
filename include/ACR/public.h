@@ -152,28 +152,43 @@
            ACR_COMPILER_VS2017
        ACR_IDE_QTCREATOR
            ACR_COMPILER_VS2017
+
+    ACR_PLATFORM_GITPOD
+        ACR_IDE_THEIA
+            ACR_COMPILER_GCC
 */
 
 #ifdef ACR_PLATFORM_MAC
-#define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-#define ACR_PLATFORM_NAME "mac"
-#ifdef ACR_IDE_QTCREATOR
-#define ACR_HAS_IDE ACR_BOOL_TRUE
-#define ACR_IDE_NAME "qt_creator"
-#ifdef ACR_COMPILER_CLANG
-#define ACR_HAS_COMPILER ACR_BOOL_TRUE
-#define ACR_COMPILER_NAME "clang"
-#endif // ACR_COMPILER_CLANG
-#endif // ACR_IDE_QTCREATOR
-#ifdef ACR_IDE_XCODE
-#define ACR_HAS_IDE ACR_BOOL_TRUE
-#define ACR_IDE_NAME "xcode"
-#ifdef ACR_COMPILER_CLANG
-#define ACR_HAS_COMPILER ACR_BOOL_TRUE
-#define ACR_COMPILER_NAME "clang"
-#endif // ACR_COMPILER_CLANG
-#endif // ACR_IDE_XCODE
+    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+    #define ACR_PLATFORM_NAME "mac"
+    #ifdef ACR_IDE_QTCREATOR
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "qt_creator"
+        #ifdef ACR_COMPILER_CLANG
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "clang"
+        #endif // ACR_COMPILER_CLANG
+    #endif // ACR_IDE_QTCREATOR
+    #ifdef ACR_IDE_XCODE
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "xcode"
+        #ifdef ACR_COMPILER_CLANG
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "clang"
+        #endif // ACR_COMPILER_CLANG
+    #endif // ACR_IDE_XCODE
 #endif // ACR_PLATFORM_MAC
+
+#ifdef ACR_PLATFORM_GITPOD
+        #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+        #define ACR_PLATFORM_NAME "gitpod"
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_THEIA
+        #define ACR_IDE_NAME "theia"
+        #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+        #define ACR_COMPILER_GCC
+        #define ACR_COMPILER_NAME "gcc"
+#endif // ACR_PLATFORM_GITPOD
 
 #ifndef ACR_HAS_PLATFORM
 #define ACR_PLATFORM_UNKNOWN
@@ -290,7 +305,7 @@
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
 #endif
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, __VA_ARGS__)
+#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
 #define ACR_DEBUG_PRINT(number, format, ...)
@@ -549,9 +564,13 @@ typedef ACR_Length_t ACR_PointerValue_t;
 */
 typedef unsigned long ACR_Count_t;
 
-/** max value that can be stored by the ACR_Count_t type
+/** used for setting a count explicitly to zero
 */
-#define ACR_MAX_COUNT 4294967295UL // hex value 0xFFFF
+#define ACR_ZERO_COUNT 0
+
+/** max value that can be stored by the ACR_Count_t type such that it will not overflow when added to 1 (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
+*/
+#define ACR_MAX_COUNT 4294967294UL // hex value ‭0xFFFFFFFE‬
 
 ////////////////////////////////////////////////////////////
 //
@@ -725,6 +744,9 @@ typedef enum ACR_Month_e
 #ifdef ACR_COMPILER_CLANG
 #include <time.h>
 #endif
+#ifdef ACR_COMPILER_GCC
+#include <time.h>
+#endif
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
 // disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
@@ -757,6 +779,9 @@ typedef struct tm ACR_DateTime_t;
 #define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_s(&name,&temp);}
 #endif
 #ifdef ACR_COMPILER_CLANG
+#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_r(&temp,&name);}
+#endif
+#ifdef ACR_COMPILER_GCC
 #define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_r(&temp,&name);}
 #endif
 
@@ -794,7 +819,7 @@ typedef struct ACR_DateTime_s {
 
 /** define an empty date time on the stack
 */
-#define ACR_DATETIME(name) ACR_DateTime_t name = {0,0,0,0,0,0,0,0,0};
+#define ACR_DATETIME(name) ACR_DateTime_t name = {0};
 
 /** determine if the specified date time has the time data set
 
@@ -1396,7 +1421,7 @@ typedef struct ACR_String_s
 
 /** define a string on the stack with the specified name
 */
-#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_COUNT};
+#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_ZERO_COUNT};
 
 /** assign memory to the string
 */

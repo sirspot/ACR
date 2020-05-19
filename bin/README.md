@@ -1,0 +1,1 @@
+This folder stores binaries that are built by gitpod tasks. The binaries themselves are ignored but the folder is checked in so that it will always exist.

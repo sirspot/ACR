@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2019 Adam C. Rosenberg
+    Copyright (C) 2018 - 2020 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -190,7 +190,9 @@ int ACR_Test(void)
     ACR_String_t stringForEmojiSmile;
 
     // other
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     int messageNumber;
+    #endif
 
     #ifdef ACR_USE_UTF8_LOCALE
     setlocale(LC_ALL, "en_US.utf8");
@@ -199,10 +201,12 @@ int ACR_Test(void)
     //
     // ENDIANNESS
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 100;
-#ifdef ACR_COMPILER_VS2017
+    #endif
+    #ifdef ACR_COMPILER_VS2017
 	#pragma warning(suppress: 4127)
-#endif
+    #endif
     if(ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
         // system is little endian
@@ -260,7 +264,9 @@ int ACR_Test(void)
     //
     // BYTES
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 200;
+    #endif
     byte += 1;
     if(byte != 0)
     {
@@ -276,7 +282,9 @@ int ACR_Test(void)
     //
     // MEMORY LENGTHS
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 300;
+    #endif
     length += 1;
     if(length != 0)
     {
@@ -296,23 +304,27 @@ int ACR_Test(void)
     //
     // COUNTS
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 400;
+    #endif
     count += 1;
-    if(count != 0)
-    {
-        // ACR_MAX_COUNT value is incorrect
-        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_MAX_COUNT value is incorrect");
-        return ACR_FAILURE;
-    }
-    else
+    if(count > ACR_ZERO_COUNT)
     {
         ACR_DEBUG_PRINT(messageNumber+2, "OK: ACR_MAX_COUNT value is %lu", ACR_MAX_COUNT);
     }
+    else
+    {
+         // ACR_MAX_COUNT value is incorrect
+        ACR_DEBUG_PRINT(messageNumber+1, "ERROR: ACR_MAX_COUNT value is incorrect");
+        return ACR_FAILURE;
+   }
 
     //
     // DATE AND TIME VALUES
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 500;
+    #endif
     if(ACR_DayOfWeekFromString(dayOfWeekString) != ACR_DAY_TUESDAY)
     {
         // ACR_DayOfWeekToString() or ACR_DayOfWeekFromString() are not working
@@ -376,7 +388,9 @@ int ACR_Test(void)
     //
     // SIMPLE MEMORY BUFFER
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 600;
+    #endif
     if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
     {
         // buffer length should have initialized to zero
@@ -426,7 +440,9 @@ int ACR_Test(void)
     //
     // DECIMAL VALUES
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 700;
+    #endif
     if(ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, (ACR_Decimal_t)5.2, (ACR_Decimal_t)0.0001) != ACR_INFO_EQUAL)
     {
         // 5.1999 and 5.2 should have been equal using the tolerance
@@ -441,7 +457,9 @@ int ACR_Test(void)
     //
     // SIMPLE UTF8 STRINGS
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 800;
+    #endif
     if(infoFromUp != ACR_INFO_UP)
     {
         // incorrect value returned from "up"
@@ -468,7 +486,9 @@ int ACR_Test(void)
     //
     // ALL TESTS COMPLETE
     //
+    #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 900;
+    #endif
     ACR_DEBUG_PRINT(messageNumber+1, "OK: All tests complete");
     return ACR_SUCCESS;
 }

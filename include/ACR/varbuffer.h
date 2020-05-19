@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2019 Adam C. Rosenberg
+    Copyright (C) 2018 - 2020 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
