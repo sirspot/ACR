@@ -101,6 +101,8 @@ void ACR_AlignedBufferInit(
 void ACR_AlignedBufferDeInit(
 	ACR_AlignedBuffer_t* me);
 
+/// \todo ACR_AlignedBufferAllocate
+
 /** set aligned memory by reference
 	\param ptr pointer to the start of the memory to access
 	\length the length of the memory at ptr 1 to ACR_MAX_LENGTH

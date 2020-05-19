@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2019 Adam C. Rosenberg
+    Copyright (C) 2018 - 2020 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -94,6 +94,117 @@
 
 ////////////////////////////////////////////////////////////
 //
+// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE)
+//
+////////////////////////////////////////////////////////////
+
+/** represents a false boolean result
+
+    example:
+
+    if(ACR_BOOL_FALSE)
+    {
+        // never reaches this code
+    }
+    else
+    {
+        // always reaches this code
+    }
+
+*/
+#define ACR_BOOL_FALSE 0
+
+/** represents a true boolean result
+
+    example:
+
+    if(ACR_BOOL_TRUE)
+    {
+        // always reaches this code
+    }
+    else
+    {
+        // never reaches this code
+    }
+
+*/
+#define ACR_BOOL_TRUE 1
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - PLATFORM AND COMPILER
+//
+////////////////////////////////////////////////////////////
+
+/* The following preprocessor defines can be used to
+   automatically select the correct features for your
+   development environment
+
+   ACR_PLATFORM_MAC
+       ACR_IDE_XCODE
+           ACR_COMPILER_CLANG
+       ACR_IDE_QTCREATOR
+           ACR_COMPILER_CLANG
+
+   ACR_PLATFORM_WIN
+       ACR_IDE_VS2017
+           ACR_COMPILER_VS2017
+       ACR_IDE_QTCREATOR
+           ACR_COMPILER_VS2017
+*/
+
+#ifdef ACR_PLATFORM_MAC
+#define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+#define ACR_PLATFORM_NAME "mac"
+#ifdef ACR_IDE_QTCREATOR
+#define ACR_HAS_IDE ACR_BOOL_TRUE
+#define ACR_IDE_NAME "qt_creator"
+#ifdef ACR_COMPILER_CLANG
+#define ACR_HAS_COMPILER ACR_BOOL_TRUE
+#define ACR_COMPILER_NAME "clang"
+#endif // ACR_COMPILER_CLANG
+#endif // ACR_IDE_QTCREATOR
+#ifdef ACR_IDE_XCODE
+#define ACR_HAS_IDE ACR_BOOL_TRUE
+#define ACR_IDE_NAME "xcode"
+#ifdef ACR_COMPILER_CLANG
+#define ACR_HAS_COMPILER ACR_BOOL_TRUE
+#define ACR_COMPILER_NAME "clang"
+#endif // ACR_COMPILER_CLANG
+#endif // ACR_IDE_XCODE
+#endif // ACR_PLATFORM_MAC
+
+#ifndef ACR_HAS_PLATFORM
+#define ACR_PLATFORM_UNKNOWN
+#define ACR_HAS_PLATFORM ACR_BOOL_FALSE
+#define ACR_PLATFORM_NAME "unknown"
+#endif
+
+#ifndef ACR_HAS_COMPILER
+#define ACR_COMPILER_UNKNOWN
+#define ACR_HAS_COMPILER ACR_BOOL_FALSE
+#define ACR_COMPILER_NAME "unknown"
+#endif
+
+#ifndef ACR_HAS_IDE
+#define ACR_IDE_UNKNOWN
+#define ACR_HAS_IDE ACR_BOOL_FALSE
+#define ACR_IDE_NAME "unknown"
+#endif
+
+#if ACR_HAS_COMPILER == ACR_BOOL_FALSE
+// compiler is unknown
+
+// cannot include time
+#define ACR_NO_TIME
+
+// cannot use 64bit
+#define ACR_NO_64BIT
+
+#endif
+
+////////////////////////////////////////////////////////////
+//
 // TYPES AND DEFINES - SYSTEM LEVEL
 //
 ////////////////////////////////////////////////////////////
@@ -122,38 +233,6 @@
 	}
 */
 #define ACR_FAILURE -1
-
-/** represents a false boolean result
-
-    example:
-
-    if(ACR_BOOL_FALSE)
-    {
-        // never reaches this code
-    }
-    else
-    {
-        // always reaches this code
-    }
-
-*/
-#define ACR_BOOL_FALSE 0
-
-/** represents a true boolean result
-
-	example:
-
-	if(ACR_BOOL_TRUE)
-	{
-		// always reaches this code
-	}
-	else
-	{
-		// never reaches this code
-	}
-
-*/
-#define ACR_BOOL_TRUE 1
 
 /** represents a null pointer.
     use this instead of 0 to clearly indicate the value
@@ -200,12 +279,16 @@
 // printed messages are only compiled if desired
 #ifdef ACR_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
 // disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
 #pragma warning(disable:4710)
+#endif
 // included for printf
 #include <stdio.h>
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
+#endif
 #define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, __VA_ARGS__)
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
@@ -638,11 +721,16 @@ typedef enum ACR_Month_e
 // functions if desired
 #ifndef ACR_NO_TIME
 #define ACR_HAS_RTC ACR_BOOL_TRUE
+#ifdef ACR_COMPILER_CLANG
+#include <time.h>
+#endif
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
 // disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
 #pragma warning(disable:4820)
 #include <time.h>
 #pragma warning(pop)
+#endif
 #else
 #define ACR_HAS_RTC ACR_BOOL_FALSE
 #endif
@@ -664,7 +752,12 @@ typedef struct tm ACR_DateTime_t;
     ACR_DATETIME_NOW(current);
 
 */
+#ifdef ACR_COMPILER_VS2017
 #define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_s(&name,&temp);}
+#endif
+#ifdef ACR_COMPILER_CLANG
+#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_r(&temp,&name);}
+#endif
 
 #else
 
@@ -681,7 +774,7 @@ typedef unsigned long ACR_Time_t;
 /** standard date time structure
 */
 typedef struct ACR_DateTime_s {
-   int tm_sec;         /* seconds,  range 0 to 59          */
+   int tm_sec;         /* seconds, range 0 to 59          */
    int tm_min;         /* minutes, range 0 to 59           */
    int tm_hour;        /* hours, range 0 to 23             */
    int tm_mday;        /* day of the month, range 1 to 31  */
@@ -700,7 +793,7 @@ typedef struct ACR_DateTime_s {
 
 /** define an empty date time on the stack
 */
-#define ACR_DATETIME(name) ACR_DateTime_t name = {0};
+#define ACR_DATETIME(name) ACR_DateTime_t name = {0,0,0,0,0,0,0,0,0};
 
 /** determine if the specified date time has the time data set
 
@@ -740,9 +833,11 @@ typedef struct ACR_DateTime_s {
 //
 ////////////////////////////////////////////////////////////
 
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
 // disable warning C4820: padding added after data member
 #pragma warning(disable:4820)
+#endif
 /** type for reference to a memory area.
     - prevents use of malloc and free directly.
     - prevents use of void pointers without associated memory length
@@ -766,7 +861,9 @@ typedef struct ACR_Buffer_s
 	ACR_Flags_t m_Flags;
 
 } ACR_Buffer_t;
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
+#endif
 
 /** buffer flags to change default behavior
 */
@@ -778,7 +875,7 @@ enum ACR_BufferFlags_e
 
 /** define a buffer on the stack with the specified name
 */
-#define ACR_BUFFER(name) ACR_Buffer_t name = {0};
+#define ACR_BUFFER(name) ACR_Buffer_t name = {ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE};
 
 /** determine if the buffer is valid
 */
@@ -891,7 +988,7 @@ typedef struct ACR_VarBuffer_s
 /** define a variable sized buffer on the stack with the
     specified name
 */
-#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {0};
+#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_LENGTH_ZERO};
 
 /** get the max length of the buffer
 */
@@ -1033,7 +1130,7 @@ typedef struct ACR_AlignedBuffer_s
 
 /** define an empty aligned buffer on the stack with the specified name
 */
-#define ACR_ALIGNED_BUFFER(name) ACR_AlignedBuffer_t name = {0};
+#define ACR_ALIGNED_BUFFER(name) ACR_AlignedBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE}};
 
 /** check if the aligned buffer is valid
 */
@@ -1275,9 +1372,11 @@ typedef float ACR_Decimal_t;
 //
 ////////////////////////////////////////////////////////////
 
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
 // disable warning C4820: padding added after data member
 #pragma warning(disable:4820)
+#endif
 /** type for string data
 */
 typedef struct ACR_String_s
@@ -1285,11 +1384,13 @@ typedef struct ACR_String_s
     ACR_Buffer_t m_Buffer;
     ACR_Count_t m_Count;
 } ACR_String_t;
+#ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
+#endif
 
 /** define a string on the stack with the specified name
 */
-#define ACR_STRING(name) ACR_String_t name = {0};
+#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_COUNT};
 
 /** assign memory to the string
 */

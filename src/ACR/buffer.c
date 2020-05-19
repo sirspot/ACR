@@ -184,11 +184,7 @@ void ACR_BufferShiftLeft(
 		return;
 	}
 
-	length = (length % me->m_Length);
-	if(length > 0)
-	{
-
-	}
+    /// \todo shift left
 }
 
 /**********************************************************/
@@ -201,9 +197,5 @@ void ACR_BufferShiftRight(
 		return;
 	}
 
-	length = (length % me->m_Length);
-	if(length > 0)
-	{
-		
-	}
+    /// \todo shift right
 }

@@ -200,7 +200,9 @@ int ACR_Test(void)
     // ENDIANNESS
     //
     messageNumber = 100;
+#ifdef ACR_COMPILER_VS2017
 	#pragma warning(suppress: 4127)
+#endif
     if(ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
         // system is little endian
@@ -389,7 +391,9 @@ int ACR_Test(void)
     if(ACR_BUFFER_GET_LENGTH(buffer) == 0)
     {
         // failed to allocate the buffer
+#ifdef ACR_COMPILER_VS2017
 		#pragma warning(suppress: 4127)
+#endif
         if(ACR_HAS_MALLOC != ACR_BOOL_FALSE)
         {
             ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
