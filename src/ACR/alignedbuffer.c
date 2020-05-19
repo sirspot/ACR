@@ -135,7 +135,7 @@ ACR_Info_t ACR_AlignedBufferRef(
 }
 
 /**********************************************************/
-ACR_Info_t ACR_AlignedBufferGet(
+ACR_Info_t ACR_AlignedBufferGetRef(
 	ACR_AlignedBuffer_t* me,
 	ACR_Buffer_t* buffer)
 {
