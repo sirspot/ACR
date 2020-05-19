@@ -187,7 +187,10 @@ void ACR_BufferShiftLeft(
 	length = (length % me->m_Length);
 	if(length > 0)
 	{
-
+		ACR_Byte_t tempData[ACR_BUFFER_BYTE_COUNT_PER_SHIFT];
+		ACR_BUFFER(temp);
+		ACR_BUFFER_REFERENCE(temp, tempData, ACR_BUFFER_BYTE_COUNT_PER_SHIFT);
+		
 	}
 }
 

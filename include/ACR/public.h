@@ -47,17 +47,17 @@
 
     ACR_DEBUG           include debug tools
 
-    ACR_NO_MALLOC       do not include malloc() or free()
+    ACR_NO_MALLOC       do not include stdlib.h for malloc() and free()
 
-    ACR_BIG_ENDIAN      always use big endian without
+    ACR_BIG_ENDIAN      always assume big endian without
                         dynamically checking the system
                         endianess
 
-    ACR_LITTLE_ENDIAN   always use little endian without
+    ACR_LITTLE_ENDIAN   always assume little endian without
                         dynamically checking the system
                         endianess
 
-    ACR_NO_TIME         do not include time()
+    ACR_NO_TIME         do not include time.h for time_t, struct tm, time(), and gmtime_s()
 
     ACR_NO_64BIT        do not use types of long long
 
@@ -69,8 +69,9 @@
                         the preprocessor
 
     ACR_BYTE_ORDER_16   ensures a value is stored
-                        in big endian byte order
-    ACR_BYTE_ORDER_32   \see ACR_IS_BIG_ENDIAN
+    ACR_BYTE_ORDER_32   in big endian byte order
+                        see the section on ENDIANNESS
+	                    for details
 
     ACR_Buffer_t        a simple struct with macros
                         to handle allocation and freeing
@@ -780,6 +781,10 @@ enum ACR_BufferFlags_e
 */
 #define ACR_BUFFER(name) ACR_Buffer_t name = {0};
 
+/** define a buffer using stack memory of the specified size on the stack and with the specified name
+*/
+#define ACR_BUFFER_USE_DATA(name, data, length) name.m_Pointer = &name_data; name.m_Length = length; name.m_Flags = ACR_BUFFER_IS_REF;
+
 /** determine if the buffer is valid
 */
 #define ACR_BUFFER_IS_VALID(name) ((name.m_Pointer != ACR_NULL) && (name.m_Length > 0))
@@ -793,6 +798,7 @@ enum ACR_BufferFlags_e
 #define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, 0, (size_t)name.m_Length);
 
 /** assign memory to the buffer
+    /// \todo make a version of this without free()
 */
 #define ACR_BUFFER_REFERENCE(name, memory, length) \
         if(name.m_Pointer != ACR_NULL) \

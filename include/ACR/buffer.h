@@ -47,6 +47,16 @@
 
 #include "ACR/public.h"
 
+#ifndef ACR_BUFFER_BYTE_COUNT_PER_SHIFT
+/** this is used by ACR_BufferShiftLeft() and ACR_BufferShiftRight() to
+    determine the amount of stack memory used for a temporary location to
+	store data during the shift operation.  the actual shift can be larger
+	than this number but will occur in a tight loop instead of a single
+	copy operation
+*/
+#define ACR_BUFFER_BYTE_COUNT_PER_SHIFT 256
+#endif
+
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
 ////////////////////////////////////////////////////////////
