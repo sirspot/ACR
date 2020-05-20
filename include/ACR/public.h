@@ -38,16 +38,44 @@
 
 */
 /** \file public.h
-
+ 
     All enums and defines are found here. Some of the most
     common functions and typedefs will also be predefined
     by this header.
 
-    --- Preprocessor Defines for Configuration Options ---
+    --- How To Get The Most Out Of Header ---
+
+    An example of how to use many of the featues of this header
+    are included in the function called ACR_Test(). The fastest
+    way to get started is to look at the source code for that
+    function in "src/ACR/public.c"
+
+    In addition to the ACR_Test() function, you may want to
+    skim this header before using it. There is a lot here
+    but it is roughly organized by large comment blocks that
+    look like this:
+
+    /////
+    //
+    // TOPIC GOES HERE
+    //
+    /////
+
+    --- Preprocessor Defines For Confguration Options ---
+
+    Hopefully you are able to use one of the development environments
+    that have been preconfigured such as Gitpod, Visual Studio, or Qt Creator.
+    These platforms are described by this header in detail in the
+    "TYPES AND DEFINES - PLATFORM AND COMPILER" section.
+
+    For additional control over the configuration or if using an
+    althernate development environment, the following are the most
+    useful options to define in your preprocessor flags.
 
     ACR_DEBUG           include debug tools
+                        Note: see "TYPES AND DEFINES - DEBUG" for details
 
-    ACR_NO_MALLOC       do not include stdlib.h for malloc() and free()
+    ACR_NO_MALLOC       do not include <stdlib.h> for malloc() and free()
 
     ACR_BIG_ENDIAN      always assume big endian without
                         dynamically checking the system
@@ -57,9 +85,20 @@
                         dynamically checking the system
                         endianess
 
-    ACR_NO_TIME         do not include time.h for time_t, struct tm, time(), and gmtime_s()
+    ACR_NO_TIME         do not include <time.h> for time_t, struct tm,
+                        time(), and gmtime_s() or gmtime_r()
+                        Note: this does not completely disable support
+                              for times and dates but does limit it.
+                              see "TYPES AND DEFINES - TIME VALUES"
+                              for details
 
     ACR_NO_64BIT        do not use types of long long
+                        Note: only use this setting if you know that your
+                              compiler does not support 64bit values
+                              so that 32bit values will be used as the
+                              largest integer and pointer size instead.
+                              see "TYPES AND DEFINES - MEMORY LENGTHS"
+                              for details
 
     --- Top Uses ---
 
@@ -76,18 +115,24 @@
     ACR_Buffer_t        a simple struct with macros
                         to handle allocation and freeing
                         of memory safely.
+                        for ease of use see "ACR/buffer.h"
 
     ACR_VarBuffer_t     a simple struct with macros to 
                         handle allocation of memory
                         safely while freeing memory only
                         when necessary to grow the
                         memory area.
+                        for ease of use see "ACR/varbuffer.h"
 
     ACR_String_t        a struct for access to strings
                         with support for UTF8 encoding
+                        for ease of use see "ACR/string.h"
 
-    DECIMAL_COMPARE     compare decimal values within a
-                        tolerance
+    ACR_DECIMAL_COMPARE compare decimal values within a
+                        default tolerance of 0.0001 which
+                        is many cases is safer than performing
+                        a direct if(a==b) type of comparison
+                        because of possible rounding
 
 */
 #ifndef _ACR_PUBLIC_H_
@@ -148,10 +193,11 @@
            ACR_COMPILER_CLANG
 
    ACR_PLATFORM_WIN
-       ACR_IDE_VS2017
-           ACR_COMPILER_VS2017
-       ACR_IDE_QTCREATOR
-           ACR_COMPILER_VS2017
+        ACR_IDE_QTCREATOR
+            ACR_COMPILER_MINGW
+            ACR_COMPILER_MSVC
+      ACR_IDE_VS2017
+            ACR_COMPILER_MSVC
 
     ACR_PLATFORM_GITPOD
         ACR_IDE_THEIA
@@ -178,6 +224,31 @@
         #endif // ACR_COMPILER_CLANG
     #endif // ACR_IDE_XCODE
 #endif // ACR_PLATFORM_MAC
+
+#ifdef ACR_PLATFORM_WIN
+    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+    #define ACR_PLATFORM_NAME "win64"
+    #ifdef ACR_IDE_QTCREATOR
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "qt_creator"
+        #ifdef ACR_COMPILER_MINGW
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "mingw"
+        #endif // ACR_COMPILER_MINGW
+        #ifdef ACR_COMPILER_MSVC
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "msvc"
+        #endif // ACR_COMPILER_MSVC
+    #endif // ACR_IDE_QTCREATOR
+    #ifdef ACR_IDE_VS2017
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "vs2017"
+        #ifdef ACR_COMPILER_MSVC
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "msvc"
+        #endif // ACR_COMPILER_MSVC
+    #endif // ACR_IDE_VS2017
+#endif // ACR_PLATFORM_WIN
 
 #ifdef ACR_PLATFORM_GITPOD
         #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
@@ -225,8 +296,13 @@
 //
 ////////////////////////////////////////////////////////////
 
-// included for memset()
-#include <string.h>
+#ifndef ACR_NO_LIBC
+    // included for memset()
+    #include <string.h>
+    #define ACR_MEMSET(p,v,s) memset(p,v,s)
+#else
+    #define ACR_MEMSET(p,v,s) {char* pc=(char*)p; while(s>0){(*pc)=(char)v;s--;}}
+#endif // #ifndef ACR_NO_LIBC
 
 /** represents a successful program or thread execution
 
@@ -301,6 +377,7 @@
 #pragma warning(disable:4710)
 #endif
 // included for printf
+// Note: this ignores ACR_NO_LIBC intentionally for debug only
 #include <stdio.h>
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
@@ -317,18 +394,25 @@
 //
 ////////////////////////////////////////////////////////////
 
-// defines ACR_HAS_MALLOC and includes malloc() and free()
-// functions if desired
 #ifndef ACR_NO_MALLOC
-/** defined when malloc is available
-    Note: to remove malloc from this library define
-          ACR_NO_MALLOC in your preprocessor
-*/
-#define ACR_HAS_MALLOC ACR_BOOL_TRUE
-// included for malloc and free
-#include <stdlib.h>
+    #ifndef ACR_NO_LIBC
+        /** defined when malloc is available
+            Note: to remove malloc from this library define
+                  ACR_NO_LIBC in your preprocessor
+        */
+        #define ACR_HAS_MALLOC ACR_BOOL_TRUE
+        // included for malloc and free
+        #include <stdlib.h>
+        #define ACR_MALLOC(s) malloc((size_t)s)
+        #define ACR_FREE(p) free(p);
+    #else
+        /// \todo create a simple built-in malloc
+        #define ACR_HAS_MALLOC ACR_BOOL_FALSE // ACR_BOOL_TRUE
+        #define ACR_MALLOC(s) {}
+        #define ACR_FREE(p) {}
+    #endif // #ifndef ACR_NO_LIBC
 #else
-#define ACR_HAS_MALLOC ACR_BOOL_FALSE
+    #define ACR_HAS_MALLOC ACR_BOOL_FALSE
 #endif // #ifndef ACR_NO_MALLOC
 
 ////////////////////////////////////////////////////////////
@@ -504,7 +588,8 @@ typedef unsigned char ACR_Byte_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** type for a typical length such as the size of a file
+/** type for a typical length such as the size of a file or
+    the size of an area of memory
 	\see ACR_MAX_LENGTH for the maximum value that can be
 	stored by this data type
 */
@@ -640,7 +725,7 @@ typedef struct ACR_Blocks_s
     for memory init:
 
         char data[64];
-        memset(data, ACR_EMPTY_VALUE, sizeof(data));
+        ACR_MEMSET(data, ACR_EMPTY_VALUE, sizeof(data));
         
     for variable init:
 
@@ -740,22 +825,29 @@ typedef enum ACR_Month_e
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
 #ifndef ACR_NO_TIME
-#define ACR_HAS_RTC ACR_BOOL_TRUE
-#ifdef ACR_COMPILER_CLANG
-#include <time.h>
-#endif
-#ifdef ACR_COMPILER_GCC
-#include <time.h>
-#endif
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(push)
-// disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
-#pragma warning(disable:4820)
-#include <time.h>
-#pragma warning(pop)
-#endif
-#else
-#define ACR_HAS_RTC ACR_BOOL_FALSE
+    #ifndef ACR_NO_LIBC
+        #ifdef ACR_COMPILER_CLANG
+            #include <time.h>
+            #define ACR_HAS_RTC ACR_BOOL_TRUE
+        #endif
+        #ifdef ACR_COMPILER_GCC
+            #include <time.h>
+            #define ACR_HAS_RTC ACR_BOOL_TRUE
+        #endif
+        #ifdef ACR_COMPILER_VS2017
+            #pragma warning(push)
+            // disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
+            #pragma warning(disable:4820)
+            #include <time.h>
+            #pragma warning(pop)
+            #define ACR_HAS_RTC ACR_BOOL_TRUE
+        #endif
+    #else // #ifndef ACR_NO_LIBC
+        #define ACR_USE_BUILT_IN_RTC
+        #define ACR_HAS_RTC ACR_BOOL_FALSE
+    #endif 
+#else // #ifndef ACR_NO_TIME
+    #define ACR_HAS_RTC ACR_BOOL_FALSE
 #endif
 
 #if ACR_HAS_RTC == ACR_BOOL_TRUE
@@ -812,10 +904,17 @@ typedef struct ACR_DateTime_s {
 } ACR_DateTime_t;
 
 /** RTC is not available so this macro just clears the date time
+    \todo create a simple built-in RTC using a function that must be called by the user each second to increment the clock
 */
-#define ACR_DATETIME_NOW(name) memset(&name,0,sizeof(ACR_DateTime_t));
+#define ACR_DATETIME_NOW(name) ACR_MEMSET(&name,0,sizeof(ACR_DateTime_t));
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+#ifdef ACR_USE_BUILT_IN_RTC
+    #undef ACR_HAS_RTC
+    #define ACR_HAS_RTC ACR_BOOL_FALSE // ACR_BOOL_TRUE
+    /// \todo create a simple built-in RTC using a function that must be called by the user each second to increment the "clock"
+#endif
 
 /** define an empty date time on the stack
 */
@@ -917,7 +1016,7 @@ enum ACR_BufferFlags_e
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) memset(name.m_Pointer, 0, (size_t)name.m_Length);
+#define ACR_BUFFER_CLEAR(name) ACR_MEMSET(name.m_Pointer, 0, (size_t)name.m_Length);
 
 /** assign memory to the buffer
     /// \todo make a version of this without free()

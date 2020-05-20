@@ -21,6 +21,8 @@
             "label": "build example quick_start debug",
             "command": "/usr/bin/gcc",
             "args": [
+                "-Wall",
+                "-pedantic",
                 "-ggdb",
                 "-D",
                 "ACR_PLATFORM_GITPOD",

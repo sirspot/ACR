@@ -2,7 +2,7 @@
     "configurations": [
         {
             "name": "Gitpod",
-            "defines": [],
+            "defines": ["ACR_PLATFORM_GITPOD"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
