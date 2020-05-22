@@ -39,21 +39,62 @@
 */
 /** \file public.h
  
-    All enums and defines are found here. Some of the most
-    common functions and typedefs will also be predefined
-    by this header.
+    This header contains many common defines, enums, functions, and typedefs.
+    In many cases, this is the only header needed for the ACR library to
+    be a useful addition to your project.
 
-    --- How To Get The Most Out Of Header ---
+    ### New to C? ###
+
+    Q: What is a "header"?
+    A: A header (.h file) is a file that predefines the names of
+       various functions and values that are then fully
+       defined by the source file. In many cases it is
+       only necessary to read the header file to
+       understand what the code in a source file does.
+       The header can be thought of as "Public" so that
+       any part of a program may use it.
+
+    Q: What is a "source"?
+    A: A source (.c file) fully defines variables and functions.
+       The source can be thought of as "Private" because
+       anything defined within the file cannot safely be used
+       in another part of a program without a header.
+
+    Q: What is a "define"?
+    A: A define is a name assigned to a value. Before the code
+       is compiled, a preprocessor will replace the name with
+       the value. The value can be any valid code such as numbers, 
+       "strings", or even code snippets that can accept parameters
+       (these are called Macros)
+
+    Q: What is an "enum"?
+    A: An enum, short for enumeration, is a list of names
+       with a number assigned to each name. The names are
+       used by the preprocessor just like a define.
+
+    Q: What is a "typedef"?
+    A: A typedef is a way to expand the types of data that
+       can be stored by a variable. It is similar to a define
+       in that the name specified by the typedef refers to
+       another value, but it is more specific and helps to
+       more clearly define the purpose of the data.
+
+    Q: Where can I learn more about this header?
+    A: Many topics are covered by this header. Each topic
+       begins with a large comment block and will follow
+       with additional details. Look for "New to C?" for
+       detailed explanations of each topic.
+
+    ### Getting Started Quickly ###
 
     An example of how to use many of the featues of this header
-    are included in the function called ACR_Test(). The fastest
-    way to get started is to look at the source code for that
-    function in "src/ACR/public.c"
+    are included in the function called ACR_Test(). For those
+    familiar with C, the fastest way to get started is to look
+    at the source code for that function in "src/ACR/public.c"
 
     In addition to the ACR_Test() function, you may want to
-    skim this header before using it. There is a lot here
-    but it is roughly organized by large comment blocks that
-    look like this:
+    skim this header before using it. There is a lot here, roughly
+    organized by large comment blocks that look like this:
 
     /////
     //
@@ -61,7 +102,7 @@
     //
     /////
 
-    --- Preprocessor Defines For Confguration Options ---
+    ### Preprocessor Defines For Confguration Options ###
 
     Hopefully you are able to use one of the development environments
     that have been preconfigured such as Gitpod, Visual Studio, or Qt Creator.
@@ -69,52 +110,67 @@
     "TYPES AND DEFINES - PLATFORM AND COMPILER" section.
 
     For additional control over the configuration or if using an
-    althernate development environment, the following are the most
+    alternate development environment, the following are the most
     useful options to define in your preprocessor flags.
 
-    ACR_DEBUG           include debug tools
-                        Note: see "TYPES AND DEFINES - DEBUG" for details
+    ACR_DEBUG           include debug tools.
+                        see "TYPES AND DEFINES - DEBUG" for details.
 
-    ACR_NO_MALLOC       do not include <stdlib.h> for malloc() and free()
+    ACR_NO_MALLOC       do not include malloc() or free() and disables
+                        ACR_MALLOC and ACR_FREE macros.
+                        see "TYPES AND DEFINES - MALLOC" for details.
 
     ACR_BIG_ENDIAN      always assume big endian without
                         dynamically checking the system
-                        endianess
+                        endianess.
+                        see "TYPES AND DEFINES - ENDIANNESS" for details.
 
     ACR_LITTLE_ENDIAN   always assume little endian without
                         dynamically checking the system
-                        endianess
+                        endianess.
+                        see "TYPES AND DEFINES - ENDIANNESS" for details.
 
     ACR_NO_TIME         do not include <time.h> for time_t, struct tm,
                         time(), and gmtime_s() or gmtime_r()
-                        Note: this does not completely disable support
+                        Note: this never completely disables support
                               for times and dates but does limit it.
-                              see "TYPES AND DEFINES - TIME VALUES"
-                              for details
+                        see "TYPES AND DEFINES - TIME VALUES" for details.
 
     ACR_NO_64BIT        do not use types of long long
                         Note: only use this setting if you know that your
                               compiler does not support 64bit values
                               so that 32bit values will be used as the
                               largest integer and pointer size instead.
-                              see "TYPES AND DEFINES - MEMORY LENGTHS"
-                              for details
+                        see "TYPES AND DEFINES - MEMORY LENGTHS" for details.
 
-    --- Top Uses ---
+    ACR_NO_LIBC         do not include any headers from the system
+                        including but not limited to <stdlib.h>,
+                        <string.h>, and <time.h>. when ACR_DEBUG is
+                        defined there may be some system headers
+                        included only to allow the debug featues.
+                        Note: features provided by these headers will
+                              attempt to be made available but may
+                              be limited or require additional user
+                              setup to be functional.
+                        each section may use this define to prevent
+                        system headers from being included and will
+                        provide additional details upon use.
+
+    ### Top Uses ###
 
     ACR_DEBUG_PRINT     interface to printf() that only
                         writes messages to stdout
-                        when ACR_DEBUG is defined in
-                        the preprocessor
+                        when ACR_DEBUG is defined.
+                        see "TYPES AND DEFINES - DEBUG" for details.
 
     ACR_BYTE_ORDER_16   ensures a value is stored
     ACR_BYTE_ORDER_32   in big endian byte order
-                        see the section on ENDIANNESS
-	                    for details
+    ACR_BYTE_ORDER_64   see "TYPES AND DEFINES - ENDIANNESS" for details.
 
     ACR_Buffer_t        a simple struct with macros
                         to handle allocation and freeing
                         of memory safely.
+                        see "TYPES AND DEFINES - SIMPLE MEMORY BUFFER" for details.
                         for ease of use see "ACR/buffer.h"
 
     ACR_VarBuffer_t     a simple struct with macros to 
@@ -122,17 +178,20 @@
                         safely while freeing memory only
                         when necessary to grow the
                         memory area.
+                        see "TYPES AND DEFINES - VARIABLE LENGTH MEMORY BUFFER" for details.
                         for ease of use see "ACR/varbuffer.h"
 
     ACR_String_t        a struct for access to strings
-                        with support for UTF8 encoding
+                        with support for UTF8 encoding.
+                        see "TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS" for details.
                         for ease of use see "ACR/string.h"
 
     ACR_DECIMAL_COMPARE compare decimal values within a
                         default tolerance of 0.0001 which
                         is many cases is safer than performing
                         a direct if(a==b) type of comparison
-                        because of possible rounding
+                        because of possible rounding.
+                        see "TYPES AND DEFINES - DECIMAL VALUES" for details.
 
 */
 #ifndef _ACR_PUBLIC_H_
@@ -140,7 +199,7 @@
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE)
+// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE) AND EMPTY VALUES
 //
 ////////////////////////////////////////////////////////////
 
@@ -148,14 +207,24 @@
 
     example:
 
-    if(ACR_BOOL_FALSE)
-    {
-        // never reaches this code
-    }
-    else
-    {
-        // always reaches this code
-    }
+        if(ACR_BOOL_FALSE)
+        {
+            // never reaches this code
+        }
+        else
+        {
+            // always reaches this code
+        }
+
+    ### New to C? ###
+
+    Q: What is a boolean?
+    A: A boolean is a "true" or "false" value. In C, a value
+       of 0 is "false" and all other values are "true".
+       A confusing thing about C is that some functions will
+       return 0 to mean success while others will return 0
+       as an error. This is why ACR defines many more specific
+       values that can be used as return codes.
 
 */
 #define ACR_BOOL_FALSE 0
@@ -164,17 +233,45 @@
 
     example:
 
-    if(ACR_BOOL_TRUE)
-    {
-        // always reaches this code
-    }
-    else
-    {
-        // never reaches this code
-    }
+        if(ACR_BOOL_TRUE)
+        {
+            // always reaches this code
+        }
+        else
+        {
+            // never reaches this code
+        }
 
 */
 #define ACR_BOOL_TRUE 1
+
+/** represents an empty value.
+    use this instead of 0 to clearly indicate the value
+    is being used to identify an empty value
+
+    for memory init:
+
+        char data[64];
+        ACR_MEMSET(data, ACR_EMPTY_VALUE, sizeof(data));
+        
+    for variable init:
+
+        int selected = ACR_EMPTY_VALUE;
+
+    for comparison:
+
+        if(data[0] == ACR_EMPTY_VALUE)
+        {
+            // nothing has been written to the data
+        }
+
+        if(selected == ACR_EMPTY_VALUE)
+        {
+            // nothing has been selected
+        }
+
+*/
+#define ACR_EMPTY_VALUE 0
 
 ////////////////////////////////////////////////////////////
 //
@@ -202,8 +299,21 @@
     ACR_PLATFORM_GITPOD
         ACR_IDE_THEIA
             ACR_COMPILER_GCC
+
+    ### New to C? ###
+
+    Q: Why are there so many different platform settings?
+    A: To allow ACR to be used with as many different types
+       of projects as possible. These platform defines provide
+       support for Windows, Mac OS X, Linux, or even an embedded
+       microprocessor with no operating system. Code is removed or
+       added based on the platform settings using the preprocessor
+       commands #ifdef and #ifndef.
+
 */
 
+/** MAC OS X
+*/
 #ifdef ACR_PLATFORM_MAC
     #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
     #define ACR_PLATFORM_NAME "mac"
@@ -225,6 +335,8 @@
     #endif // ACR_IDE_XCODE
 #endif // ACR_PLATFORM_MAC
 
+/** WINDOWS
+*/
 #ifdef ACR_PLATFORM_WIN
     #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
     #define ACR_PLATFORM_NAME "win64"
@@ -250,6 +362,8 @@
     #endif // ACR_IDE_VS2017
 #endif // ACR_PLATFORM_WIN
 
+/** GITPOD (LINUX)
+*/
 #ifdef ACR_PLATFORM_GITPOD
         #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
         #define ACR_PLATFORM_NAME "gitpod"
@@ -279,17 +393,6 @@
 #define ACR_IDE_NAME "unknown"
 #endif
 
-#if ACR_HAS_COMPILER == ACR_BOOL_FALSE
-// compiler is unknown
-
-// cannot include time
-#define ACR_NO_TIME
-
-// cannot use 64bit
-#define ACR_NO_64BIT
-
-#endif
-
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SYSTEM LEVEL
@@ -300,9 +403,39 @@
     // included for memset()
     #include <string.h>
     #define ACR_MEMSET(p,v,s) memset(p,v,s)
+
+    /*
+        ### New to C? ###
+
+        Q: What does memset do?
+        A: memset is a function that changes an entire
+           area of memory to be a single value. It is
+           typically used to set a region of memory
+           that has unknown or undesired values to all
+           zeros so that the values of all memory in
+           that region are known and valid.
+
+    */
+
 #else
-    #define ACR_MEMSET(p,v,s) {char* pc=(char*)p; while(s>0){(*pc)=(char)v;s--;}}
+    // generic (slow) memset but gets the job done
+    #define ACR_MEMSET(p,v,s) \
+    {\
+        char* pc=(char*)p;\
+        size_t sz=(size_t)s;\
+        while(sz>0)\
+        {\
+            sz--;\
+            pc[sz]=(char)v;\
+        }\
+    }
 #endif // #ifndef ACR_NO_LIBC
+
+/** clears a region of memory
+ *  \param p a pointer to the memory to clear
+ *  \param s the number of bytes of data to clear
+*/
+#define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s)}
 
 /** represents a successful program or thread execution
 
@@ -714,37 +847,9 @@ typedef struct ACR_Blocks_s
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - COMMMON VALUES AND FLAGS
+// TYPES AND DEFINES - FLAGS
 //
 ////////////////////////////////////////////////////////////
-
-/** represents an empty value.
-    use this instead of 0 to clearly indicate the value
-    is being used to identify an empty value
-
-    for memory init:
-
-        char data[64];
-        ACR_MEMSET(data, ACR_EMPTY_VALUE, sizeof(data));
-        
-    for variable init:
-
-        int selected = ACR_EMPTY_VALUE;
-
-    for comparison:
-
-        if(data[0] == ACR_EMPTY_VALUE)
-        {
-            // nothing has been written to the data
-        }
-
-        if(selected == ACR_EMPTY_VALUE)
-        {
-            // nothing has been selected
-        }
-
-*/
-#define ACR_EMPTY_VALUE 0
 
 /** flags are always a single byte to keep options organized.
     if necessary, use more than one set of flags.
@@ -906,7 +1011,7 @@ typedef struct ACR_DateTime_s {
 /** RTC is not available so this macro just clears the date time
     \todo create a simple built-in RTC using a function that must be called by the user each second to increment the clock
 */
-#define ACR_DATETIME_NOW(name) ACR_MEMSET(&name,0,sizeof(ACR_DateTime_t));
+#define ACR_DATETIME_NOW(name) ACR_CLEAR_MEMORY(&name,sizeof(ACR_DateTime_t));
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
@@ -1016,7 +1121,7 @@ enum ACR_BufferFlags_e
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) ACR_MEMSET(name.m_Pointer, 0, (size_t)name.m_Length);
+#define ACR_BUFFER_CLEAR(name) ACR_CLEAR_MEMORY(name.m_Pointer, (size_t)name.m_Length);
 
 /** assign memory to the buffer
     /// \todo make a version of this without free()
@@ -1487,8 +1592,7 @@ typedef float ACR_Decimal_t;
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - SIMPLE UTF8 STRINGS 
-//                     AND UNICODE CHARACTERS
+// TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS
 //
 // Note: for UTF8 to display properly in a Windows
 //       terminal you must use 
