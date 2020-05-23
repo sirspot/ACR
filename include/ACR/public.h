@@ -739,55 +739,69 @@
 //
 // TYPES AND DEFINES - ENDIANNESS
 //
+// ### New to C? ###
+//
+// Even experienced programmers sometimes forget about
+// endianess. Read the following details to help understand
+// what endianess means and how it changes the way data
+// is stored in memory
+//
+// Q: What is MSB and LSB?
+// A: The Most Significant Bit/Byte (MSB) is the bit or byte
+//    that changes the value of an integer by the greatest amount.
+//    The Least Significant Bit/Byte (LSB) is the bit or byte
+//    that changes the value of an integer by the smallest amount.
+//    See the Sample Memory illustrations below for details.
+//
 // Note: Big Endian means that multibyte values have the
 //       bytes stored in memory from least significant 
-//       to most significant.
+//       to most significant. Little Endian is the opposite.
 //
-// Optional: If you already know the endianess of your
-//           system then set the preprocessor define as
-//           follows to improve byte order handling
-//           performance.
-//           Big Endian:    ACR_BIG_ENDIAN
-//           Little Endian: ACR_LITTLE_ENDIAN
+// ### Sample Memory ###
 //
-// Sample memory:
+//   type/bytes   illustration
 //
-//   type/bytes
+//   char/1       memory = [ 0x01 ---- ---- ---- ]
+//                binary little endian =
+//                    MSB -------- -------- -------- 00000001 LSB
+//                decimal little endian = 1
+//                decimal big endian = 1
 //
-//   char/1     memory = [ 0x01 ---- ---- ---- ]
-//              binary little endian =
-//                  MSB ------------------------00000001 LSB
-//              decimal big endian = 1
-//              decimal little endian = 1
+//   short/2      memory = [ 0x01 0x00 ---- ---- ]
+//                binary little endian = 
+//                    MSB -------- -------- 00000001 00000000 LSB
+//                decimal little endian = 256
+//                decimal big endian = 1
 //
-//   short/2    memory = [ 0x01 0x00 ---- ---- ]
-//              binary little endian = 
-//                  MSB ----------------0000000100000000 LSB
-//              decimal big endian = 1
-//              decimal little endian = 256
+//   short/2      memory = [ 0x00 0x01 ---- ---- ]
+//                binary little endian = 
+//                    MSB -------- -------- 00000000 00000001 LSB
+//                decimal little endian = 1
+//                decimal big endian = 256
 //
-//   short/2    memory = [ 0x00 0x01 ---- ---- ]
-//              binary little endian = 
-//                  MSB ----------------0000000000000001 LSB
-//              decimal big endian = 256
-//              decimal little endian = 1
+//   long/4       memory = [ 0x00 0x01 0x00 0x00 ]
+//                binary little endian = 
+//                    MSB 00000000 00000001 00000000 00000000 LSB
+//                decimal little endian = 65536
+//                decimal big endian = 256
 //
-//   long/4     memory = [ 0x00 0x01 0x00 0x00 ]
-//              binary little endian = 
-//                  MSB 00000000000000010000000000000000 LSB
-//              decimal big endian = 256
-//              decimal little endian = 65536
-//
-// "short" Example:
+// "long" Example:
 //
 //      // given a local variable with value 1
-//      short valueInSystemEndian = 1;
+//      long valueInSystemEndian = 1;
 //      // convert the value to big endian 
-//      short valueInBigEndian = ACR_BYTE_ORDER_16(valueInSystemEndian);
+//      long valueInBigEndian = ACR_BYTE_ORDER_32(valueInSystemEndian);
 //      // and use the same macro to convert
 //      // a big endian value back to system endianness
-//      valueInSystemEndian = ACR_BYTE_ORDER_16(valueInBigEndian);
+//      valueInSystemEndian = ACR_BYTE_ORDER_32(valueInBigEndian);
 //
+// "short" example
+//
+//      // given a value known to be in big endian
+//      short valueInBigEndian = 1;
+//      // convert the value to system endian
+//      short valueInSystemEndian = ACR_BYTE_ORDER_16(valueInBigEndian);
+//      
 ////////////////////////////////////////////////////////////
 
 /** byte order swap of 16 bit value
@@ -804,6 +818,8 @@
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
+/** byte order swap of 64 bit value
+*/
 #define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
                                      (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
                                      (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
@@ -818,6 +834,13 @@
 //
 // defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
 // ACR_BOOL_FALSE
+//
+// Optional: If you already know the endianess of your
+//           system then set the preprocessor define as
+//           follows to improve byte order handling
+//           performance.
+//           Big Endian:    ACR_BIG_ENDIAN
+//           Little Endian: ACR_LITTLE_ENDIAN
 //
 #ifdef ACR_BIG_ENDIAN
 /** the system is big endian because ACR_BIG_ENDIAN
@@ -859,7 +882,7 @@
 #endif // #ifndef ACR_IS_BIG_ENDIAN
 
 //
-// defines ACR_BYTE_ORDER_16 and ACR_BYTE_ORDER_32
+// defines ACR_BYTE_ORDER_16 and ACR_BYTE_ORDER_32 and ACR_BYTE_ORDER_64
 // to swap byte order to big endian when needed
 //
 #ifdef ACR_ENDIAN_DYNAMIC
@@ -891,6 +914,22 @@
 ////////////////////////////////////////////////////////////
 
 /** type for a single byte
+
+    ### New to C? ###
+
+    Q: What does unsigned mean?
+    A: When a variable type is unsigned, it cannot be negative.
+       This has a few pros and cons.
+       Pros: 1. the sign bit can be used for the value and thus a larger number can be stored
+             2. the value is never negative so it is not necessary to check when used as an index into arrays
+             3. bit flags are easier to understand because changing a single bit will never make the value negative
+                see TYPES AND DEFINES - FLAGS for details on bit flags
+             4. binary values are easier to understand because they don't use Two's complement
+                see https://en.wikipedia.org/wiki/Two%27s_complement for a detailed explanation
+       Cons: 1. negative numbers are not available so subtraction must be done more carefully
+             2. when signed and unsigned variables are compared, the compiler could make some
+                unexpected type changes so this must be done carefully to support all platforms.
+
 */
 typedef unsigned char ACR_Byte_t;
 
@@ -927,7 +966,7 @@ typedef unsigned long ACR_Length_t;
 
 	for variable init:
 
-		int length = ACR_ZERO_LENGTH;
+		ACR_Length_t length = ACR_ZERO_LENGTH;
 
 	for comparison:
 
@@ -1031,6 +1070,15 @@ typedef struct ACR_Blocks_s
     exact number of blocks and bytes needed for the memory length
 */
 #define ACR_LENGTH_TO_BLOCKS(blocks, length) { blocks.m_Blocks = (length / ACR_BYTES_PER_BLOCK); blocks.m_Bytes = (length % ACR_BYTES_PER_BLOCK); }
+
+#ifndef ACR_NO_LIBC
+    // included for memcpy()
+    #include <string.h>
+    #define ACR_MEMCPY(dsl) memcpy(d,s,l);
+#else
+    /// \todo make a generic copy for memcpy
+    #define ACR_MEMCPY(dsl) memcpy(d,s,l);
+#endif // #ifndef ACR_NO_LIBC
 
 ////////////////////////////////////////////////////////////
 //
