@@ -152,9 +152,9 @@
                               attempt to be made available but may
                               be limited or require additional user
                               setup to be functional.
-                        each section may use this define to prevent
-                        system headers from being included and will
-                        provide additional details upon use.
+                              each section may use this define to prevent
+                              system headers from being included and will
+                              provide additional details upon use.
 
     ### Top Uses ###
 
@@ -315,6 +315,7 @@
 /** MAC OS X
 */
 #ifdef ACR_PLATFORM_MAC
+
     #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
     #define ACR_PLATFORM_NAME "mac"
     #ifdef ACR_IDE_QTCREATOR
@@ -333,11 +334,13 @@
             #define ACR_COMPILER_NAME "clang"
         #endif // ACR_COMPILER_CLANG
     #endif // ACR_IDE_XCODE
+
 #endif // ACR_PLATFORM_MAC
 
 /** WINDOWS
 */
 #ifdef ACR_PLATFORM_WIN
+
     #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
     #define ACR_PLATFORM_NAME "win64"
     #ifdef ACR_IDE_QTCREATOR
@@ -360,11 +363,13 @@
             #define ACR_COMPILER_NAME "msvc"
         #endif // ACR_COMPILER_MSVC
     #endif // ACR_IDE_VS2017
+
 #endif // ACR_PLATFORM_WIN
 
 /** GITPOD (LINUX)
 */
 #ifdef ACR_PLATFORM_GITPOD
+
         #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
         #define ACR_PLATFORM_NAME "gitpod"
         #define ACR_HAS_IDE ACR_BOOL_TRUE
@@ -373,25 +378,32 @@
         #define ACR_HAS_COMPILER ACR_BOOL_TRUE
         #define ACR_COMPILER_GCC
         #define ACR_COMPILER_NAME "gcc"
+
 #endif // ACR_PLATFORM_GITPOD
 
 #ifndef ACR_HAS_PLATFORM
-#define ACR_PLATFORM_UNKNOWN
-#define ACR_HAS_PLATFORM ACR_BOOL_FALSE
-#define ACR_PLATFORM_NAME "unknown"
-#endif
+
+    #define ACR_PLATFORM_UNKNOWN
+    #define ACR_HAS_PLATFORM ACR_BOOL_FALSE
+    #define ACR_PLATFORM_NAME "unknown"
+
+#endif // #ifndef ACR_HAS_PLATFORM
 
 #ifndef ACR_HAS_COMPILER
-#define ACR_COMPILER_UNKNOWN
-#define ACR_HAS_COMPILER ACR_BOOL_FALSE
-#define ACR_COMPILER_NAME "unknown"
-#endif
+
+    #define ACR_COMPILER_UNKNOWN
+    #define ACR_HAS_COMPILER ACR_BOOL_FALSE
+    #define ACR_COMPILER_NAME "unknown"
+
+#endif // #ifndef ACR_HAS_COMPILER
 
 #ifndef ACR_HAS_IDE
-#define ACR_IDE_UNKNOWN
-#define ACR_HAS_IDE ACR_BOOL_FALSE
-#define ACR_IDE_NAME "unknown"
-#endif
+
+    #define ACR_IDE_UNKNOWN
+    #define ACR_HAS_IDE ACR_BOOL_FALSE
+    #define ACR_IDE_NAME "unknown"
+
+#endif // #ifndef ACR_HAS_IDE
 
 ////////////////////////////////////////////////////////////
 //
@@ -400,6 +412,7 @@
 ////////////////////////////////////////////////////////////
 
 #ifndef ACR_NO_LIBC
+
     // included for memset()
     #include <string.h>
     #define ACR_MEMSET(p,v,s) memset(p,v,s)
@@ -418,7 +431,10 @@
     */
 
 #else
-    // generic (slow) memset but gets the job done
+
+    /** ACR_NO_LIBC is defined so this is a 
+        generic (slow) memset but gets the job done
+    */
     #define ACR_MEMSET(p,v,s) \
     {\
         char* pc=(char*)p;\
@@ -429,13 +445,97 @@
             pc[sz]=(char)v;\
         }\
     }
+
 #endif // #ifndef ACR_NO_LIBC
 
 /** clears a region of memory
- *  \param p a pointer to the memory to clear
- *  \param s the number of bytes of data to clear
+    \param p a pointer to the memory to clear
+    \param s the number of bytes of data to clear
 */
 #define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s)}
+
+/** defines a callback function type
+    \param t the name of the type to define
+    \param r the return type or void if there is none
+  
+    ### New to C? ###
+
+        Q: What is a callback function?
+        A: A callback function is a variable
+           that can act as the function it is
+           assigned to.
+
+	example:
+
+        // define a list of all callback names
+        enum CallbackExample_e
+        {
+            CBEX_1 = 0,
+            CBEX_2,
+            CBEX_3,
+
+            CBEX_COUNT
+        };
+
+        // define the callback function prototypes
+        ACR_TYPEDEF_CALLBACK(CallbackExample_t, void)(int, void*);
+            void CbEx1(int,void*);
+            void CbEx2(int,void*);
+            void CbEx3(int,void*);
+
+        // create a lookup table of the callback functions
+        CallbackExample_t g_CbEx[CBEX_COUNT+1] = 
+        {
+            CbEx1, // CBEX_1
+            CbEx2, // CBEX_2
+            CbEx3, // CBEX_3
+
+            ACR_NULL
+        };
+
+        int main()
+        {
+            unsigned int cbIndex;
+
+            // just use one callback function
+            g_CbEx[CBEX_1](0, ACR_NULL);
+
+            // loop through all callback functions
+            cbIndex = 0;
+            while(cbIndex < CBEX_COUNT)
+            {
+                g_CbEx[cbIndex](cbIndex, ACR_NULL);
+            }
+
+            return ACR_SUCCESS;
+        }
+
+        // complete the definition of the first callback function
+        void CbEx1(int a, void* b)
+        {
+            ACR_UNUSED(a);
+            ACR_UNUSED(b);
+            ACR_DEBUG_PRINT(1,"One");
+        }
+
+        // complete the definition of the second callback function
+        void CbEx2(int a, void* b)
+        {
+            ACR_UNUSED(a);
+            ACR_UNUSED(b);
+            ACR_DEBUG_PRINT(2,"Two");
+        }
+        
+        // complete the definition of the third callback function
+        void CbEx3(int a, void* b)
+        {
+            ACR_UNUSED(a);
+            ACR_UNUSED(b);
+            ACR_DEBUG_PRINT(3,"Three");
+        }
+
+*/
+#define ACR_TYPEDEF_CALLBACK(t,r) typedef r (*t)
 
 /** represents a successful program or thread execution
 
@@ -474,6 +574,21 @@
             // ptr is a null pointer
         }
 
+    ### New to C? ###
+
+    Q: What is a pointer?
+    A: A pointer is a variable except
+       that the value of the variable
+       is a memory address.
+
+    Q: What is a null pointer?
+    A: A null pointer is a pointer variable with
+       value 0. Memory address 0 is invalid
+       and if an attempt to access the memory is made
+       by a null pointer it will cause the program to crash.
+       This is why it is important to always check
+       if a pointer is null before using it.
+
 */
 #ifdef __cplusplus
 #define ACR_NULL nullptr
@@ -484,13 +599,37 @@
 #endif
 
 /** explicitly states that a variable or parameter is not used
+
+    ### New to C? ###
+
+    Q: Why would a variable or parameter exist that is not used?
+    A: There are many reasons to not use a variable or parameter
+       when it has already been defined. One example is a callback
+       function that doesn't need to use all of the parameters.
+
 */
 #define ACR_UNUSED(arg) (void)arg
 
-// defines ACR_USE_64BIT
+/** defines ACR_USE_64BIT
+    see TYPES AND DEFINES - MEMORY LENGTHS for more details
+
+    ### New to C? ###
+
+    Q: What is 64bit?
+    A: This refers to the number of bits used for a memory address.
+       The majority of consumer-level computers when this was written
+       use 64bits for memory addresses so that they can support a
+       larger amount of memory than in the past. Some platforms
+       do not support 64bit addressing and instead use 32bits, 16bits,
+       or even 8bits. In some cases, a platform that does not support
+       64bits cannot store a 64bit integer, which changes the maximum
+       value that can be stored in a simple type.
+ 
+*/
 #ifdef ACR_NO_64BIT
 #define ACR_USE_64BIT ACR_BOOL_FALSE
 #else
+/// \todo is there a way to determine, at compile time, whether or not the platform uses 64bit addresses?
 #define ACR_USE_64BIT ACR_BOOL_TRUE
 #endif // #ifndef ACR_NO_64BIT
 
@@ -500,8 +639,21 @@
 //
 ////////////////////////////////////////////////////////////
 
-// defines ACR_IS_DEBUG and ACR_DEBUG_PRINT such that
-// printed messages are only compiled if desired
+/** defines ACR_IS_DEBUG and ACR_DEBUG_PRINT such that
+    printed messages are only compiled if desired
+
+    ### New to C? ###
+
+    Q: What is debug?
+    A: This refers to running a program such that it is easier
+       to understand what may be causing a bug/problem.
+
+    Q: Why not always use debug?
+    A: There are two main reasons:
+       1. it can greatly impact the speed of the program
+       2. the users of the program may be confused by the extra information
+
+*/
 #ifdef ACR_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE
 #ifdef ACR_COMPILER_VS2017
@@ -528,6 +680,7 @@
 ////////////////////////////////////////////////////////////
 
 #ifndef ACR_NO_MALLOC
+
     #ifndef ACR_NO_LIBC
         /** defined when malloc is available
             Note: to remove malloc from this library define
@@ -539,14 +692,48 @@
         #define ACR_MALLOC(s) malloc((size_t)s)
         #define ACR_FREE(p) free(p);
     #else
+        // ACR_BOOL_TRUE
+        #define ACR_HAS_MALLOC ACR_BOOL_FALSE
         /// \todo create a simple built-in malloc
-        #define ACR_HAS_MALLOC ACR_BOOL_FALSE // ACR_BOOL_TRUE
-        #define ACR_MALLOC(s) {}
-        #define ACR_FREE(p) {}
+        #define ACR_MALLOC(s) ACR_NULL
+        /// \todo create a simple built-in free
+        #define ACR_FREE(p) 
     #endif // #ifndef ACR_NO_LIBC
 #else
     #define ACR_HAS_MALLOC ACR_BOOL_FALSE
+    #define ACR_MALLOC(s) ACR_NULL
+    #define ACR_FREE(p)
 #endif // #ifndef ACR_NO_MALLOC
+
+/** similar to malloc but automatically defines the variable and clears the memory
+ 
+    example:
+
+        int main()
+        {
+            ACR_NEW_BY_SIZE(oneHundredNumbers, int, sizeof(int)*100);
+
+            oneHundredNumbers[0] = 42;
+            oneHundredNumbers[1] = 3000;
+            // etc
+        }
+*/
+#define ACR_NEW_BY_SIZE(n, t, s) t* n = (t*)ACR_MALLOC(s);ACR_CLEAR_MEMORY(n,s);
+
+/** similar to malloc but automatically defines the variable and clears the memory
+ 
+    example:
+
+        int main()
+        {
+            ACR_NEW_BY_TYPE(oneDateTime, ACR_DateTime_t);
+
+            oneDateTime->tm_sec = 30;
+            oneDateTime->tm_min = 1;
+            // etc
+        }
+*/
+#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_SIZE(n,t,sizeof(t));
 
 ////////////////////////////////////////////////////////////
 //
@@ -1017,7 +1204,8 @@ typedef struct ACR_DateTime_s {
 
 #ifdef ACR_USE_BUILT_IN_RTC
     #undef ACR_HAS_RTC
-    #define ACR_HAS_RTC ACR_BOOL_FALSE // ACR_BOOL_TRUE
+    // ACR_BOOL_TRUE
+    #define ACR_HAS_RTC ACR_BOOL_FALSE 
     /// \todo create a simple built-in RTC using a function that must be called by the user each second to increment the "clock"
 #endif
 
