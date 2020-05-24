@@ -548,6 +548,21 @@ ACR_Info_t ACR_InfoFromString(
 //
 ////////////////////////////////////////////////////////////
 
+int ACR_DaysPerMonth(
+    ACR_Month_t month,
+    ACR_Bool_t isLeapYear)
+{
+    int days = g_ACRMonthDaysLookup[month];
+    if(isLeapYear)
+    {
+        if(month == ACR_MONTH_FEBRUARY)
+        {
+            days++;
+        }
+    }
+    return days;
+}
+
 ACR_String_t ACR_DayOfWeekToString(
     ACR_DayOfWeek_t dayOfWeek)
 {
@@ -596,19 +611,24 @@ ACR_Month_t ACR_MonthFromString(
     return ACR_MONTH_UNKNOWN;
 }
 
-ACR_Count_t ACR_MonthToDays(
-    ACR_Month_t month,
-    ACR_Bool_t isLeapYear)
+ACR_Bool_t ACR_YearIsLeapYear(
+    int fourDigitYear)
 {
-    ACR_Count_t days = g_ACRMonthDaysLookup[month];
-    if(isLeapYear)
+    ACR_Bool_t isLeapTear = ACR_BOOL_FALSE;
+
+    if(fourDigitYear % 400 == 0)
     {
-        if(month == ACR_MONTH_FEBRUARY)
+        isLeapTear = ACR_BOOL_TRUE;
+    }
+    else if(fourDigitYear % 100 != 0)
+    {
+        if(fourDigitYear % 4 == 0)
         {
-            days++;
+            isLeapTear = ACR_BOOL_TRUE;
         }
     }
-    return days;
+
+    return isLeapTear;
 }
 
 ////////////////////////////////////////////////////////////

@@ -130,7 +130,7 @@
                         endianess.
                         see "TYPES AND DEFINES - ENDIANNESS" for details.
 
-    ACR_NO_TIME         do not include <time.h> for time_t, struct tm,
+    ACR_NO_RTC          do not include <time.h> for time_t, struct tm,
                         time(), and gmtime_s() or gmtime_r()
                         Note: this never completely disables support
                               for times and dates but does limit it.
@@ -592,6 +592,12 @@ typedef char ACR_Bool_t;
        by a null pointer it will cause the program to crash.
        This is why it is important to always check
        if a pointer is null before using it.
+
+    Q: What is a SEGFAULT or Segmentation fault?
+    A: This occurs when attempting to access memory that
+       does not belong to your program. In almost all cases
+       this will cause your program to crash. The most common
+       SEGFAULT is caused by trying to access a null pointer.
 
 */
 #ifdef __cplusplus
@@ -1211,11 +1217,37 @@ typedef ACR_Byte_t ACR_Flags_t;
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - TIME AND DATE VALUES
+// TYPES AND DEFINES - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
 
 /** months of the year
+ * 
+    ### New to C? ###
+
+    Q: Why not just use the number of the month?
+    A: Best practice is to avoid the user of "magic numbers",
+       which is any number present in the code that does
+       not have a name attached to it. Some numbers, like
+       the number of the month, seem so simple that you may
+       think it is ok to just use a number, but this is how
+       many off-by-one errors occur.
+
+    Q: What is an off-by-one error?
+    A: This is one of the most common programming mistakes and
+       typically involves a simple mistake caused by counting
+       starting with the number 0 or the number 1. The result
+       is a value that is either 1 too big or 1 too small. In
+       the best case it just causes some display errors and in
+       the worst case it can crash the program.
+
+    Q: What is a buffer overrun or overflow?
+    A: This occurs when accessing an index of an array that 
+       is greater than the size of the array. This almost always
+       causes the program to crash but it is also possible for
+       the program to continue running with undefined behavior.
+       An off-by-one error can easily cause a buffer overrun.
+
 */
 typedef enum ACR_Month_e
 {
@@ -1253,6 +1285,8 @@ typedef enum ACR_DayOfWeek_e
 
 #define ACR_DAY_OF_WEEK_UNKNOWN (ACR_DAY_COUNT+1)
 #define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
+#define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(year)))
+#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(year)?366:365)
 
 // HOURS
 #define ACR_HOUR_PER_DAY 24
@@ -1277,6 +1311,11 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_MICRO_PER_SEC (ACR_MICRO_PER_MILLI*ACR_MILLI_PER_SEC)
 #define ACR_MICRO_PER_MIN (ACR_MICRO_PER_SEC*ACR_SEC_PER_MIN)
 
+// NANOSECONDS
+#define ACR_NANO_PER_MICRO 1000
+#define ACR_NANO_PER_MILLI (ACR_NANO_PER_MICRO*ACR_MICRO_PER_MILLI)
+#define ACR_NANO_PER_SEC (ACR_NANO_PER_MILLI*ACR_MILLI_PER_SEC)
+
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - REAL TIME CLOCK
@@ -1285,7 +1324,7 @@ typedef enum ACR_DayOfWeek_e
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
-#ifndef ACR_NO_TIME
+#ifndef ACR_NO_RTC
     #ifndef ACR_NO_LIBC
         #ifdef ACR_COMPILER_CLANG
             #include <time.h>
@@ -1307,7 +1346,7 @@ typedef enum ACR_DayOfWeek_e
         #define ACR_USE_BUILT_IN_RTC
         #define ACR_HAS_RTC ACR_BOOL_FALSE
     #endif 
-#else // #ifndef ACR_NO_TIME
+#else // #ifndef ACR_NO_RTC
     #define ACR_HAS_RTC ACR_BOOL_FALSE
 #endif
 
@@ -2164,6 +2203,17 @@ ACR_Info_t ACR_InfoFromString(
 //
 ////////////////////////////////////////////////////////////
 
+/** get the number of days in the specified month
+    \param month the month
+           \see enum ACR_Month_e
+    \param isLeapYear set to ACR_BOOL_TRUE to get leap year days (only affects February)
+           \see ACR_YearIsLeapYear()
+    \returns the number of days in the month
+*/
+int ACR_DaysPerMonth(
+    ACR_Month_t month,
+    ACR_Bool_t isLeapYear);
+
 /** get the day of week value as a string
     \param dayOfWeek the day of week value
            \see enum ACR_DayOfWeek_e
@@ -2196,14 +2246,11 @@ ACR_String_t ACR_MonthToString(
 ACR_Month_t ACR_MonthFromString(
     ACR_String_t src);
 
-/** get the number of days in the specified month
-    \param month the month
-           \see enum ACR_Month_e
-    \param isLeapYear set to ACR_BOOL_TRUE to get leap year days (only affects February)
+/** \param fourDigitYear any four digit year
+    \returns ACR_BOOL_TRUE if the year is a leap year
 */
-ACR_Count_t ACR_MonthToDays(
-    ACR_Month_t month,
-    ACR_Bool_t isLeapYear);
+ACR_Bool_t ACR_YearIsLeapYear(
+    int fourDigitYear);
 
 ////////////////////////////////////////////////////////////
 //
