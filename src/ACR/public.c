@@ -167,6 +167,9 @@ unsigned char g_ACRMonthDaysLookup[ACR_MONTH_COUNT+1] =
     0   // ACR_MONTH_COUNT
 };
 
+ACR_Bool_t g_ACRSimRtcIsSet = ACR_BOOL_FALSE;
+ACR_Time_t g_ACRSimRtcTime = 0;
+
 ////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS - TEST
@@ -629,6 +632,111 @@ ACR_Bool_t ACR_YearIsLeapYear(
     }
 
     return isLeapTear;
+}
+
+ACR_Bool_t ACR_TimeNow(
+    ACR_Time_t* me)
+{
+    if(me)
+    {
+        #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+            ACR_TIME_NOW((*me));
+            return ACR_BOOL_TRUE;
+
+        #else
+
+            if(g_ACRSimRtcIsSet)
+            {
+                (*me) = g_ACRSimRtcTime;
+                return ACR_BOOL_TRUE;
+            }
+
+        #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+        // time has never been set and a RTC is not available.
+        // set time to zero seconds.
+        (*me) = 0;
+    }
+
+    return ACR_BOOL_FALSE;
+}
+
+ACR_Bool_t ACR_DateTimeFromTime(
+    ACR_DateTime_t* me,
+    ACR_Time_t* time)
+{
+    if(me)
+    {
+        if(time)
+        {
+            if((*time) > 0)
+            {
+                #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+                    ACR_DATETIME_FROM_TIME((*me), (*time));
+                    return ACR_BOOL_TRUE;
+
+                #else
+
+                    ACR_Time_t tempTime = (*time);
+                    int year = 1970;
+
+                    if((*time) >= ACR_SEC_FROM_1970_TO_2020)
+                    {
+                        // year 2020 or later
+                        year = 2020;
+                        tempTime -= ACR_SEC_FROM_1970_TO_2020;
+                    }
+                    else if((*time) >= ACR_SEC_FROM_1970_TO_2000)
+                    {
+                        // year 2000 to 2019
+                        year = 2000;
+                        tempTime -= ACR_SEC_FROM_1970_TO_2000;
+                    }
+                    else
+                    {
+                        // year 1970 to 1999
+                    }
+
+                    do
+                    {
+                        ACR_Time_t secondsInYear = (ACR_SEC_PER_DAY * ACR_DAYS_PER_YEAR(year));
+                        if(secondsInYear > tempTime)
+                        {
+                            year++;
+                            tempTime -= secondsInYear;
+                        }
+                        else
+                        {
+                            // found the year
+                            me->tm_year = (year-1900);
+                            // break out of this loop.
+                            break;
+                        }
+                    }
+                    while (tempTime >= ACR_SEC_PER_STANDARD_YEAR);
+
+                    
+                    
+                    return ACR_BOOL_TRUE;
+
+                #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+            }
+            else
+            {
+                // invalid time
+            }
+        }
+        else
+        {
+            // time is null
+        }
+
+        ACR_CLEAR_MEMORY(me, sizeof(ACR_DateTime_t));
+    }
+
+    return ACR_BOOL_FALSE;
 }
 
 ////////////////////////////////////////////////////////////

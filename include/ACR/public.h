@@ -456,7 +456,7 @@ typedef char ACR_Bool_t;
     \param p a pointer to the memory to clear
     \param s the number of bytes of data to clear
 */
-#define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s)}
+#define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s);}
 
 /** defines a callback function type
     \param t the name of the type to define
@@ -1286,7 +1286,9 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_DAY_OF_WEEK_UNKNOWN (ACR_DAY_COUNT+1)
 #define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
 #define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(year)))
-#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(year)?366:365)
+#define ACR_DAYS_PER_STANDARD_YEAR 365
+#define ACR_DAYS_PER_LEAP_YEAR 366
+#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(year)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
 
 // HOURS
 #define ACR_HOUR_PER_DAY 24
@@ -1300,6 +1302,11 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_SEC_PER_MIN 60
 #define ACR_SEC_PER_HOUR (ACR_SEC_PER_MIN*ACR_MIN_PER_HOUR)
 #define ACR_SEC_PER_DAY (ACR_SEC_PER_HOUR*ACR_HOUR_PER_DAY)
+#define ACR_SEC_PER_STANDARD_YEAR (ACR_SEC_PER_DAY*ACR_DAYS_PER_STANDARD_YEAR)
+#define ACR_SEC_PER_LEAP_YEAR (ACR_SEC_PER_DAY*ACR_DAYS_PER_LEAP_YEAR)
+#define ACR_SEC_FROM_1900_TO_1970 2208988800UL
+#define ACR_SEC_FROM_1970_TO_2000  946684800UL
+#define ACR_SEC_FROM_1970_TO_2020 1577836800UL
 
 // MILLISECONDS
 #define ACR_MILLI_PER_SEC 1000
@@ -1329,10 +1336,14 @@ typedef enum ACR_DayOfWeek_e
         #ifdef ACR_COMPILER_CLANG
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
+            #define ACR_TIME_NOW(name) time(&name)
+            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
         #endif
         #ifdef ACR_COMPILER_GCC
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
+            #define ACR_TIME_NOW(name) time(&name)
+            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
         #endif
         #ifdef ACR_COMPILER_VS2017
             #pragma warning(push)
@@ -1341,81 +1352,74 @@ typedef enum ACR_DayOfWeek_e
             #include <time.h>
             #pragma warning(pop)
             #define ACR_HAS_RTC ACR_BOOL_TRUE
+            #define ACR_TIME_NOW(name) time(&name)
+            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)
         #endif
-    #else // #ifndef ACR_NO_LIBC
-        #define ACR_USE_BUILT_IN_RTC
-        #define ACR_HAS_RTC ACR_BOOL_FALSE
-    #endif 
-#else // #ifndef ACR_NO_RTC
+    #endif // #ifndef ACR_NO_LIBC
+#endif // #ifndef ACR_NO_RTC
+
+#ifndef ACR_HAS_RTC
     #define ACR_HAS_RTC ACR_BOOL_FALSE
-#endif
+#endif // #ifndef ACR_HAS_RTC
 
 #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
-/** time value
-*/
-typedef time_t ACR_Time_t;
+    /** time value (seconds since unix epoch Jan 1, 1970)
+    */
+    typedef time_t ACR_Time_t;
 
-/** standard date time structure
-*/
-typedef struct tm ACR_DateTime_t;
-
-/** set the specified date time to the current date and time
-
-    example:
-    ACR_DATETIME(current);
-    ACR_DATETIME_NOW(current);
-
-*/
-#ifdef ACR_COMPILER_VS2017
-#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_s(&name,&temp);}
-#endif
-#ifdef ACR_COMPILER_CLANG
-#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_r(&temp,&name);}
-#endif
-#ifdef ACR_COMPILER_GCC
-#define ACR_DATETIME_NOW(name) {time_t temp; time(&temp); gmtime_r(&temp,&name);}
-#endif
+    /** standard date time structure
+    */
+    typedef struct tm ACR_DateTime_t;
 
 #else
 
-/** time value
-*/
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-typedef unsigned long long ACR_Time_t;
-#else
-// 32bit
-typedef unsigned long ACR_Time_t;
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
+    /** time value (seconds since unix epoch Jan 1, 1970)
+    */
+    #if ACR_USE_64BIT == ACR_BOOL_TRUE
+        // 64bit
+        typedef unsigned long long ACR_Time_t;
+    #else
+        // 32bit
+        typedef unsigned long ACR_Time_t;
+    #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
-/** standard date time structure
-*/
-typedef struct ACR_DateTime_s {
-   int tm_sec;         /* seconds, range 0 to 59          */
-   int tm_min;         /* minutes, range 0 to 59           */
-   int tm_hour;        /* hours, range 0 to 23             */
-   int tm_mday;        /* day of the month, range 1 to 31  */
-   int tm_mon;         /* month, range 0 to 11             */
-   int tm_year;        /* The number of years since 1900   */
-   int tm_wday;        /* day of the week, range 0 to 6    */
-   int tm_yday;        /* day in the year, range 0 to 365  */
-   int tm_isdst;       /* daylight saving time             */	
-} ACR_DateTime_t;
+    /** standard date time structure
+    */
+    typedef struct ACR_DateTime_s
+    {
+        int tm_sec;          /* seconds, range 0 to 59           */
+        int tm_min;          /* minutes, range 0 to 59           */
+        int tm_hour;         /* hours, range 0 to 23             */
+        int tm_mday;         /* day of the month, range 1 to 31  */
+        int tm_mon;          /* month, range 0 to 11             */
+        int tm_year;         /* The number of years since 1900   */
+        int tm_wday;         /* day of the week, range 0 to 6    */
+        int tm_yday;         /* day in the year, range 0 to 365  */
+        int tm_isdst;        /* daylight saving time             */	
+        int tm_gmtoff;		 /* Seconds east of UTC.             */
+        const char *tm_zone; /* Timezone abbreviation.           */
+    } ACR_DateTime_t;
 
-/** RTC is not available so this macro just clears the date time
-    \todo create a simple built-in RTC using a function that must be called by the user each second to increment the clock
-*/
-#define ACR_DATETIME_NOW(name) ACR_CLEAR_MEMORY(&name,sizeof(ACR_DateTime_t));
+    #define ACR_TIME_NOW(name) ACR_TimeNow(&name)
+    #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&name,&time)
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
-#ifdef ACR_USE_BUILT_IN_RTC
-    #undef ACR_HAS_RTC
-    // ACR_BOOL_TRUE
-    #define ACR_HAS_RTC ACR_BOOL_FALSE 
-    /// \todo create a simple built-in RTC using a function that must be called by the user each second to increment the "clock"
-#endif
+/** get the current date and time
+    \param name any ACR_DateTime_t variable
+*/
+#define ACR_DATETIME_NOW(name) {time_t temp; ACR_TIME_NOW(temp); ACR_DATETIME_FROM_TIME(name,temp);}
+
+/** values that represent whether in day light savings time or not
+    see tm_isdst in ACR_DateTime_t
+*/
+enum ACR_DST_e
+{
+    ACR_DST_UNKNOWN = -1,
+    ACR_DST_OFF = 0,
+    ACR_DST_ON = 1
+};
 
 /** define an empty date time on the stack
 */
@@ -1452,6 +1456,12 @@ typedef struct ACR_DateTime_s {
 #define ACR_DATETIME_HOUR(name) (name.tm_hour)
 #define ACR_DATETIME_MIN(name) (name.tm_min)
 #define ACR_DATETIME_SEC(name) (name.tm_sec)
+
+/** ntp time is the number of seconds since Jan 1, 1900.
+    this will convert NTP time to UNIX timestamp by subtracting
+    seventy years in seconds
+*/
+#define ACR_TIME_FROM_NTP(ntpTime) (ntpTime - ACR_SEC_FROM_1900_TO_1970)
 
 ////////////////////////////////////////////////////////////
 //
@@ -1517,7 +1527,7 @@ enum ACR_BufferFlags_e
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) ACR_CLEAR_MEMORY(name.m_Pointer, (size_t)name.m_Length);
+#define ACR_BUFFER_CLEAR(name) ACR_CLEAR_MEMORY(name.m_Pointer, (size_t)name.m_Length)
 
 /** assign memory to the buffer
     /// \todo make a version of this without free()
@@ -2037,6 +2047,15 @@ typedef unsigned long ACR_Unicode_t;
 
 /////////////////////////////////////////////////////////
 //                                                     //
+// TYPES AND DEFINES - UNITS OF MEASURE                //
+//                                                     //
+/////////////////////////////////////////////////////////
+
+#define ACR_DEGREES_C_TO_F(c) ((c*1.8)+32.0)
+#define ACR_DEGREES_F_TO_C(f) ((f-32.0)/1.8)
+
+/////////////////////////////////////////////////////////
+//                                                     //
 // TYPES AND DEFINES - UNIQUE STRING VALUES            //
 //                                                     //
 // note: keep these in alphabetical order so that it   //
@@ -2251,6 +2270,22 @@ ACR_Month_t ACR_MonthFromString(
 */
 ACR_Bool_t ACR_YearIsLeapYear(
     int fourDigitYear);
+
+/** set the time to the current system time
+    \param me the time
+    \returns ACR_BOOL_TRUE if successful
+*/
+ACR_Bool_t ACR_TimeNow(
+    ACR_Time_t* me);
+
+/** set the date time data from the specified time
+    \param me the date time
+    \param time the time
+    \returns ACR_BOOL_TRUE if successful
+*/
+ACR_Bool_t ACR_DateTimeFromTime(
+    ACR_DateTime_t* me,
+    ACR_Time_t* time);
 
 ////////////////////////////////////////////////////////////
 //
