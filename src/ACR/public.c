@@ -148,6 +148,25 @@ static char* g_ACRMonthStringLookup[ACR_MONTH_COUNT+1] =
     ""                      // ACR_MONTH_COUNT
 };
 
+/** months to days lookup table
+*/
+unsigned char g_ACRMonthDaysLookup[ACR_MONTH_COUNT+1] =
+{
+    31, // ACR_MONTH_JANUARY
+    28, // ACR_MONTH_FEBRUARY
+    31, // ACR_MONTH_MARCH
+    30, // ACR_MONTH_APRIL
+    31, // ACR_MONTH_MAY
+    30, // ACR_MONTH_JUNE
+    31, // ACR_MONTH_JULY
+    31, // ACR_MONTH_AUGUST
+    30, // ACR_MONTH_SEPTEMBER
+    31, // ACR_MONTH_OCTOBER
+    30, // ACR_MONTH_NOVEMBER
+    31, // ACR_MONTH_DECEMBER
+    0   // ACR_MONTH_COUNT
+};
+
 ////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS - TEST
@@ -575,6 +594,21 @@ ACR_Month_t ACR_MonthFromString(
     }
     while(i < ACR_INFO_COUNT);
     return ACR_MONTH_UNKNOWN;
+}
+
+ACR_Count_t ACR_MonthToDays(
+    ACR_Month_t month,
+    ACR_Bool_t isLeapYear)
+{
+    ACR_Count_t days = g_ACRMonthDaysLookup[month];
+    if(isLeapYear)
+    {
+        if(month == ACR_MONTH_FEBRUARY)
+        {
+            days++;
+        }
+    }
+    return days;
 }
 
 ////////////////////////////////////////////////////////////

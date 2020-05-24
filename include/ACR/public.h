@@ -134,7 +134,7 @@
                         time(), and gmtime_s() or gmtime_r()
                         Note: this never completely disables support
                               for times and dates but does limit it.
-                        see "TYPES AND DEFINES - TIME VALUES" for details.
+                        see "TYPES AND DEFINES - REAL TIME CLOCK" for details.
 
     ACR_NO_64BIT        do not use types of long long
                         Note: only use this setting if you know that your
@@ -244,6 +244,10 @@
 
 */
 #define ACR_BOOL_TRUE 1
+
+/** use this type only for ACR_BOOL_FALSE or ACR_BOOL_TRUE
+*/
+typedef char ACR_Bool_t;
 
 /** represents an empty value.
     use this instead of 0 to clearly indicate the value
@@ -1072,12 +1076,43 @@ typedef struct ACR_Blocks_s
 #define ACR_LENGTH_TO_BLOCKS(blocks, length) { blocks.m_Blocks = (length / ACR_BYTES_PER_BLOCK); blocks.m_Bytes = (length % ACR_BYTES_PER_BLOCK); }
 
 #ifndef ACR_NO_LIBC
+
     // included for memcpy()
     #include <string.h>
-    #define ACR_MEMCPY(dsl) memcpy(d,s,l);
+    #define ACR_MEMCPY(d,s,l) memcpy(d,s,l);
+
+    /*
+        ### New to C? ###
+
+        Q: What does memcpy do?
+        A: memcpy is a function that copies memory from
+           one address to another. It is generally best
+           to avoid copying memory unless necessary since
+           it can be a relatively slow process. What this
+           means is that if there is way to work with the
+           data without copying it first, then that is
+           preferred over making a copy.
+
+    */
+
 #else
-    /// \todo make a generic copy for memcpy
-    #define ACR_MEMCPY(dsl) memcpy(d,s,l);
+
+    /** ACR_NO_LIBC is defined so this is a 
+        generic (slow) memcpy but gets the job done
+    */
+    #define ACR_MEMCPY(d,s,l) \
+    {\
+        char* pd=(char*)d;\
+        char* ps=(char*)s;\
+        size_t ln=(size_t)l;\
+        while(ln>0)\
+        {\
+            ln--;\
+            pd[ln]=ps[ln];\
+        }\
+    }
+
+
 #endif // #ifndef ACR_NO_LIBC
 
 ////////////////////////////////////////////////////////////
@@ -1088,57 +1123,97 @@ typedef struct ACR_Blocks_s
 
 /** flags are always a single byte to keep options organized.
     if necessary, use more than one set of flags.
+
+    ### New to C? ###
+
+    Q: What are flags?
+    A: Flags are a clever way to store boolean values.
+       There are 8 bits in a byte and each one can be set
+       to 0 (false) or 1 (true). Checking and modifying
+       these bits individually allows them to be used
+       as a single boolean value but the real power of
+       this feature is the ability to do this on many
+       of the bits at the same time. 
+
 */
 typedef ACR_Byte_t ACR_Flags_t;
 
-#define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) ((checkFlags & forFlags) != 0)
-#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) ((checkFlags & forFlags) == forFlags)
-#define ACR_HAS_FLAG(checkFlags, forFlag) ACR_HAS_ALL_FLAGS(checkFlags, forFlag)
-#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) ((checkFlags & (~forFlags) == 0)
-#define ACR_ADD_FLAGS(flags, flagsToAdd) flags |= flagsToAdd;
-#define ACR_REMOVE_FLAGS(flags, flagsToRemove) flags &= (~flagsToRemove);
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - TIME VALUES
-//
-////////////////////////////////////////////////////////////
-
-#define ACR_MICRO_PER_MILLI 1000
-#define ACR_MILLI_PER_SEC   1000
-#define ACR_SEC_PER_MIN     60
-#define ACR_MIN_PER_HOUR    60
-#define ACR_HOUR_PER_DAY    24
-
-// MINUTES
-#define ACR_MIN_PER_DAY (ACR_MIN_PER_HOUR*ACR_HOUR_PER_DAY)
-// SECONDS
-#define ACR_SEC_PER_HOUR (ACR_SEC_PER_MIN*ACR_MIN_PER_HOUR)
-#define ACR_SEC_PER_DAY (ACR_SEC_PER_HOUR*ACR_HOUR_PER_DAY)
-// MILLISECONDS
-#define ACR_MILLI_PER_MIN (ACR_MILLI_PER_SEC*ACR_SEC_PER_MIN)
-#define ACR_MILLI_PER_HOUR (ACR_MILLI_PER_MIN*ACR_MIN_PER_HOUR)
-// MICROSECONDS
-#define ACR_MICRO_PER_SEC (ACR_MICRO_PER_MILLI*ACR_MILLI_PER_SEC)
-#define ACR_MICRO_PER_MIN (ACR_MICRO_PER_SEC*ACR_SEC_PER_MIN)
-
-/** days of the week
+/* Hex values for each flag
 */
-typedef enum ACR_DayOfWeek_e
-{
-    ACR_DAY_SUNDAY = 0,
-    ACR_DAY_MONDAY,
-    ACR_DAY_TUESDAY,
-    ACR_DAY_WEDNESDAY,
-    ACR_DAY_THURSDAY,
-    ACR_DAY_FRIDAY,
-    ACR_DAY_SATURDAY,
-    ACR_DAY_COUNT
-} ACR_DayOfWeek_t;
+#define ACR_FLAG_NONE  0x00
+#define ACR_FLAG_ONE   0x01
+#define ACR_FLAG_TWO   0x02
+#define ACR_FLAG_THREE 0x04
+#define ACR_FLAG_FOUR  0x08
+#define ACR_FLAG_FIVE  0x10
+#define ACR_FLAG_SIX   0x20
+#define ACR_FLAG_SEVEN 0x40
+#define ACR_FLAG_EIGHT 0x80
 
-#define ACR_DAY_OF_WEEK_UNKNOWN ACR_DAY_COUNT
-#define ACR_DAY_PER_WEEK ACR_DAY_COUNT
-#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
+/** Converts a number between 1 and 8 to the cooresponding flag
+*/
+#define ACR_FLAG(n) (0x01 << (n-1))
+
+/** checks if any of the flags are present
+ 
+    example:
+
+    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
+    if(ACR_HAS_ANY_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR))
+    {
+        // flags has ONE and/or FOUR
+    }
+
+*/
+#define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) != 0
+
+/** checks if all of the flags are present
+ 
+    example:
+
+    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
+    if(ACR_HAS_ALL_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN))
+    {
+        // flags has ONE, FOUR, and SEVEN
+    }
+
+*/
+#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) == forFlags
+
+/** use this when checking for just one flag
+*/
+#define ACR_HAS_FLAG(checkFlags, forFlag) ACR_HAS_ALL_FLAGS(checkFlags, forFlag)
+
+/** checks if any flags exist that are not specified
+ 
+    example:
+
+    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
+    if(ACR_HAS_ONLY_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR))
+    {
+        // flags has ONE and/or FOUR and no other flags
+    }
+    else
+    {
+        // there are flags other than ONE and FOUR present
+    }
+
+*/
+#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) ((checkFlags) & (~(forFlags)) == 0
+
+/** adds one or more flags to the existing flags
+*/
+#define ACR_ADD_FLAGS(flags, flagsToAdd) flags |= (flagsToAdd)
+
+/** removes one or more flags from the existing flags
+*/
+#define ACR_REMOVE_FLAGS(flags, flagsToRemove) flags &= (~(flagsToRemove))
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - TIME AND DATE VALUES
+//
+////////////////////////////////////////////////////////////
 
 /** months of the year
 */
@@ -1159,8 +1234,54 @@ typedef enum ACR_Month_e
     ACR_MONTH_COUNT
 } ACR_Month_t;
 
-#define ACR_MONTH_UNKNOWN ACR_MONTH_COUNT
-#define ACR_MONTH_PER_YEAR ACR_MONTH_COUNT
+#define ACR_MONTH_UNKNOWN (ACR_MONTH_COUNT+1)
+#define ACR_MONTHS_PER_YEAR ACR_MONTH_COUNT
+
+/** days of the week
+*/
+typedef enum ACR_DayOfWeek_e
+{
+    ACR_DAY_SUNDAY = 0,
+    ACR_DAY_MONDAY,
+    ACR_DAY_TUESDAY,
+    ACR_DAY_WEDNESDAY,
+    ACR_DAY_THURSDAY,
+    ACR_DAY_FRIDAY,
+    ACR_DAY_SATURDAY,
+    ACR_DAY_COUNT
+} ACR_DayOfWeek_t;
+
+#define ACR_DAY_OF_WEEK_UNKNOWN (ACR_DAY_COUNT+1)
+#define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
+
+// HOURS
+#define ACR_HOUR_PER_DAY 24
+
+// MINUTES
+#define ACR_MIN_PER_HOUR 60
+#define ACR_MIN_PER_DAY (ACR_MIN_PER_HOUR*ACR_HOUR_PER_DAY)
+#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
+
+// SECONDS
+#define ACR_SEC_PER_MIN 60
+#define ACR_SEC_PER_HOUR (ACR_SEC_PER_MIN*ACR_MIN_PER_HOUR)
+#define ACR_SEC_PER_DAY (ACR_SEC_PER_HOUR*ACR_HOUR_PER_DAY)
+
+// MILLISECONDS
+#define ACR_MILLI_PER_SEC 1000
+#define ACR_MILLI_PER_MIN (ACR_MILLI_PER_SEC*ACR_SEC_PER_MIN)
+#define ACR_MILLI_PER_HOUR (ACR_MILLI_PER_MIN*ACR_MIN_PER_HOUR)
+
+// MICROSECONDS
+#define ACR_MICRO_PER_MILLI 1000
+#define ACR_MICRO_PER_SEC (ACR_MICRO_PER_MILLI*ACR_MILLI_PER_SEC)
+#define ACR_MICRO_PER_MIN (ACR_MICRO_PER_SEC*ACR_SEC_PER_MIN)
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - REAL TIME CLOCK
+//
+////////////////////////////////////////////////////////////
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
@@ -1488,7 +1609,7 @@ typedef struct ACR_VarBuffer_s
         { \
              if(srcPtr != ACR_NULL) \
              { \
-                 memcpy(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length, srcPtr, (size_t)length); \
+                 ACR_MEMCPY(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length, srcPtr, (size_t)length); \
              } \
              name.m_Buffer.m_Length += length; \
         }
@@ -2074,6 +2195,15 @@ ACR_String_t ACR_MonthToString(
 */
 ACR_Month_t ACR_MonthFromString(
     ACR_String_t src);
+
+/** get the number of days in the specified month
+    \param month the month
+           \see enum ACR_Month_e
+    \param isLeapYear set to ACR_BOOL_TRUE to get leap year days (only affects February)
+*/
+ACR_Count_t ACR_MonthToDays(
+    ACR_Month_t month,
+    ACR_Bool_t isLeapYear);
 
 ////////////////////////////////////////////////////////////
 //
