@@ -167,8 +167,10 @@ unsigned char g_ACRMonthDaysLookup[ACR_MONTH_COUNT+1] =
     0   // ACR_MONTH_COUNT
 };
 
-ACR_Bool_t g_ACRSimRtcIsSet = ACR_BOOL_FALSE;
+ACR_Bool_t g_ACRSimRtcTimeIsSet = ACR_BOOL_FALSE;
 ACR_Time_t g_ACRSimRtcTime = 0;
+ACR_Bool_t g_ACRSimRtcTimeMilliIsSet = ACR_BOOL_FALSE;
+ACR_Time_t g_ACRSimRtcTimeMilli = 0;
 
 ////////////////////////////////////////////////////////////
 //
@@ -646,7 +648,7 @@ ACR_Bool_t ACR_TimeNow(
 
         #else
 
-            if(g_ACRSimRtcIsSet)
+            if(g_ACRSimRtcTimeIsSet)
             {
                 (*me) = g_ACRSimRtcTime;
                 return ACR_BOOL_TRUE;
@@ -660,6 +662,49 @@ ACR_Bool_t ACR_TimeNow(
     }
 
     return ACR_BOOL_FALSE;
+}
+
+ACR_Bool_t ACR_TimeSet(
+    ACR_Time_t* me)
+{
+    ACR_Bool_t resut = ACR_BOOL_FALSE;
+
+    g_ACRSimRtcTimeIsSet = ACR_BOOL_TRUE;
+    g_ACRSimRtcTime = (*me);
+
+    #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+        #ifdef ACR_PLATFORM_MAC
+            /// \todo try to set the RTC to the specified time for this platform
+        #endif
+
+        #ifdef ACR_PLATFORM_WIN
+            /// \todo try to set the RTC to the specified time for this platform
+        #endif
+
+        #ifdef ACR_PLATFORM_GITPOD
+            /// \todo try to set the RTC to the specified time for this platform
+        #endif
+
+    #else
+        // there is no RTC.
+        // the simulated RTC is always set.
+        resut = ACR_BOOL_TRUE;
+    #endif
+
+}
+
+void ACR_TimeProcessSecondTick(
+    ACR_Time_t seconds)
+{
+    g_ACRSimRtcTime += seconds;
+}
+
+void ACR_TimeProcessMilliTick(
+    ACR_Time_t milliseconds)
+{
+    g_ACRSimRtcTimeMilliIsSet = ACR_BOOL_TRUE;
+    g_ACRSimRtcTimeMilli += milliseconds;
 }
 
 ACR_Bool_t ACR_DateTimeFromTime(
@@ -680,18 +725,18 @@ ACR_Bool_t ACR_DateTimeFromTime(
                 #else
 
                     ACR_Time_t tempTime = (*time);
-                    int year = 1970;
+                    int tempYear = 1970;
 
                     if((*time) >= ACR_SEC_FROM_1970_TO_2020)
                     {
                         // year 2020 or later
-                        year = 2020;
+                        tempYear = 2020;
                         tempTime -= ACR_SEC_FROM_1970_TO_2020;
                     }
                     else if((*time) >= ACR_SEC_FROM_1970_TO_2000)
                     {
                         // year 2000 to 2019
-                        year = 2000;
+                        tempYear = 2000;
                         tempTime -= ACR_SEC_FROM_1970_TO_2000;
                     }
                     else
@@ -699,25 +744,84 @@ ACR_Bool_t ACR_DateTimeFromTime(
                         // year 1970 to 1999
                     }
 
+                    //
+                    // tempTime contains at least the number of seconds necessary for the
+                    // the current value of the tempYear variable
+                    //
+                    // subtract the seconds for each year until less than a year of seconds remains
                     do
                     {
-                        ACR_Time_t secondsInYear = (ACR_SEC_PER_DAY * ACR_DAYS_PER_YEAR(year));
-                        if(secondsInYear > tempTime)
+                        ACR_Time_t secondsInYear = (ACR_SEC_PER_DAY * ACR_DAYS_PER_YEAR(tempYear));
+                        if(secondsInYear >= tempTime)
                         {
-                            year++;
+                            tempYear++;
                             tempTime -= secondsInYear;
                         }
                         else
                         {
                             // found the year
-                            me->tm_year = (year-1900);
+                            me->tm_year = (tempYear-1900);
                             // break out of this loop.
                             break;
                         }
                     }
                     while (tempTime >= ACR_SEC_PER_STANDARD_YEAR);
 
-                    
+                    //
+                    // calculate the day of the year from the tempTime
+                    //
+                    me->tm_yday = (tempTime / ACR_SEC_PER_DAY);
+                    tempTime -= (me->tm_yday * ACR_SEC_PER_DAY);
+
+                    //
+                    // find the month and day from the day of the year
+                    // by counting the days of each month and finding the remainder
+                    //
+                    {
+                        int tempDays = 0;
+                        int tempMonth = ACR_MONTH_JANUARY;
+                        int tempDaysToFirstOfMonth = 0;
+                        do
+                        {
+                            int daysInMonth = ACR_DAYS_PER_MONTH(tempYear, tempMonth);
+                            tempDays += daysInMonth;
+                            if(tempDays > me->tm_yday)
+                            {
+                                // found the month
+                                // break out of this loop.
+                                break;
+                            }
+                            tempDaysToFirstOfMonth += daysInMonth;
+                            tempMonth++;
+                        }
+                        while (tempMonth < ACR_MONTH_DECEMBER);
+                        me->tm_mon = tempMonth;
+                        me->tm_mday = (me->tm_yday - tempDaysToFirstOfMonth) + 1;
+                    }
+
+                    //
+                    // calculate the day of the week using Tomohiko Sakamoto's method
+                    // as defined on Wikipedia https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
+                    //
+                    {
+                        static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+                        tempYear -= ((me->tm_mon-1) < 3);
+                        me->tm_wday = (tempYear + tempYear/4 - tempYear/100 + tempYear/400 + t[me->tm_mon] + me->tm_mday) % 7;
+                    }
+
+                    //
+                    // temp time is now just the time of day in seconds.
+                    // covert to hours, minutes, seconds.
+                    //
+                    me->tm_hour = (tempTime / ACR_SEC_PER_HOUR);
+                    tempTime -= (me->tm_hour * ACR_SEC_PER_HOUR);
+                    me->tm_min = (tempTime / ACR_SEC_PER_MIN);
+                    tempTime -= (me->tm_min * ACR_SEC_PER_MIN);
+                    me->tm_sec = tempTime;
+
+                    // indicate using UTC time
+                    me->tm_gmtoff = 0;
+                    me->tm_zone = "UTC";
                     
                     return ACR_BOOL_TRUE;
 

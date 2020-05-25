@@ -37,6 +37,7 @@
     ******************************************************
 
 */
+#define ACR_NO_RTC
 /** \file public.h
  
     This header contains many common defines, enums, functions, and typedefs.
@@ -1285,10 +1286,10 @@ typedef enum ACR_DayOfWeek_e
 
 #define ACR_DAY_OF_WEEK_UNKNOWN (ACR_DAY_COUNT+1)
 #define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
-#define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(year)))
+#define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(fourDigitYear)))
 #define ACR_DAYS_PER_STANDARD_YEAR 365
 #define ACR_DAYS_PER_LEAP_YEAR 366
-#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(year)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
+#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
 
 // HOURS
 #define ACR_HOUR_PER_DAY 24
@@ -1384,6 +1385,8 @@ typedef enum ACR_DayOfWeek_e
         typedef unsigned long ACR_Time_t;
     #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
+    /// \todo support struct for time with seconds and microseconds
+
     /** standard date time structure
     */
     typedef struct ACR_DateTime_s
@@ -1409,7 +1412,7 @@ typedef enum ACR_DayOfWeek_e
 /** get the current date and time
     \param name any ACR_DateTime_t variable
 */
-#define ACR_DATETIME_NOW(name) {time_t temp; ACR_TIME_NOW(temp); ACR_DATETIME_FROM_TIME(name,temp);}
+#define ACR_DATETIME_NOW(name) {ACR_Time_t temp; ACR_TIME_NOW(temp); ACR_DATETIME_FROM_TIME(name,temp);}
 
 /** values that represent whether in day light savings time or not
     see tm_isdst in ACR_DateTime_t
@@ -2277,6 +2280,29 @@ ACR_Bool_t ACR_YearIsLeapYear(
 */
 ACR_Bool_t ACR_TimeNow(
     ACR_Time_t* me);
+
+/** attempt to set the RTC to the specified time
+    \param me the time to set the RTC to
+    \returns ACR_BOOL_TRUE if successful
+*/
+ACR_Bool_t ACR_TimeSet(
+    ACR_Time_t* me);
+
+/** when there is no RTC, call this function
+    once per second (or as close as possible)
+    to simulate the time
+    \param seconds the number of seconds since the last call to this function (typically 1 is desired)
+*/
+void ACR_TimeProcessSecondTick(
+    ACR_Time_t seconds);
+
+/** where there is no RTC, call this function
+    once per millisecond (or as close as possible)
+    to simulate the time
+    \param milliseconds the number of milliseconds since the last call to this function (typically 10 or less is desired)
+*/
+void ACR_TimeProcessMilliTick(
+    ACR_Time_t milliseconds);
 
 /** set the date time data from the specified time
     \param me the date time
