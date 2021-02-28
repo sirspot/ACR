@@ -38,7 +38,7 @@
 
 */
 
-/** \file public_strings.h
+/** \file public_unique_strings.h
  
     This header contains commonly used strings. It can
     be used standalone from the entire library or

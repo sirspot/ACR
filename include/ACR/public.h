@@ -103,60 +103,6 @@
     //
     /////
 
-    ### Preprocessor Defines For Confguration Options ###
-
-    Hopefully you are able to use one of the development environments
-    that have been preconfigured such as Gitpod, Visual Studio, or Qt Creator.
-    These platforms are described by this header in detail in the
-    "TYPES AND DEFINES - PLATFORM AND COMPILER" section.
-
-    For additional control over the configuration or if using an
-    alternate development environment, the following are the most
-    useful options to define in your preprocessor flags.
-
-    ACR_DEBUG           include debug tools.
-                        see "TYPES AND DEFINES - DEBUG" for details.
-
-    ACR_NO_MALLOC       do not include malloc() or free() and disables
-                        ACR_MALLOC and ACR_FREE macros.
-                        see "TYPES AND DEFINES - MALLOC" for details.
-
-    ACR_BIG_ENDIAN      always assume big endian without
-                        dynamically checking the system
-                        endianess.
-                        see "TYPES AND DEFINES - ENDIANNESS" for details.
-
-    ACR_LITTLE_ENDIAN   always assume little endian without
-                        dynamically checking the system
-                        endianess.
-                        see "TYPES AND DEFINES - ENDIANNESS" for details.
-
-    ACR_NO_RTC          do not include <time.h> for time_t, struct tm,
-                        time(), and gmtime_s() or gmtime_r()
-                        Note: this never completely disables support
-                              for times and dates but does limit it.
-                        see "TYPES AND DEFINES - REAL TIME CLOCK" for details.
-
-    ACR_NO_64BIT        do not use types of long long
-                        Note: only use this setting if you know that your
-                              compiler does not support 64bit values
-                              so that 32bit values will be used as the
-                              largest integer and pointer size instead.
-                        see "TYPES AND DEFINES - MEMORY LENGTHS" for details.
-
-    ACR_NO_LIBC         do not include any headers from the system
-                        including but not limited to <stdlib.h>,
-                        <string.h>, and <time.h>. when ACR_DEBUG is
-                        defined there may be some system headers
-                        included only to allow the debug featues.
-                        Note: features provided by these headers will
-                              attempt to be made available but may
-                              be limited or require additional user
-                              setup to be functional.
-                              each section may use this define to prevent
-                              system headers from being included and will
-                              provide additional details upon use.
-
     ### Top Uses ###
 
     ACR_DEBUG_PRINT     interface to printf() that only
@@ -283,28 +229,9 @@ typedef char ACR_Bool_t;
 // TYPES AND DEFINES - PLATFORM AND COMPILER
 //
 ////////////////////////////////////////////////////////////
+#include "ACR/public_config.h"
 
-/* The following preprocessor defines can be used to
-   automatically select the correct features for your
-   development environment
-
-   ACR_PLATFORM_MAC
-       ACR_IDE_XCODE
-           ACR_COMPILER_CLANG
-       ACR_IDE_QTCREATOR
-           ACR_COMPILER_CLANG
-
-   ACR_PLATFORM_WIN
-        ACR_IDE_QTCREATOR
-            ACR_COMPILER_MINGW
-            ACR_COMPILER_MSVC
-      ACR_IDE_VS2017
-            ACR_COMPILER_MSVC
-
-    ACR_PLATFORM_GITPOD
-        ACR_IDE_THEIA
-            ACR_COMPILER_GCC
-
+/* 
     ### New to C? ###
 
     Q: Why are there so many different platform settings?
@@ -348,6 +275,10 @@ typedef char ACR_Bool_t;
 
     #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
     #define ACR_PLATFORM_NAME "win64"
+    #ifdef ACR_WIN_NATIVE
+        #define WIN32_LEAN_AND_MEAN
+        #include <Windows.h>
+    #endif
     #ifdef ACR_IDE_QTCREATOR
         #define ACR_HAS_IDE ACR_BOOL_TRUE
         #define ACR_IDE_NAME "qt_creator"
@@ -415,6 +346,7 @@ typedef char ACR_Bool_t;
 // TYPES AND DEFINES - SYSTEM LEVEL
 //
 ////////////////////////////////////////////////////////////
+#include "ACR/public_callbacks.h"
 
 #ifndef ACR_NO_LIBC
 
@@ -458,89 +390,6 @@ typedef char ACR_Bool_t;
     \param s the number of bytes of data to clear
 */
 #define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s);}
-
-/** defines a callback function type
-    \param t the name of the type to define
-    \param r the return type or void if there is none
-  
-    ### New to C? ###
-
-        Q: What is a callback function?
-        A: A callback function is a variable
-           that can act as the function it is
-           assigned to.
-
-	example:
-
-        // define a list of all callback names
-        enum CallbackExample_e
-        {
-            CBEX_1 = 0,
-            CBEX_2,
-            CBEX_3,
-
-            CBEX_COUNT
-        };
-
-        // define the callback function prototypes
-        ACR_TYPEDEF_CALLBACK(CallbackExample_t, void)(int, void*);
-            void CbEx1(int,void*);
-            void CbEx2(int,void*);
-            void CbEx3(int,void*);
-
-        // create a lookup table of the callback functions
-        CallbackExample_t g_CbEx[CBEX_COUNT+1] = 
-        {
-            CbEx1, // CBEX_1
-            CbEx2, // CBEX_2
-            CbEx3, // CBEX_3
-
-            ACR_NULL
-        };
-
-        int main()
-        {
-            unsigned int cbIndex;
-
-            // just use one callback function
-            g_CbEx[CBEX_1](0, ACR_NULL);
-
-            // loop through all callback functions
-            cbIndex = 0;
-            while(cbIndex < CBEX_COUNT)
-            {
-                g_CbEx[cbIndex](cbIndex, ACR_NULL);
-            }
-
-            return ACR_SUCCESS;
-        }
-
-        // complete the definition of the first callback function
-        void CbEx1(int a, void* b)
-        {
-            ACR_UNUSED(a);
-            ACR_UNUSED(b);
-            ACR_DEBUG_PRINT(1,"One");
-        }
-
-        // complete the definition of the second callback function
-        void CbEx2(int a, void* b)
-        {
-            ACR_UNUSED(a);
-            ACR_UNUSED(b);
-            ACR_DEBUG_PRINT(2,"Two");
-        }
-        
-        // complete the definition of the third callback function
-        void CbEx3(int a, void* b)
-        {
-            ACR_UNUSED(a);
-            ACR_UNUSED(b);
-            ACR_DEBUG_PRINT(3,"Three");
-        }
-
-*/
-#define ACR_TYPEDEF_CALLBACK(t,r) typedef r (*t)
 
 /** represents a successful program or thread execution
 
@@ -750,173 +599,33 @@ typedef char ACR_Bool_t;
 //
 // TYPES AND DEFINES - ENDIANNESS
 //
-// ### New to C? ###
-//
-// Even experienced programmers sometimes forget about
-// endianess. Read the following details to help understand
-// what endianess means and how it changes the way data
-// is stored in memory
-//
-// Q: What is MSB and LSB?
-// A: The Most Significant Bit/Byte (MSB) is the bit or byte
-//    that changes the value of an integer by the greatest amount.
-//    The Least Significant Bit/Byte (LSB) is the bit or byte
-//    that changes the value of an integer by the smallest amount.
-//    See the Sample Memory illustrations below for details.
-//
-// Note: Big Endian means that multibyte values have the
-//       bytes stored in memory from least significant 
-//       to most significant. Little Endian is the opposite.
-//
-// ### Sample Memory ###
-//
-//   type/bytes   illustration
-//
-//   char/1       memory = [ 0x01 ---- ---- ---- ]
-//                binary little endian =
-//                    MSB -------- -------- -------- 00000001 LSB
-//                decimal little endian = 1
-//                decimal big endian = 1
-//
-//   short/2      memory = [ 0x01 0x00 ---- ---- ]
-//                binary little endian = 
-//                    MSB -------- -------- 00000001 00000000 LSB
-//                decimal little endian = 256
-//                decimal big endian = 1
-//
-//   short/2      memory = [ 0x00 0x01 ---- ---- ]
-//                binary little endian = 
-//                    MSB -------- -------- 00000000 00000001 LSB
-//                decimal little endian = 1
-//                decimal big endian = 256
-//
-//   long/4       memory = [ 0x00 0x01 0x00 0x00 ]
-//                binary little endian = 
-//                    MSB 00000000 00000001 00000000 00000000 LSB
-//                decimal little endian = 65536
-//                decimal big endian = 256
-//
-// "long" Example:
-//
-//      // given a local variable with value 1
-//      long valueInSystemEndian = 1;
-//      // convert the value to big endian 
-//      long valueInBigEndian = ACR_BYTE_ORDER_32(valueInSystemEndian);
-//      // and use the same macro to convert
-//      // a big endian value back to system endianness
-//      valueInSystemEndian = ACR_BYTE_ORDER_32(valueInBigEndian);
-//
-// "short" example
-//
-//      // given a value known to be in big endian
-//      short valueInBigEndian = 1;
-//      // convert the value to system endian
-//      short valueInSystemEndian = ACR_BYTE_ORDER_16(valueInBigEndian);
-//      
 ////////////////////////////////////////////////////////////
-
-/** byte order swap of 16 bit value
-*/
-#define ACR_BYTE_ORDER_SWAP_16(x)   (((((unsigned short)(x)) & 0x00ff) << 8) | \
-                                     ((((unsigned short)(x)) & 0xff00) >> 8))
-
-/** byte order swap of 32 bit value
-*/
-#define ACR_BYTE_ORDER_SWAP_32(x)   ((((unsigned long)(x) & 0x000000ffUL) << 24) | \
-                                     (((unsigned long)(x) & 0x0000ff00UL) <<  8) | \
-                                     (((unsigned long)(x) & 0x00ff0000UL) >>  8) | \
-                                     (((unsigned long)(x) & 0xff000000UL) >> 24))
+#include "ACR/public_byte_order.h"
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
-/** byte order swap of 64 bit value
-*/
-#define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
-                                     (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
-                                     (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
-                                     (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
-                                     (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
-                                     (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
-                                     (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
-                                     (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
+    /** byte order swap of 64 bit value
+    */
+    #define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
+                                        (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
+                                        (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
+                                        (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
+                                        (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
+                                        (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
+                                        (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
+                                        (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
+    #ifdef ACR_ENDIAN_DYNAMIC
+        #define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
+    #else
+        #if ACR_IS_BIG_ENDIAN == 0
+            #define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
+        #else
+            #define ACR_BYTE_ORDER_64(x) (x)
+        #endif // #if ACR_IS_BIG_ENDIAN == 0
+    #endif // #ifdef ACR_ENDIAN_DYNAMIC
 
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
-//
-// defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
-// ACR_BOOL_FALSE
-//
-// Optional: If you already know the endianess of your
-//           system then set the preprocessor define as
-//           follows to improve byte order handling
-//           performance.
-//           Big Endian:    ACR_BIG_ENDIAN
-//           Little Endian: ACR_LITTLE_ENDIAN
-//
-#ifdef ACR_BIG_ENDIAN
-/** the system is big endian because ACR_BIG_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
-#else
-#ifdef ACR_LITTLE_ENDIAN
-/** the system is NOT big endian because ACR_LITTLE_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
-#endif // #ifdef ACR_LITTLE_ENDIAN
-#endif // #ifdef ACR_BIG_ENDIAN
-
-//
-// defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
-// ACR_BOOL_FALSE if not previously defined
-//
-#ifndef ACR_IS_BIG_ENDIAN
-#ifdef BIG_ENDIAN
-/** the system is big endian because BIG_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
-#else
-#ifdef LITTLE_ENDIAN
-/** the system is NOT big endian because LITTLE_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
-#else
-// Note: warning C4906: string literal cast to 'unsigned short *' must be
-//       ignored in project settings to use dynamic endianess detection
-#define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
-#define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
-#endif // #ifdef LITTLE_ENDIAN
-#endif // #ifdef BIG_ENDIAN
-#endif // #ifndef ACR_IS_BIG_ENDIAN
-
-//
-// defines ACR_BYTE_ORDER_16 and ACR_BYTE_ORDER_32 and ACR_BYTE_ORDER_64
-// to swap byte order to big endian when needed
-//
-#ifdef ACR_ENDIAN_DYNAMIC
-#define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_16(x):x)
-#define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_32(x):x)
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-#define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_64(x):x)
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-#else
-#if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
-#define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
-#define ACR_BYTE_ORDER_32(x) (ACR_BYTE_ORDER_SWAP_32(x))
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-#define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-#else
-#define ACR_BYTE_ORDER_16(x) (x)
-#define ACR_BYTE_ORDER_32(x) (x)
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-#define ACR_BYTE_ORDER_64(x) (x)
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-#endif // #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
-#endif // #ifdef ACR_ENDIAN_DYNAMIC
 
 ////////////////////////////////////////////////////////////
 //
