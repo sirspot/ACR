@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2020 Adam C. Rosenberg
+    Copyright (C) 2018 - 2021 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -37,7 +37,7 @@
     ******************************************************
 
 */
-#define ACR_NO_RTC
+
 /** \file public.h
  
     This header contains many common defines, enums, functions, and typedefs.
@@ -923,34 +923,7 @@ typedef char ACR_Bool_t;
 // TYPES AND DEFINES - BYTES
 //
 ////////////////////////////////////////////////////////////
-
-/** type for a single byte
-
-    ### New to C? ###
-
-    Q: What does unsigned mean?
-    A: When a variable type is unsigned, it cannot be negative.
-       This has a few pros and cons.
-       Pros: 1. the sign bit can be used for the value and thus a larger number can be stored
-             2. the value is never negative so it is not necessary to check when used as an index into arrays
-             3. bit flags are easier to understand because changing a single bit will never make the value negative
-                see TYPES AND DEFINES - FLAGS for details on bit flags
-             4. binary values are easier to understand because they don't use Two's complement
-                see https://en.wikipedia.org/wiki/Two%27s_complement for a detailed explanation
-       Cons: 1. negative numbers are not available so subtraction must be done more carefully
-             2. when signed and unsigned variables are compared, the compiler could make some
-                unexpected type changes so this must be done carefully to support all platforms.
-
-*/
-typedef unsigned char ACR_Byte_t;
-
-/** number of bits in ACR_Byte_t
-*/
-#define ACR_BITS_PER_BYTE 8
-
-/** max value that can be stored by the ACR_Byte_t type
-*/
-#define ACR_MAX_BYTE 255 // hex value 0xFF
+#include "ACR/public_bytes_and_flags.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -1127,202 +1100,17 @@ typedef struct ACR_Blocks_s
 // TYPES AND DEFINES - FLAGS
 //
 ////////////////////////////////////////////////////////////
-
-/** flags are always a single byte to keep options organized.
-    if necessary, use more than one set of flags.
-
-    ### New to C? ###
-
-    Q: What are flags?
-    A: Flags are a clever way to store boolean values.
-       There are 8 bits in a byte and each one can be set
-       to 0 (false) or 1 (true). Checking and modifying
-       these bits individually allows them to be used
-       as a single boolean value but the real power of
-       this feature is the ability to do this on many
-       of the bits at the same time. 
-
-*/
-typedef ACR_Byte_t ACR_Flags_t;
-
-/* Hex values for each flag
-*/
-#define ACR_FLAG_NONE  0x00
-#define ACR_FLAG_ONE   0x01
-#define ACR_FLAG_TWO   0x02
-#define ACR_FLAG_THREE 0x04
-#define ACR_FLAG_FOUR  0x08
-#define ACR_FLAG_FIVE  0x10
-#define ACR_FLAG_SIX   0x20
-#define ACR_FLAG_SEVEN 0x40
-#define ACR_FLAG_EIGHT 0x80
-
-/** Converts a number between 1 and 8 to the cooresponding flag
-*/
-#define ACR_FLAG(n) (0x01 << (n-1))
-
-/** checks if any of the flags are present
- 
-    example:
-
-    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
-    if(ACR_HAS_ANY_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR))
-    {
-        // flags has ONE and/or FOUR
-    }
-
-*/
-#define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) != 0
-
-/** checks if all of the flags are present
- 
-    example:
-
-    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
-    if(ACR_HAS_ALL_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN))
-    {
-        // flags has ONE, FOUR, and SEVEN
-    }
-
-*/
-#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) == forFlags
-
-/** use this when checking for just one flag
-*/
-#define ACR_HAS_FLAG(checkFlags, forFlag) ACR_HAS_ALL_FLAGS(checkFlags, forFlag)
-
-/** checks if any flags exist that are not specified
- 
-    example:
-
-    ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
-    if(ACR_HAS_ONLY_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR))
-    {
-        // flags has ONE and/or FOUR and no other flags
-    }
-    else
-    {
-        // there are flags other than ONE and FOUR present
-    }
-
-*/
-#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) ((checkFlags) & (~(forFlags)) == 0
-
-/** adds one or more flags to the existing flags
-*/
-#define ACR_ADD_FLAGS(flags, flagsToAdd) flags |= (flagsToAdd)
-
-/** removes one or more flags from the existing flags
-*/
-#define ACR_REMOVE_FLAGS(flags, flagsToRemove) flags &= (~(flagsToRemove))
+#include "ACR/public_bytes_and_flags.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
+#include "ACR/public_dates_and_times.h"
 
-/** months of the year
- * 
-    ### New to C? ###
-
-    Q: Why not just use the number of the month?
-    A: Best practice is to avoid the user of "magic numbers",
-       which is any number present in the code that does
-       not have a name attached to it. Some numbers, like
-       the number of the month, seem so simple that you may
-       think it is ok to just use a number, but this is how
-       many off-by-one errors occur.
-
-    Q: What is an off-by-one error?
-    A: This is one of the most common programming mistakes and
-       typically involves a simple mistake caused by counting
-       starting with the number 0 or the number 1. The result
-       is a value that is either 1 too big or 1 too small. In
-       the best case it just causes some display errors and in
-       the worst case it can crash the program.
-
-    Q: What is a buffer overrun or overflow?
-    A: This occurs when accessing an index of an array that 
-       is greater than the size of the array. This almost always
-       causes the program to crash but it is also possible for
-       the program to continue running with undefined behavior.
-       An off-by-one error can easily cause a buffer overrun.
-
-*/
-typedef enum ACR_Month_e
-{
-    ACR_MONTH_JANUARY = 0,
-    ACR_MONTH_FEBRUARY,
-    ACR_MONTH_MARCH,
-    ACR_MONTH_APRIL,
-    ACR_MONTH_MAY,
-    ACR_MONTH_JUNE,
-    ACR_MONTH_JULY,
-    ACR_MONTH_AUGUST,
-    ACR_MONTH_SEPTEMBER,
-    ACR_MONTH_OCTOBER,
-    ACR_MONTH_NOVEMBER,
-    ACR_MONTH_DECEMBER,
-    ACR_MONTH_COUNT
-} ACR_Month_t;
-
-#define ACR_MONTH_UNKNOWN (ACR_MONTH_COUNT+1)
-#define ACR_MONTHS_PER_YEAR ACR_MONTH_COUNT
-
-/** days of the week
-*/
-typedef enum ACR_DayOfWeek_e
-{
-    ACR_DAY_SUNDAY = 0,
-    ACR_DAY_MONDAY,
-    ACR_DAY_TUESDAY,
-    ACR_DAY_WEDNESDAY,
-    ACR_DAY_THURSDAY,
-    ACR_DAY_FRIDAY,
-    ACR_DAY_SATURDAY,
-    ACR_DAY_COUNT
-} ACR_DayOfWeek_t;
-
-#define ACR_DAY_OF_WEEK_UNKNOWN (ACR_DAY_COUNT+1)
-#define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
 #define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(fourDigitYear)))
-#define ACR_DAYS_PER_STANDARD_YEAR 365
-#define ACR_DAYS_PER_LEAP_YEAR 366
 #define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
-
-// HOURS
-#define ACR_HOUR_PER_DAY 24
-
-// MINUTES
-#define ACR_MIN_PER_HOUR 60
-#define ACR_MIN_PER_DAY (ACR_MIN_PER_HOUR*ACR_HOUR_PER_DAY)
-#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
-
-// SECONDS
-#define ACR_SEC_PER_MIN 60
-#define ACR_SEC_PER_HOUR (ACR_SEC_PER_MIN*ACR_MIN_PER_HOUR)
-#define ACR_SEC_PER_DAY (ACR_SEC_PER_HOUR*ACR_HOUR_PER_DAY)
-#define ACR_SEC_PER_STANDARD_YEAR (ACR_SEC_PER_DAY*ACR_DAYS_PER_STANDARD_YEAR)
-#define ACR_SEC_PER_LEAP_YEAR (ACR_SEC_PER_DAY*ACR_DAYS_PER_LEAP_YEAR)
-#define ACR_SEC_FROM_1900_TO_1970 2208988800UL
-#define ACR_SEC_FROM_1970_TO_2000  946684800UL
-#define ACR_SEC_FROM_1970_TO_2020 1577836800UL
-
-// MILLISECONDS
-#define ACR_MILLI_PER_SEC 1000
-#define ACR_MILLI_PER_MIN (ACR_MILLI_PER_SEC*ACR_SEC_PER_MIN)
-#define ACR_MILLI_PER_HOUR (ACR_MILLI_PER_MIN*ACR_MIN_PER_HOUR)
-
-// MICROSECONDS
-#define ACR_MICRO_PER_MILLI 1000
-#define ACR_MICRO_PER_SEC (ACR_MICRO_PER_MILLI*ACR_MILLI_PER_SEC)
-#define ACR_MICRO_PER_MIN (ACR_MICRO_PER_SEC*ACR_SEC_PER_MIN)
-
-// NANOSECONDS
-#define ACR_NANO_PER_MICRO 1000
-#define ACR_NANO_PER_MILLI (ACR_NANO_PER_MICRO*ACR_MICRO_PER_MILLI)
-#define ACR_NANO_PER_SEC (ACR_NANO_PER_MILLI*ACR_MILLI_PER_SEC)
 
 ////////////////////////////////////////////////////////////
 //
@@ -2056,125 +1844,15 @@ typedef unsigned long ACR_Unicode_t;
 
 #define ACR_DEGREES_C_TO_F(c) ((c*1.8)+32.0)
 #define ACR_DEGREES_F_TO_C(f) ((f-32.0)/1.8)
+#define ACR_MEASURE_INCHES_TO_CM(i) (i*2.54)
+#define ACR_MEASURE_CM_TO_INCHES(cm) (cm/2.54)
 
 /////////////////////////////////////////////////////////
 //                                                     //
 // TYPES AND DEFINES - UNIQUE STRING VALUES            //
 //                                                     //
-// note: keep these in alphabetical order so that it   //
-//       is easy to determine which have been used     //
-//       and no duplicates will be created by accident //
-//                                                     //
 /////////////////////////////////////////////////////////
-
-// *** A ***
-#define ACR_INFO_STR_ACCEPT "accept"
-#define ACR_MONTH_STR_APRIL "april"
-#define ACR_MONTH_STR_AUGUST "august"
-
-// *** B ***
-#define ACR_INFO_STR_BEGIN "begin"
-#define ACR_INFO_STR_BOTTOM "bottom"
-
-// *** C ***
-#define ACR_INFO_STR_CURRENT "current"
-
-// *** D ***
-#define ACR_MONTH_STR_DECEMBER "december"
-#define ACR_INFO_STR_DISABLED "disabled"
-#define ACR_INFO_STR_DOWN "down"
-
-// *** E ***
-#define ACR_INFO_STR_ENABLED "enabled"
-#define ACR_INFO_STR_END "end"
-#define ACR_INFO_STR_EQUAL "equal"
-#define ACR_INFO_STR_ERROR "error"
-
-// *** F ***
-#define ACR_INFO_STR_FALSE "false"
-#define ACR_MONTH_STR_FEBRUARY "february"
-#define ACR_INFO_STR_FIRST "first"
-#define ACR_DAY_STR_FRIDAY "friday"
-
-// *** G ***
-#define ACR_INFO_STR_GO "go"
-#define ACR_INFO_STR_GREATER "greater"
-
-// *** H ***
-
-// *** I ***
-#define ACR_INFO_STR_IGNORE "ignore"
-#define ACR_INFO_STR_INVALID "invalid"
-
-// *** J ***
-#define ACR_MONTH_STR_JANUARY "january"
-#define ACR_MONTH_STR_JULY "july"
-#define ACR_MONTH_STR_JUNE "june"
-
-// *** K ***
-
-// *** L ***
-#define ACR_INFO_STR_LAST "last"
-#define ACR_INFO_STR_LEFT "left"
-#define ACR_INFO_STR_LESS "less"
-
-// *** M ***
-#define ACR_MONTH_STR_MARCH "march"
-#define ACR_MONTH_STR_MAY "may"
-#define ACR_DAY_STR_MONDAY "monday"
-
-// *** N ***
-#define ACR_INFO_STR_NEW "new"
-#define ACR_INFO_STR_NEXT "next"
-#define ACR_INFO_STR_NO "no"
-#define ACR_INFO_STR_NOT_EQUAL "not_equal"
-#define ACR_MONTH_STR_NOVEMBER "november"
-
-// *** O ***
-#define ACR_MONTH_STR_OCTOBER "october"
-#define ACR_INFO_STR_OFF "off"
-#define ACR_INFO_STR_OK "ok"
-#define ACR_INFO_STR_OLD "old"
-#define ACR_INFO_STR_ON "on"
-
-// *** P ***
-#define ACR_INFO_STR_PREVIOUS "previous"
-
-// *** Q ***
-
-// *** R ***
-#define ACR_INFO_STR_READY "ready"
-#define ACR_INFO_STR_RIGHT "right"
-
-// *** S ***
-#define ACR_DAY_STR_SATURDAY "saturday"
-#define ACR_MONTH_STR_SEPTEMBER "september"
-#define ACR_INFO_STR_START "start"
-#define ACR_INFO_STR_STOP "stop"
-#define ACR_DAY_STR_SUNDAY "sunday"
-
-// *** T ***
-#define ACR_DAY_STR_THURSDAY "thursday"
-#define ACR_INFO_STR_TOP "top"
-#define ACR_INFO_STR_TRUE "true"
-#define ACR_DAY_STR_TUESDAY "tuesday"
-
-// *** U ***
-#define ACR_INFO_STR_UNKNOWN "unknown"
-#define ACR_INFO_STR_UP "up"
-
-// *** V ***
-#define ACR_INFO_STR_VALID "valid"
-
-// *** W ***
-#define ACR_INFO_STR_WAIT "wait"
-#define ACR_DAY_STR_WEDNESDAY "wednesday"
-
-// *** X ***
-// *** Y ***
-#define ACR_INFO_STR_YES "yes"
-
-// *** Z ***
+#include "ACR/public_unique_strings.h"
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
