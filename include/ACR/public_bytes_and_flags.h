@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -50,12 +50,6 @@
 */
 #ifndef _ACR_PUBLIC_BYTES_AND_FLAGS_H_
 #define _ACR_PUBLIC_BYTES_AND_FLAGS_H_
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - BYTES
-//
-////////////////////////////////////////////////////////////
 
 /** type for a single byte
 

@@ -41,21 +41,26 @@
 /** \file public_config.h
  
     This header describes the defines used to
-    configure the ACR library.
+    configure the ACR library. 
     It is included automatically with public.h
 
-    See public.h for more information.
+    This header gaurantees the following will be defined:
+    ACR_HAS_PLATFORM   as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_PLATFORM_NAME  as a quoted string
+    ACR_HAS_IDE        as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_IDE_NAME       as a quoted string
+    ACR_HAS_COMPILER   as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_COMPILER_NAME  as a quoted string
+
 */
 #ifndef _ACR_PUBLIC_CONFIG_H_
 #define _ACR_PUBLIC_CONFIG_H_
 
-/*
-    ### Preprocessor Defines For Confguration Options ###
+// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
+#include "ACR/public_bool.h"
 
-    Hopefully you are able to use one of the development environments
-    that have been preconfigured such as Gitpod, Visual Studio, or Qt Creator.
-    These platforms are further described in public.h under the
-    "TYPES AND DEFINES - PLATFORM AND COMPILER" section.
+/*
+    ### Set the following Preprocessor Defines for Confguration Options ###
 
         ACR_PLATFORM_MAC            MacOS X
 
@@ -98,7 +103,7 @@
 
         ACR_CONFIG_NO_MALLOC       do not include malloc() or free() and disables
                                    ACR_MALLOC and ACR_FREE macros.
-                                   see "TYPES AND DEFINES - MALLOC" for details.
+                                   see "TYPES AND DEFINES - MEMORY HEAP" for details.
 
         ACR_CONFIG_NO_RTC          do not include <time.h> for time_t, struct tm,
                                    time(), and gmtime_s() or gmtime_r()

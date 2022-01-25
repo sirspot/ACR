@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -44,15 +44,11 @@
     also called endianness. It can be used standalone from 
     the entire library or is included automatically with public.h
 
-    See public.h for more information.
-
 */
 #ifndef _ACR_PUBLIC_BYTE_ORDER_H_
 #define _ACR_PUBLIC_BYTE_ORDER_H_
 
 ////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - ENDIANNESS
 //
 // ### New to C? ###
 //

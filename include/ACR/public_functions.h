@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -38,17 +38,19 @@
 
 */
 
-/** \file public_callbacks.h
+/** \file public_functions.h
  
     This header makes defining callback function types easy.
+    It also provides basic function return values and
+    unused parameter macro.
     It can be used standalone from the entire library or
     is included automatically with public.h
 
     See public.h for more information.
 
 */
-#ifndef _ACR_PUBLIC_CALLBACKS_H_
-#define _ACR_PUBLIC_CALLBACKS_H_
+#ifndef _ACR_PUBLIC_FUNCTIONS_H_
+#define _ACR_PUBLIC_FUNCTIONS_H_
 
 /** defines a callback function type
     \param t the name of the type to define
@@ -126,5 +128,39 @@
 
 */
 #define ACR_TYPEDEF_CALLBACK(t,r) typedef r (*t)
+
+/** explicitly states that a variable or parameter is not used
+
+    ### New to C? ###
+
+    Q: Why would a variable or parameter exist that is not used?
+    A: There are many reasons to not use a variable or parameter
+       when it has already been defined. One example is a callback
+       function that doesn't need to use all of the parameters.
+
+*/
+#define ACR_UNUSED(arg) (void)arg
+
+/** represents a successful program or thread execution
+
+	example:
+
+	int main()
+	{
+		return ACR_SUCCESS;
+	}
+*/
+#define ACR_SUCCESS 0
+
+/** represents a failed program or thread execution
+
+	example:
+
+	int main()
+	{
+		return ACR_FAILURE;
+	}
+*/
+#define ACR_FAILURE -1
 
 #endif

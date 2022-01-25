@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -146,7 +146,7 @@
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE) AND EMPTY VALUES
+// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE)
 //
 ////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@
        as it appears in the file system.
 
 */
-#include "ACR/public_bool_and_empty.h"
+#include "ACR/public_bool.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -197,7 +197,7 @@
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - SYSTEM LEVEL
+// TYPES AND DEFINES - FUNCTIONS
 //
 ////////////////////////////////////////////////////////////
 
@@ -216,136 +216,18 @@
         A: A callback function is a variable
            that can act as the function it is
            assigned to.
-           See the include file ACR/public_callbacks.h for more details.
+           See the include file ACR/public_functions.h for more details.
 
 */
-#include "ACR/public_callbacks.h"
+#include "ACR/public_functions.h"
 
-#ifndef ACR_CONFIG_NO_LIBC
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - MEMORY
+//
+////////////////////////////////////////////////////////////
 
-    // included for memset()
-    #include <string.h>
-    #define ACR_MEMSET(p,v,s) memset(p,v,s)
-
-    /*
-        ### New to C? ###
-
-        Q: What does memset do?
-        A: memset is a function that changes an entire
-           area of memory to be a single value. It is
-           typically used to set a region of memory
-           that has unknown or undesired values to all
-           zeros so that the values of all memory in
-           that region are known and valid.
-
-    */
-
-#else
-
-    /** ACR_CONFIG_NO_LIBC is defined so this is a 
-        generic (slow) memset but gets the job done
-    */
-    #define ACR_MEMSET(p,v,s) \
-    {\
-        char* pc=(char*)p;\
-        size_t sz=(size_t)s;\
-        while(sz>0)\
-        {\
-            sz--;\
-            pc[sz]=(char)v;\
-        }\
-    }
-
-#endif // #ifndef ACR_CONFIG_NO_LIBC
-
-/** clears a region of memory
-    \param p a pointer to the memory to clear
-    \param s the number of bytes of data to clear
-*/
-#define ACR_CLEAR_MEMORY(p,s) if(p){ACR_MEMSET(p,ACR_EMPTY_VALUE,s);}
-
-/** represents a successful program or thread execution
-
-	example:
-
-	int main()
-	{
-		return ACR_SUCCESS;
-	}
-*/
-#define ACR_SUCCESS 0
-
-/** represents a failed program or thread execution
-
-	example:
-
-	int main()
-	{
-		return ACR_FAILURE;
-	}
-*/
-#define ACR_FAILURE -1
-
-/** represents a null pointer.
-    use this instead of 0 to clearly indicate the value
-    is being used for a null pointer
-
-    for variable init:
-
-        char* ptr = ACR_NULL;
-
-    for comparison:
-    
-        if(ptr == ACR_NULL)
-        {
-            // ptr is a null pointer
-        }
-
-    ### New to C? ###
-
-    Q: What is a pointer?
-    A: A pointer is a variable except
-       that the value of the variable
-       is a memory address.
-
-    Q: What is a null pointer?
-    A: A null pointer is a pointer variable with
-       value 0. Memory address 0 is invalid
-       and if an attempt to access the memory is made
-       by a null pointer it will cause the program to crash.
-       This is why it is important to always check
-       if a pointer is null before using it.
-
-    Q: What is a SEGFAULT or Segmentation fault?
-    A: This occurs when attempting to access memory that
-       does not belong to your program. In almost all cases
-       this will cause your program to crash. The most common
-       SEGFAULT is caused by trying to access a null pointer.
-
-*/
-#ifdef __cplusplus
-#define ACR_NULL nullptr
-#endif
-
-#ifndef ACR_NULL
-#define ACR_NULL 0
-#endif
-
-/** explicitly states that a variable or parameter is not used
-
-    ### New to C? ###
-
-    Q: Why would a variable or parameter exist that is not used?
-    A: There are many reasons to not use a variable or parameter
-       when it has already been defined. One example is a callback
-       function that doesn't need to use all of the parameters.
-
-*/
-#define ACR_UNUSED(arg) (void)arg
-
-/** defines ACR_USE_64BIT
-    see TYPES AND DEFINES - MEMORY LENGTHS for more details
-
+/** 
     ### New to C? ###
 
     Q: What is 64bit?
@@ -357,14 +239,18 @@
        or even 8bits. In some cases, a platform that does not support
        64bits cannot store a 64bit integer, which changes the maximum
        value that can be stored in a simple type.
+
+    Q: What is uninitialized memory?
+    A: When a variable is created in a program, the initial value
+       of that variable is unknown and is referred to as
+       uninitialized. A simple variable can be initialized by
+       assigning a value but a variable that represents a larger
+       area of memory must be initialized in another way.
+       see ACR_MEMSET and ACR_CLEAR_MEMORY in the include file
+       ACR/public_memory.h for more details.
  
 */
-#ifdef ACR_CONFIG_NO_64BIT
-#define ACR_USE_64BIT ACR_BOOL_FALSE
-#else
-/// \todo is there a way to determine, at compile time, whether or not the platform uses 64bit addresses?
-#define ACR_USE_64BIT ACR_BOOL_TRUE
-#endif // #ifndef ACR_CONFIG_NO_64BIT
+#include "ACR/public_memory.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -387,92 +273,54 @@
        2. the users of the program may be confused by the extra information
 
 */
-#ifdef ACR_CONFIG_DEBUG
-#define ACR_IS_DEBUG ACR_BOOL_TRUE
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(push)
-// disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
-#pragma warning(disable:4710)
-#endif
-// included for printf
-// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
-#include <stdio.h>
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(pop)
-#endif
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
-#else
-#define ACR_IS_DEBUG ACR_BOOL_FALSE
-#define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_CONFIG_DEBUG
+#include "ACR/public_debug.h"
 
 ////////////////////////////////////////////////////////////
 //
-// TYPES AND DEFINES - MALLOC
+// TYPES AND DEFINES - MEMORY HEAP
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef ACR_CONFIG_NO_MALLOC
+/** 
+    ### New to C? ###
 
-    #ifndef ACR_CONFIG_NO_LIBC
-        /** defined when malloc is available
-            Note: to remove malloc from this library define
-                  ACR_CONFIG_NO_LIBC in your preprocessor
-        */
-        #define ACR_HAS_MALLOC ACR_BOOL_TRUE
-        // included for malloc and free
-        #include <stdlib.h>
-        #define ACR_MALLOC(s) malloc((size_t)s)
-        #define ACR_FREE(p) free(p);
-    #else
-        // ACR_BOOL_TRUE
-        #define ACR_HAS_MALLOC ACR_BOOL_FALSE
-        /// \todo create a simple built-in malloc
-        #define ACR_MALLOC(s) ACR_NULL
-        /// \todo create a simple built-in free
-        #define ACR_FREE(p) 
-    #endif // #ifndef ACR_CONFIG_NO_LIBC
-#else
-    #define ACR_HAS_MALLOC ACR_BOOL_FALSE
-    #define ACR_MALLOC(s) ACR_NULL
-    #define ACR_FREE(p)
-#endif // #ifndef ACR_CONFIG_NO_MALLOC
+    Q: What is the heap?
+    A: This refers to the area of memory reserved for
+       the program to use dynamically. This means the
+       program can use as much or as little of the heap
+       as it wants to but must remain within it's allotted
+       address range. Access to the heap is protected
+       so that it is possible for the program to gracefully
+       handle when it runs out of heap space.
+       See the include file ACR/public_heap.h for more details.
 
-/** similar to malloc but automatically defines the variable and clears the memory
- 
-    example:
+    Q: What is the stack?
+    A: This refers to the area of memory reserved for
+       program execution that can also be used to store 
+       variable data. It is best to use the stack sparingly
+       for large datasets because the program will terminate
+       unexpectedly if it tries to use more stack memory than
+       was allotted. This is called a Stack Overflow.
 
-        int main()
-        {
-            ACR_NEW_BY_SIZE(oneHundredNumbers, int, sizeof(int)*100);
-
-            oneHundredNumbers[0] = 42;
-            oneHundredNumbers[1] = 3000;
-            // etc
-        }
 */
-#define ACR_NEW_BY_SIZE(n, t, s) t* n = (t*)ACR_MALLOC(s);ACR_CLEAR_MEMORY(n,s);
-
-/** similar to malloc but automatically defines the variable and clears the memory
- 
-    example:
-
-        int main()
-        {
-            ACR_NEW_BY_TYPE(oneDateTime, ACR_DateTime_t);
-
-            oneDateTime->tm_sec = 30;
-            oneDateTime->tm_min = 1;
-            // etc
-        }
-*/
-#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_SIZE(n,t,sizeof(t));
+#include "ACR/public_heap.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - ENDIANNESS
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    ### New to C? ###
+
+    Q: What is endianness?
+    A: This refers to the order bytes are stored in memory.
+       It is only necessary to understand when a program
+       must work with itself or other programs on various
+       hardware platforms.
+       See the include file ACR/public_byte_order.h for more details.
+*/
 #include "ACR/public_byte_order.h"
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
@@ -499,67 +347,24 @@
 
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - BYTES AND FLAGS
+//
+////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - BYTES
-//
-////////////////////////////////////////////////////////////
+/**
+    ### New to C? ###
+
+    Q: What is a byte?
+    A: A byte is a group of 8 bits.
+       
+    Q: What are flags?
+    A: Flags are a method of setting, clearing, and checking
+       the state of individual bits
+       See the include file ACR/public_bytes_and_flags.h for more details.
+*/
 #include "ACR/public_bytes_and_flags.h"
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - MEMORY LENGTHS
-//
-////////////////////////////////////////////////////////////
-
-/** type for a typical length such as the size of a file or
-    the size of an area of memory
-	\see ACR_MAX_LENGTH for the maximum value that can be
-	stored by this data type
-*/
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-typedef unsigned long long ACR_Length_t;
-#else
-// 32bit
-typedef unsigned long ACR_Length_t;
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-/** represents zero length.
-	use this instead of 0 to clearly indicate the value
-	is being used for a length
-
-	for variable init:
-
-		ACR_Length_t length = ACR_ZERO_LENGTH;
-
-	for comparison:
-
-		if(length == ACR_ZERO_LENGTH)
-		{
-			// length is zero
-		}
-
-*/
-#define ACR_ZERO_LENGTH 0
-
-/** max value that can be stored by the ACR_Length_t type
-*/
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-#define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
-#else
-// 32bit
-#define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-/** the value of a pointer (used for pointer math)
-    can always be stored within the ACR_Length_t type
-	but for clarity it is best to use a type that
-	specifically designates the use as a pointer's value
-*/
-typedef ACR_Length_t ACR_PointerValue_t;
 
 ////////////////////////////////////////////////////////////
 //
@@ -578,9 +383,11 @@ typedef unsigned long ACR_Count_t;
 */
 #define ACR_ZERO_COUNT 0
 
-/** max value that can be stored by the ACR_Count_t type such that it will not overflow when added to 1 (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
+/** max value that can be stored by the ACR_Count_t type such that
+    it will not overflow when added to 1 
+    (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
 */
-#define ACR_MAX_COUNT 4294967294UL // hex value ‭0xFFFFFFFE‬
+#define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
 
 ////////////////////////////////////////////////////////////
 //
@@ -588,101 +395,17 @@ typedef unsigned long ACR_Count_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** type for an effeciently sized memory block, which is
-    probably the largest integer value type
-	\see ACR_MAX_BLOCK for the maximum value that can be
-	stored by this data type
+/**
+    ### New to C? ###
+
+    Q: What is a memory block?
+    A: This refers to the smallest addressable memory size.
+       It is good to know this size when performing optimized
+       copy operations or when placing data in memory where
+       it can be accessed by specialized hardware.
+       See the include file ACR/public_blocks.h for more details.
 */
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-typedef unsigned long long ACR_Block_t;
-#else
-// 32bit
-typedef unsigned long ACR_Block_t;
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-/** max value that can be stored by the ACR_Block_t type
-*/
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-#define ACR_MAX_BLOCK 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
-#else
-// 32bit
-#define ACR_MAX_BLOCK 4294967295UL // hex value 0xFFFFFFFF
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-/** number of bytes in ACR_Block_t
-*/
-#define ACR_BYTES_PER_BLOCK sizeof(ACR_Block_t)
-
-/** number of bits in ACR_Block_t
-*/
-#define ACR_BITS_PER_BLOCK (ACR_BYTES_PER_BLOCK * ACR_BITS_PER_BYTE)
-
-/** get the minimum number of blocks needed for the specified memory length.
-    to get a more accurate number of blocks and bytes use ACR_LENGTH_TO_BLOCKS
-*/
-#define ACR_MIN_BLOCKS_NEEDED(length) ((ACR_Count_t)((length / ACR_BYTES_PER_BLOCK) + ((length % ACR_BYTES_PER_BLOCK) != 0)))
-
-/** type that stores the number of full blocks and remaining bytes
-*/
-typedef struct ACR_Blocks_s
-{
-	ACR_Count_t m_Blocks;
-	ACR_Count_t m_Bytes;
-} ACR_Blocks_t;
-
-/** converts a length to ACR_Blocks_t data to provide the
-    exact number of blocks and bytes needed for the memory length
-*/
-#define ACR_LENGTH_TO_BLOCKS(blocks, length) { blocks.m_Blocks = (length / ACR_BYTES_PER_BLOCK); blocks.m_Bytes = (length % ACR_BYTES_PER_BLOCK); }
-
-#ifndef ACR_CONFIG_NO_LIBC
-
-    // included for memcpy()
-    #include <string.h>
-    #define ACR_MEMCPY(d,s,l) memcpy(d,s,l);
-
-    /*
-        ### New to C? ###
-
-        Q: What does memcpy do?
-        A: memcpy is a function that copies memory from
-           one address to another. It is generally best
-           to avoid copying memory unless necessary since
-           it can be a relatively slow process. What this
-           means is that if there is way to work with the
-           data without copying it first, then that is
-           preferred over making a copy.
-
-    */
-
-#else
-
-    /** ACR_CONFIG_NO_LIBC is defined so this is a 
-        generic (slow) memcpy but gets the job done
-    */
-    #define ACR_MEMCPY(d,s,l) \
-    {\
-        char* pd=(char*)d;\
-        char* ps=(char*)s;\
-        size_t ln=(size_t)l;\
-        while(ln>0)\
-        {\
-            ln--;\
-            pd[ln]=ps[ln];\
-        }\
-    }
-
-
-#endif // #ifndef ACR_CONFIG_NO_LIBC
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - FLAGS
-//
-////////////////////////////////////////////////////////////
-#include "ACR/public_bytes_and_flags.h"
+#include "ACR/public_blocks.h"
 
 ////////////////////////////////////////////////////////////
 //

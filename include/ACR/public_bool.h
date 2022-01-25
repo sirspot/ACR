@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -38,24 +38,16 @@
 
 */
 
-/** \file public_bool_and_empty.h
+/** \file public_bool.h
  
     This header contains types and values for boolean
     and empty values. It can be used standalone
     from the entire library or is included automatically
     with public.h
 
-    See public.h for more information.
-
 */
-#ifndef _ACR_PUBLIC_BOOL_AND_EMPTY_H_
-#define _ACR_PUBLIC_BOOL_AND_EMPTY_H_
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - BOOLEAN (TRUE/FALSE) AND EMPTY VALUES
-//
-////////////////////////////////////////////////////////////
+#ifndef _ACR_PUBLIC_BOOL_H_
+#define _ACR_PUBLIC_BOOL_H_
 
 /** represents a false boolean result
 
@@ -92,33 +84,5 @@
 /** use this type only for ACR_BOOL_FALSE or ACR_BOOL_TRUE
 */
 typedef char ACR_Bool_t;
-
-/** represents an empty value.
-    use this instead of 0 to clearly indicate the value
-    is being used to identify an empty value
-
-    for memory init:
-
-        char data[64];
-        ACR_MEMSET(data, ACR_EMPTY_VALUE, sizeof(data));
-        
-    for variable init:
-
-        int selected = ACR_EMPTY_VALUE;
-
-    for comparison:
-
-        if(data[0] == ACR_EMPTY_VALUE)
-        {
-            // nothing has been written to the data
-        }
-
-        if(selected == ACR_EMPTY_VALUE)
-        {
-            // nothing has been selected
-        }
-
-*/
-#define ACR_EMPTY_VALUE 0
 
 #endif
