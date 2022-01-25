@@ -130,7 +130,7 @@ typedef ACR_Byte_t ACR_Flags_t;
     }
 
 */
-#define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) != 0
+#define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) != 0)
 
 /** checks if all of the flags are present
  
@@ -143,7 +143,7 @@ typedef ACR_Byte_t ACR_Flags_t;
     }
 
 */
-#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) ((checkFlags) & (forFlags)) == forFlags
+#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) == forFlags)
 
 /** use this when checking for just one flag
 */
@@ -164,7 +164,7 @@ typedef ACR_Byte_t ACR_Flags_t;
     }
 
 */
-#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) ((checkFlags) & (~(forFlags)) == 0
+#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) (((checkFlags) & (~(forFlags)) == 0)
 
 /** adds one or more flags to the existing flags
 */

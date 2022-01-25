@@ -667,7 +667,7 @@ ACR_Bool_t ACR_TimeNow(
 ACR_Bool_t ACR_TimeSet(
     ACR_Time_t* me)
 {
-    ACR_Bool_t resut = ACR_BOOL_FALSE;
+    ACR_Bool_t result = ACR_BOOL_FALSE;
 
     g_ACRSimRtcTimeIsSet = ACR_BOOL_TRUE;
     g_ACRSimRtcTime = (*me);
@@ -689,9 +689,10 @@ ACR_Bool_t ACR_TimeSet(
     #else
         // there is no RTC.
         // the simulated RTC is always set.
-        resut = ACR_BOOL_TRUE;
+        result = ACR_BOOL_TRUE;
     #endif
 
+    return result;
 }
 
 void ACR_TimeProcessSecondTick(
