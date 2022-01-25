@@ -54,13 +54,6 @@
     \param t the name of the type to define
     \param r the return type or void if there is none
   
-    ### New to C? ###
-
-        Q: What is a callback function?
-        A: A callback function is a variable
-           that can act as the function it is
-           assigned to.
-
 	example:
 
         // define a list of all callback names
@@ -101,6 +94,7 @@
             while(cbIndex < CBEX_COUNT)
             {
                 g_CbEx[cbIndex](cbIndex, ACR_NULL);
+                cbIndex++;
             }
 
             return ACR_SUCCESS;

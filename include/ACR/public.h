@@ -40,7 +40,7 @@
 
 /** \file public.h
  
-    This header contains many common defines, enums, functions, and typedefs.
+    This header includes many common defines, enums, functions, and typedefs.
     In many cases, this is the only header needed for the ACR library to
     be a useful addition to your project.
 
@@ -107,7 +107,7 @@
 
     ACR_DEBUG_PRINT     interface to printf() that only
                         writes messages to stdout
-                        when ACR_DEBUG is defined.
+                        when ACR_CONFIG_DEBUG is defined.
                         see "TYPES AND DEFINES - DEBUG" for details.
 
     ACR_BYTE_ORDER_16   ensures a value is stored
@@ -150,19 +150,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-/** represents a false boolean result
-
-    example:
-
-        if(ACR_BOOL_FALSE)
-        {
-            // never reaches this code
-        }
-        else
-        {
-            // always reaches this code
-        }
-
+/**
     ### New to C? ###
 
     Q: What is a boolean?
@@ -172,183 +160,68 @@
        return 0 to mean success while others will return 0
        as an error. This is why ACR defines many more specific
        values that can be used as return codes.
+       See the include file ACR/public_bool_and_empty.h for more details.
+
+    Q: What is an "include"?
+    A: An include allows a header to be used
+       by another header or source file. The
+       file to include must be in a path known
+       to the compiler. On some platforms,
+       the path is case-sensitive so it is
+       important to include the file name exactly
+       as it appears in the file system.
 
 */
-#define ACR_BOOL_FALSE 0
-
-/** represents a true boolean result
-
-    example:
-
-        if(ACR_BOOL_TRUE)
-        {
-            // always reaches this code
-        }
-        else
-        {
-            // never reaches this code
-        }
-
-*/
-#define ACR_BOOL_TRUE 1
-
-/** use this type only for ACR_BOOL_FALSE or ACR_BOOL_TRUE
-*/
-typedef char ACR_Bool_t;
-
-/** represents an empty value.
-    use this instead of 0 to clearly indicate the value
-    is being used to identify an empty value
-
-    for memory init:
-
-        char data[64];
-        ACR_MEMSET(data, ACR_EMPTY_VALUE, sizeof(data));
-        
-    for variable init:
-
-        int selected = ACR_EMPTY_VALUE;
-
-    for comparison:
-
-        if(data[0] == ACR_EMPTY_VALUE)
-        {
-            // nothing has been written to the data
-        }
-
-        if(selected == ACR_EMPTY_VALUE)
-        {
-            // nothing has been selected
-        }
-
-*/
-#define ACR_EMPTY_VALUE 0
+#include "ACR/public_bool_and_empty.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - PLATFORM AND COMPILER
 //
 ////////////////////////////////////////////////////////////
-#include "ACR/public_config.h"
 
 /* 
     ### New to C? ###
 
-    Q: Why are there so many different platform settings?
+    Q: Why are there platform settings?
     A: To allow ACR to be used with as many different types
        of projects as possible. These platform defines provide
        support for Windows, Mac OS X, Linux, or even an embedded
        microprocessor with no operating system. Code is removed or
        added based on the platform settings using the preprocessor
        commands #ifdef and #ifndef.
+       See the include file ACR/public_config.h for more details.
 
 */
-
-/** MAC OS X
-*/
-#ifdef ACR_PLATFORM_MAC
-
-    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-    #define ACR_PLATFORM_NAME "mac"
-    #ifdef ACR_IDE_QTCREATOR
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_NAME "qt_creator"
-        #ifdef ACR_COMPILER_CLANG
-            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-            #define ACR_COMPILER_NAME "clang"
-        #endif // ACR_COMPILER_CLANG
-    #endif // ACR_IDE_QTCREATOR
-    #ifdef ACR_IDE_XCODE
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_NAME "xcode"
-        #ifdef ACR_COMPILER_CLANG
-            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-            #define ACR_COMPILER_NAME "clang"
-        #endif // ACR_COMPILER_CLANG
-    #endif // ACR_IDE_XCODE
-
-#endif // ACR_PLATFORM_MAC
-
-/** WINDOWS
-*/
-#ifdef ACR_PLATFORM_WIN
-
-    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-    #define ACR_PLATFORM_NAME "win64"
-    #ifdef ACR_WIN_NATIVE
-        #define WIN32_LEAN_AND_MEAN
-        #include <Windows.h>
-    #endif
-    #ifdef ACR_IDE_QTCREATOR
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_NAME "qt_creator"
-        #ifdef ACR_COMPILER_MINGW
-            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-            #define ACR_COMPILER_NAME "mingw"
-        #endif // ACR_COMPILER_MINGW
-        #ifdef ACR_COMPILER_MSVC
-            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-            #define ACR_COMPILER_NAME "msvc"
-        #endif // ACR_COMPILER_MSVC
-    #endif // ACR_IDE_QTCREATOR
-    #ifdef ACR_IDE_VS2017
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_NAME "vs2017"
-        #ifdef ACR_COMPILER_MSVC
-            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-            #define ACR_COMPILER_NAME "msvc"
-        #endif // ACR_COMPILER_MSVC
-    #endif // ACR_IDE_VS2017
-
-#endif // ACR_PLATFORM_WIN
-
-/** GITPOD (LINUX)
-*/
-#ifdef ACR_PLATFORM_GITPOD
-
-        #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-        #define ACR_PLATFORM_NAME "gitpod"
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_THEIA
-        #define ACR_IDE_NAME "theia"
-        #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-        #define ACR_COMPILER_GCC
-        #define ACR_COMPILER_NAME "gcc"
-
-#endif // ACR_PLATFORM_GITPOD
-
-#ifndef ACR_HAS_PLATFORM
-
-    #define ACR_PLATFORM_UNKNOWN
-    #define ACR_HAS_PLATFORM ACR_BOOL_FALSE
-    #define ACR_PLATFORM_NAME "unknown"
-
-#endif // #ifndef ACR_HAS_PLATFORM
-
-#ifndef ACR_HAS_COMPILER
-
-    #define ACR_COMPILER_UNKNOWN
-    #define ACR_HAS_COMPILER ACR_BOOL_FALSE
-    #define ACR_COMPILER_NAME "unknown"
-
-#endif // #ifndef ACR_HAS_COMPILER
-
-#ifndef ACR_HAS_IDE
-
-    #define ACR_IDE_UNKNOWN
-    #define ACR_HAS_IDE ACR_BOOL_FALSE
-    #define ACR_IDE_NAME "unknown"
-
-#endif // #ifndef ACR_HAS_IDE
+#include "ACR/public_config.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SYSTEM LEVEL
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    ### New to C? ###
+
+        Q: What is a function?
+        A: A function is a named block of code
+           designed to perform a task. Functions
+           can range in complexity from the most
+           simple 1 line operation to the most
+           complex arrangement of hundreds of
+           lines of code.
+
+        Q: What is a callback function?
+        A: A callback function is a variable
+           that can act as the function it is
+           assigned to.
+           See the include file ACR/public_callbacks.h for more details.
+
+*/
 #include "ACR/public_callbacks.h"
 
-#ifndef ACR_NO_LIBC
+#ifndef ACR_CONFIG_NO_LIBC
 
     // included for memset()
     #include <string.h>
@@ -369,7 +242,7 @@ typedef char ACR_Bool_t;
 
 #else
 
-    /** ACR_NO_LIBC is defined so this is a 
+    /** ACR_CONFIG_NO_LIBC is defined so this is a 
         generic (slow) memset but gets the job done
     */
     #define ACR_MEMSET(p,v,s) \
@@ -383,7 +256,7 @@ typedef char ACR_Bool_t;
         }\
     }
 
-#endif // #ifndef ACR_NO_LIBC
+#endif // #ifndef ACR_CONFIG_NO_LIBC
 
 /** clears a region of memory
     \param p a pointer to the memory to clear
@@ -486,12 +359,12 @@ typedef char ACR_Bool_t;
        value that can be stored in a simple type.
  
 */
-#ifdef ACR_NO_64BIT
+#ifdef ACR_CONFIG_NO_64BIT
 #define ACR_USE_64BIT ACR_BOOL_FALSE
 #else
 /// \todo is there a way to determine, at compile time, whether or not the platform uses 64bit addresses?
 #define ACR_USE_64BIT ACR_BOOL_TRUE
-#endif // #ifndef ACR_NO_64BIT
+#endif // #ifndef ACR_CONFIG_NO_64BIT
 
 ////////////////////////////////////////////////////////////
 //
@@ -514,7 +387,7 @@ typedef char ACR_Bool_t;
        2. the users of the program may be confused by the extra information
 
 */
-#ifdef ACR_DEBUG
+#ifdef ACR_CONFIG_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
@@ -522,7 +395,7 @@ typedef char ACR_Bool_t;
 #pragma warning(disable:4710)
 #endif
 // included for printf
-// Note: this ignores ACR_NO_LIBC intentionally for debug only
+// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
 #include <stdio.h>
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(pop)
@@ -531,7 +404,7 @@ typedef char ACR_Bool_t;
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
 #define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_DEBUG
+#endif // #ifdef ACR_CONFIG_DEBUG
 
 ////////////////////////////////////////////////////////////
 //
@@ -539,12 +412,12 @@ typedef char ACR_Bool_t;
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef ACR_NO_MALLOC
+#ifndef ACR_CONFIG_NO_MALLOC
 
-    #ifndef ACR_NO_LIBC
+    #ifndef ACR_CONFIG_NO_LIBC
         /** defined when malloc is available
             Note: to remove malloc from this library define
-                  ACR_NO_LIBC in your preprocessor
+                  ACR_CONFIG_NO_LIBC in your preprocessor
         */
         #define ACR_HAS_MALLOC ACR_BOOL_TRUE
         // included for malloc and free
@@ -558,12 +431,12 @@ typedef char ACR_Bool_t;
         #define ACR_MALLOC(s) ACR_NULL
         /// \todo create a simple built-in free
         #define ACR_FREE(p) 
-    #endif // #ifndef ACR_NO_LIBC
+    #endif // #ifndef ACR_CONFIG_NO_LIBC
 #else
     #define ACR_HAS_MALLOC ACR_BOOL_FALSE
     #define ACR_MALLOC(s) ACR_NULL
     #define ACR_FREE(p)
-#endif // #ifndef ACR_NO_MALLOC
+#endif // #ifndef ACR_CONFIG_NO_MALLOC
 
 /** similar to malloc but automatically defines the variable and clears the memory
  
@@ -764,7 +637,7 @@ typedef struct ACR_Blocks_s
 */
 #define ACR_LENGTH_TO_BLOCKS(blocks, length) { blocks.m_Blocks = (length / ACR_BYTES_PER_BLOCK); blocks.m_Bytes = (length % ACR_BYTES_PER_BLOCK); }
 
-#ifndef ACR_NO_LIBC
+#ifndef ACR_CONFIG_NO_LIBC
 
     // included for memcpy()
     #include <string.h>
@@ -786,7 +659,7 @@ typedef struct ACR_Blocks_s
 
 #else
 
-    /** ACR_NO_LIBC is defined so this is a 
+    /** ACR_CONFIG_NO_LIBC is defined so this is a 
         generic (slow) memcpy but gets the job done
     */
     #define ACR_MEMCPY(d,s,l) \
@@ -802,7 +675,7 @@ typedef struct ACR_Blocks_s
     }
 
 
-#endif // #ifndef ACR_NO_LIBC
+#endif // #ifndef ACR_CONFIG_NO_LIBC
 
 ////////////////////////////////////////////////////////////
 //
@@ -829,8 +702,8 @@ typedef struct ACR_Blocks_s
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
-#ifndef ACR_NO_RTC
-    #ifndef ACR_NO_LIBC
+#ifndef ACR_CONFIG_NO_RTC
+    #ifndef ACR_CONFIG_NO_LIBC
         #ifdef ACR_COMPILER_CLANG
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
@@ -853,8 +726,13 @@ typedef struct ACR_Blocks_s
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)
         #endif
-    #endif // #ifndef ACR_NO_LIBC
-#endif // #ifndef ACR_NO_RTC
+    #else
+        // without libc there is no interface to a standard
+        // operating system's real-time clock.
+        // see ACR_TimeProcessSecondTick for how to simulate
+        // a real-time clock
+    #endif // #ifndef ACR_CONFIG_NO_LIBC
+#endif // #ifndef ACR_CONFIG_NO_RTC
 
 #ifndef ACR_HAS_RTC
     #define ACR_HAS_RTC ACR_BOOL_FALSE

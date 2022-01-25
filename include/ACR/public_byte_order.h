@@ -138,22 +138,22 @@
 //           system then set the preprocessor define as
 //           follows to improve byte order handling
 //           performance.
-//           Big Endian:    ACR_BIG_ENDIAN
-//           Little Endian: ACR_LITTLE_ENDIAN
+//           Big Endian:    ACR_CONFIG_BIG_ENDIAN
+//           Little Endian: ACR_CONFIG_LITTLE_ENDIAN
 //
-#ifdef ACR_BIG_ENDIAN
-/** the system is big endian because ACR_BIG_ENDIAN
+#ifdef ACR_CONFIG_BIG_ENDIAN
+/** the system is big endian because ACR_CONFIG_BIG_ENDIAN
     was set in the preprocessor
 */
 #define ACR_IS_BIG_ENDIAN 1
 #else
-#ifdef ACR_LITTLE_ENDIAN
-/** the system is NOT big endian because ACR_LITTLE_ENDIAN
+#ifdef ACR_CONFIG_LITTLE_ENDIAN
+/** the system is NOT big endian because ACR_CONFIG_LITTLE_ENDIAN
     was set in the preprocessor
 */
 #define ACR_IS_BIG_ENDIAN 0
-#endif // #ifdef ACR_LITTLE_ENDIAN
-#endif // #ifdef ACR_BIG_ENDIAN
+#endif // #ifdef ACR_CONFIG_LITTLE_ENDIAN
+#endif // #ifdef ACR_CONFIG_BIG_ENDIAN
 
 //
 // defines ACR_IS_BIG_ENDIAN as 1 or

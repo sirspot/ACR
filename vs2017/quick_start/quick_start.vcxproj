@@ -77,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_DEBUG;ACR_LITTLE_ENDIAN;ACR_NO_64BIT;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_CONFIG_DEBUG;ACR_CONFIG_LITTLE_ENDIAN;ACR_CONFIG_NO_64BIT;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>
     </ClCompile>
@@ -89,7 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_DEBUG;ACR_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_CONFIG_DEBUG;ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>
     </ClCompile>
@@ -103,7 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_LITTLE_ENDIAN;ACR_NO_64BIT;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_CONFIG_LITTLE_ENDIAN;ACR_CONFIG_NO_64BIT;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>None</DebugInformationFormat>
       <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711</DisableSpecificWarnings>

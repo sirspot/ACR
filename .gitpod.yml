@@ -1,8 +1,9 @@
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - init: echo "Replace me with a build script for the project."
-    command: echo "Replace me with something that should run on every start, or just
-      remove me entirely."
-image: gitpod/workspace-full
-vscode:
-  extensions:
-    - ms-vscode.cpptools@0.26.2:Pq/tmf2WN3SanVzB4xZc1g==
+  - init: echo 'init script' # runs during prebuild
+    command: echo 'start script'
+
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 3000
+    onOpen: open-preview
