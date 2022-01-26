@@ -385,13 +385,31 @@ typedef unsigned long ACR_Count_t;
 //
 ////////////////////////////////////////////////////////////
 
+/**
+    ### New to C? ###
 
+    Q: What is a Real Time Clock (RTC)?
+    A: This refers to the physical part of the computer
+       that is tasked with keeping an accurate count of
+       the amount of time that has past since the time
+       was last set. Devices that do not have an RTC
+       can simulate one using a 1 aecond timer but will
+       have to correct the time more often due to drift.
+       See the include file ACR/public_clock.h for more details.
+*/
+#include "ACR/public_clock.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - SIMPLE MEMORY BUFFER
 //
 ////////////////////////////////////////////////////////////
+
+// included for ACR_Length_t
+#include "ACR/public_memory.h"
+
+// included for ACR_Flags_t
+#include "ACR/public_bytes_and_flags.h"
 
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(push)
@@ -437,9 +455,9 @@ enum ACR_BufferFlags_e
 */
 #define ACR_BUFFER(name) ACR_Buffer_t name = {ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE};
 
-/** define a buffer using stack memory of the specified size on the stack and with the specified name
+/** define a buffer using memory of the specified size on the stack and with the specified name
 */
-#define ACR_BUFFER_USE_DATA(name, data, length) name.m_Pointer = &name_data; name.m_Length = length; name.m_Flags = ACR_BUFFER_IS_REF;
+#define ACR_BUFFER_USE_DATA(name, data, length) ACR_Buffer_t name = {data,length,ACR_BUFFER_IS_REF};
 
 /** determine if the buffer is valid
 */
@@ -450,6 +468,7 @@ enum ACR_BufferFlags_e
 #define ACR_BUFFER_GET_LENGTH(name) name.m_Length
 
 /** clear the buffer
+/// \todo make a version without sizet
 */
 #define ACR_BUFFER_CLEAR(name) ACR_CLEAR_MEMORY(name.m_Pointer, (size_t)name.m_Length)
 

@@ -42,6 +42,9 @@
  
     This header provides access to the real time
     clock when available.
+    
+    ACR_HAS_RTC as ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    
 
 */
 #ifndef _ACR_PUBLIC_CLOCK_H_
@@ -49,6 +52,9 @@
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
 #include "ACR/public_bool.h"
+
+// included for ACR_SEC_FROM_1900_TO_1970
+#include "ACR/public_dates_and_times.h"
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
