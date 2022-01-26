@@ -50,12 +50,6 @@
 #ifndef _ACR_PUBLIC_DATES_AND_TIMES_H_
 #define _ACR_PUBLIC_DATES_AND_TIMES_H_
 
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - DATE AND TIME VALUES
-//
-////////////////////////////////////////////////////////////
-
 /** months of the year
  * 
     ### New to C? ###

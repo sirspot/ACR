@@ -103,43 +103,6 @@
     //
     /////
 
-    ### Top Uses ###
-
-    ACR_DEBUG_PRINT     interface to printf() that only
-                        writes messages to stdout
-                        when ACR_CONFIG_DEBUG is defined.
-                        see "TYPES AND DEFINES - DEBUG" for details.
-
-    ACR_BYTE_ORDER_16   ensures a value is stored
-    ACR_BYTE_ORDER_32   in big endian byte order
-    ACR_BYTE_ORDER_64   see "TYPES AND DEFINES - ENDIANNESS" for details.
-
-    ACR_Buffer_t        a simple struct with macros
-                        to handle allocation and freeing
-                        of memory safely.
-                        see "TYPES AND DEFINES - SIMPLE MEMORY BUFFER" for details.
-                        for ease of use see "ACR/buffer.h"
-
-    ACR_VarBuffer_t     a simple struct with macros to 
-                        handle allocation of memory
-                        safely while freeing memory only
-                        when necessary to grow the
-                        memory area.
-                        see "TYPES AND DEFINES - VARIABLE LENGTH MEMORY BUFFER" for details.
-                        for ease of use see "ACR/varbuffer.h"
-
-    ACR_String_t        a struct for access to strings
-                        with support for UTF8 encoding.
-                        see "TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS" for details.
-                        for ease of use see "ACR/string.h"
-
-    ACR_DECIMAL_COMPARE compare decimal values within a
-                        default tolerance of 0.0001 which
-                        is many cases is safer than performing
-                        a direct if(a==b) type of comparison
-                        because of possible rounding.
-                        see "TYPES AND DEFINES - DECIMAL VALUES" for details.
-
 */
 #ifndef _ACR_PUBLIC_H_
 #define _ACR_PUBLIC_H_
@@ -372,8 +335,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-/** type for a typical count such as the number of items
-	in an array or blocks of memory
+/** type for a typical count such as the number of items in an array
 	\see ACR_MAX_COUNT for the maximum value that can be
 	stored by this data type
 */
@@ -423,146 +385,7 @@ typedef unsigned long ACR_Count_t;
 //
 ////////////////////////////////////////////////////////////
 
-// defines ACR_HAS_RTC and includes time()
-// functions if desired
-#ifndef ACR_CONFIG_NO_RTC
-    #ifndef ACR_CONFIG_NO_LIBC
-        #ifdef ACR_COMPILER_CLANG
-            #include <time.h>
-            #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
-        #endif
-        #ifdef ACR_COMPILER_GCC
-            #include <time.h>
-            #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
-        #endif
-        #ifdef ACR_COMPILER_VS2017
-            #pragma warning(push)
-            // disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
-            #pragma warning(disable:4820)
-            #include <time.h>
-            #pragma warning(pop)
-            #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)
-        #endif
-    #else
-        // without libc there is no interface to a standard
-        // operating system's real-time clock.
-        // see ACR_TimeProcessSecondTick for how to simulate
-        // a real-time clock
-    #endif // #ifndef ACR_CONFIG_NO_LIBC
-#endif // #ifndef ACR_CONFIG_NO_RTC
 
-#ifndef ACR_HAS_RTC
-    #define ACR_HAS_RTC ACR_BOOL_FALSE
-#endif // #ifndef ACR_HAS_RTC
-
-#if ACR_HAS_RTC == ACR_BOOL_TRUE
-
-    /** time value (seconds since unix epoch Jan 1, 1970)
-    */
-    typedef time_t ACR_Time_t;
-
-    /** standard date time structure
-    */
-    typedef struct tm ACR_DateTime_t;
-
-#else
-
-    /** time value (seconds since unix epoch Jan 1, 1970)
-    */
-    #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        // 64bit
-        typedef unsigned long long ACR_Time_t;
-    #else
-        // 32bit
-        typedef unsigned long ACR_Time_t;
-    #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-    /// \todo support struct for time with seconds and microseconds
-
-    /** standard date time structure
-    */
-    typedef struct ACR_DateTime_s
-    {
-        int tm_sec;          /* seconds, range 0 to 59           */
-        int tm_min;          /* minutes, range 0 to 59           */
-        int tm_hour;         /* hours, range 0 to 23             */
-        int tm_mday;         /* day of the month, range 1 to 31  */
-        int tm_mon;          /* month, range 0 to 11             */
-        int tm_year;         /* The number of years since 1900   */
-        int tm_wday;         /* day of the week, range 0 to 6    */
-        int tm_yday;         /* day in the year, range 0 to 365  */
-        int tm_isdst;        /* daylight saving time             */	
-        int tm_gmtoff;		 /* Seconds east of UTC.             */
-        const char *tm_zone; /* Timezone abbreviation.           */
-    } ACR_DateTime_t;
-
-    #define ACR_TIME_NOW(name) ACR_TimeNow(&name)
-    #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&name,&time)
-
-#endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
-
-/** get the current date and time
-    \param name any ACR_DateTime_t variable
-*/
-#define ACR_DATETIME_NOW(name) {ACR_Time_t temp; ACR_TIME_NOW(temp); ACR_DATETIME_FROM_TIME(name,temp);}
-
-/** values that represent whether in day light savings time or not
-    see tm_isdst in ACR_DateTime_t
-*/
-enum ACR_DST_e
-{
-    ACR_DST_UNKNOWN = -1,
-    ACR_DST_OFF = 0,
-    ACR_DST_ON = 1
-};
-
-/** define an empty date time on the stack
-*/
-#define ACR_DATETIME(name) ACR_DateTime_t name = {0};
-
-/** determine if the specified date time has the time data set
-
-    example:
-
-    ACR_DATETIME(dateTime);
-    if(ACR_DATETIME_HAS_TIME(dateTime) == ACR_BOOL_FALSE)
-    {
-        // no time value set
-    }
-*/
-#define ACR_DATETIME_HAS_TIME(name) ((name.tm_sec|name.tm_min|name.tm_hour) != 0)
-
-/** determine if the specified date time has the date data set
-
-    example:
-
-    ACR_DATETIME(dateTime);
-    if(ACR_DATETIME_HAS_DATE(dateTime) == ACR_BOOL_FALSE)
-    {
-        // no time value set
-    }
-*/
-#define ACR_DATETIME_HAS_DATE(name) ((name.tm_year|name.tm_mon|name.tm_mday) != 0)
-
-#define ACR_DATETIME_YEAR(name) (1900 + name.tm_year)
-#define ACR_DATETIME_MONTH(name) ((ACR_Month_t)name.tm_mon)
-#define ACR_DATETIME_DAY(name) (name.tm_mday)
-#define ACR_DATETIME_DAY_OF_WEEK(name) ((ACR_DayOfWeek_t)name.tm_wday)
-#define ACR_DATETIME_HOUR(name) (name.tm_hour)
-#define ACR_DATETIME_MIN(name) (name.tm_min)
-#define ACR_DATETIME_SEC(name) (name.tm_sec)
-
-/** ntp time is the number of seconds since Jan 1, 1900.
-    this will convert NTP time to UNIX timestamp by subtracting
-    seventy years in seconds
-*/
-#define ACR_TIME_FROM_NTP(ntpTime) (ntpTime - ACR_SEC_FROM_1900_TO_1970)
 
 ////////////////////////////////////////////////////////////
 //

@@ -91,6 +91,43 @@ Note: All of the functions in each example are completely
 - Floating point comparisons
 - Basic UTF8 string handling and unicode conversion
 
+## Top Uses
+
+    ACR_DEBUG_PRINT     interface to printf() that only
+                        writes messages to stdout
+                        when ACR_CONFIG_DEBUG is defined.
+                        see "TYPES AND DEFINES - DEBUG" for details.
+
+    ACR_BYTE_ORDER_16   ensures a value is stored
+    ACR_BYTE_ORDER_32   in big endian byte order
+    ACR_BYTE_ORDER_64   see "TYPES AND DEFINES - ENDIANNESS" for details.
+
+    ACR_Buffer_t        a simple struct with macros
+                        to handle allocation and freeing
+                        of memory safely.
+                        see "TYPES AND DEFINES - SIMPLE MEMORY BUFFER" for details.
+                        for ease of use see "ACR/buffer.h"
+
+    ACR_VarBuffer_t     a simple struct with macros to 
+                        handle allocation of memory
+                        safely while freeing memory only
+                        when necessary to grow the
+                        memory area.
+                        see "TYPES AND DEFINES - VARIABLE LENGTH MEMORY BUFFER" for details.
+                        for ease of use see "ACR/varbuffer.h"
+
+    ACR_String_t        a struct for access to strings
+                        with support for UTF8 encoding.
+                        see "TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS" for details.
+                        for ease of use see "ACR/string.h"
+
+    ACR_DECIMAL_COMPARE compare decimal values within a
+                        default tolerance of 0.0001 which
+                        is many cases is safer than performing
+                        a direct if(a==b) type of comparison
+                        because of possible rounding.
+                        see "TYPES AND DEFINES - DECIMAL VALUES" for details.
+
 # Acknowledgments
 
 Each file in the library has a place for contributors to
