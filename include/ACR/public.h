@@ -711,6 +711,7 @@ typedef float ACR_Decimal_t;
 #pragma warning(disable:4820)
 #endif
 /** type for string data
+/// \todo use buffer flags to optionally mark the string data const 
 */
 typedef struct ACR_String_s
 {
@@ -866,7 +867,7 @@ ACR_Bool_t ACR_TimeNow(
     \returns ACR_BOOL_TRUE if successful
 */
 ACR_Bool_t ACR_TimeSet(
-    ACR_Time_t* me);
+    const ACR_Time_t* me);
 
 /** when there is no RTC, call this function
     once per second (or as close as possible)
@@ -891,7 +892,7 @@ void ACR_TimeProcessMilliTick(
 */
 ACR_Bool_t ACR_DateTimeFromTime(
     ACR_DateTime_t* me,
-    ACR_Time_t* time);
+    const ACR_Time_t* time);
 
 ////////////////////////////////////////////////////////////
 //
