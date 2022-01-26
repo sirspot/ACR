@@ -150,4 +150,10 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_NANO_PER_MILLI (ACR_NANO_PER_MICRO*ACR_MICRO_PER_MILLI)
 #define ACR_NANO_PER_SEC (ACR_NANO_PER_MILLI*ACR_MILLI_PER_SEC)
 
+/** ntp time is the number of seconds since Jan 1, 1900.
+    this will convert NTP time to UNIX timestamp by subtracting
+    seventy years in seconds
+*/
+#define ACR_TIME_FROM_NTP(ntpTime) (ntpTime - ACR_SEC_FROM_1900_TO_1970)
+
 #endif

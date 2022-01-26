@@ -41,8 +41,14 @@
 /** \file public_blocks.h
  
     This header provides a data type and macros to
-    work with blocks of data at a time.
+    work with blocks of data.
     It is included automatically with public.h
+
+    This header gaurantees the following will be defined:
+    ACR_Block_t           for block data count
+    ACR_Blocks_t          for exact block and byte count
+    ACR_MIN_BLOCKS_NEEDED as a macro to convert bytes to blocks needed
+    ACR_LENGTH_TO_BLOCKS  as a macro to convert bytes to exact blocks and bytes
 
 */
 #ifndef _ACR_PUBLIC_BLOCKS_H_

@@ -981,7 +981,7 @@ ACR_String_t ACR_StringFromMemory(
             srcPtr += bytes;
             remaining -= bytes;
         }
-        ACR_BUFFER_REFERENCE(s.m_Buffer, src, (srcLength - remaining));
+        ACR_BUFFER_SET_DATA(s.m_Buffer, src, (srcLength - remaining));
     }
     return s;
 }

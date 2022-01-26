@@ -79,7 +79,7 @@ void ACR_AlignedBufferDelete(
 		ACR_BUFFER(buffer);
 
 		ACR_AlignedBufferDeInit((*mePtr));
-		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_AlignedBuffer_t));
+		ACR_BUFFER_SET_DATA(buffer, (*mePtr), sizeof(ACR_AlignedBuffer_t));
 		ACR_BUFFER_FORCE_FREE(buffer);
 		(*mePtr) = ACR_NULL;
 	}

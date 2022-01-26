@@ -42,9 +42,15 @@
  
     This header provides access to the real time
     clock when available.
+    It is included automatically with public.h
     
-    ACR_HAS_RTC as ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    
+    This header gaurantees the following will be defined:
+    ACR_HAS_RTC            as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_Time_t             for time data
+    ACR_DateTime_t         for date and time data
+    ACR_TIME_NOW           as a macro that accepts a ACR_Time_t variable
+    ACR_DATETIME_FROM_TIME as a macro
+
 
 */
 #ifndef _ACR_PUBLIC_CLOCK_H_
@@ -52,9 +58,6 @@
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
 #include "ACR/public_bool.h"
-
-// included for ACR_SEC_FROM_1900_TO_1970
-#include "ACR/public_dates_and_times.h"
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
@@ -190,12 +193,5 @@ enum ACR_DST_e
 #define ACR_DATETIME_HOUR(name) (name.tm_hour)
 #define ACR_DATETIME_MIN(name) (name.tm_min)
 #define ACR_DATETIME_SEC(name) (name.tm_sec)
-
-/** ntp time is the number of seconds since Jan 1, 1900.
-    this will convert NTP time to UNIX timestamp by subtracting
-    seventy years in seconds
-*/
-#define ACR_TIME_FROM_NTP(ntpTime) (ntpTime - ACR_SEC_FROM_1900_TO_1970)
-
 
 #endif

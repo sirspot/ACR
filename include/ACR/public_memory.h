@@ -143,7 +143,7 @@ typedef unsigned long ACR_Length_t;
 
     // included for memset()
     #include <string.h>
-    #define ACR_MEMSET(p,v,s) memset(p,v,s)
+    #define ACR_MEMSET(p,v,s) memset(p,v,(size_t)s)
 
 #else
 
@@ -188,7 +188,7 @@ typedef unsigned long ACR_Length_t;
 
     // included for memcpy()
     #include <string.h>
-    #define ACR_MEMCPY(d,s,l) memcpy(d,s,l);
+    #define ACR_MEMCPY(d,s,l) memcpy(d,s,(size_t)l);
 
 #else
 

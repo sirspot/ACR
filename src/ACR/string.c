@@ -79,7 +79,7 @@ void ACR_StringDelete(
 		ACR_BUFFER(buffer);
 
 		ACR_StringDeInit((*mePtr));
-		ACR_BUFFER_REFERENCE(buffer, (*mePtr), sizeof(ACR_String_t));
+		ACR_BUFFER_SET_DATA(buffer, (*mePtr), sizeof(ACR_String_t));
 		ACR_BUFFER_FORCE_FREE(buffer);
 		(*mePtr) = ACR_NULL;
 	}
