@@ -444,65 +444,17 @@ typedef unsigned long ACR_Count_t;
 //
 ////////////////////////////////////////////////////////////
 
-/** type for reference to ACR_Block_t aligned memory area
-	- prevents use of malloc and free directly.
-	- prevents use of void pointers without associated memory length
-	- include "ACR/alignedbuffer.h" for easy and safe functions
-	- see ACR_ALIGNED_BUFFER defines for safe access via macros
+/**
+    ### New to C? ###
+
+    Q: What does it mean for memory to be aligned?
+    A: Computers work with memory in blocks. There are some hardware components
+       that require data to be stored at the start of one of these blocks in
+       order to operate correctly. An aligned buffer makes it easy to
+       placing data in memory where it can be accessed by specialized hardware
+       See the include file ACR/public/public_alignedbuffer.h for more details.
 */
-typedef struct ACR_AlignedBuffer_s
-{
-	/** the aligned memory buffer
-	*/
-	ACR_Buffer_t m_AlignedBuffer;
-
-	/** stores the original memory before alignement
-	*/
-	ACR_Buffer_t m_UnalignedBuffer;
-
-} ACR_AlignedBuffer_t;
-
-/** define an empty aligned buffer on the stack with the specified name
-*/
-#define ACR_ALIGNED_BUFFER(name) ACR_AlignedBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE}};
-
-/** check if the aligned buffer is valid
-*/
-#define ACR_ALIGNED_BUFFER_IS_VALID(name) ACR_BUFFER_IS_VALID(name.m_AlignedBuffer)
-
-/** assign memory to the buffer aligned on a block boundary
-
-    Note: the buffer length available may be up to 1 full block less than the length specified.
-	      use ACR_ALIGNED_BUFFER_GET_LENGTH to get the actual length available
-*/
-#define ACR_ALIGNED_BUFFER_REFERENCE(name, memory, length) \
-        { \
-			ACR_BUFFER_SET_DATA(name.m_UnalignedBuffer, memory, length); \
-			if((name.m_UnalignedBuffer.m_Pointer != ACR_NULL) && (name.m_UnalignedBuffer.m_Length >= ACR_BYTES_PER_BLOCK)) \
-			{ \
-				ACR_PointerValue_t alignMask = (~(ACR_BITS_PER_BLOCK-1)); \
-				ACR_PointerValue_t memValue = (ACR_PointerValue_t)memory; \
-				memValue += (ACR_BITS_PER_BLOCK-1); \
-				memValue &= alignMask; \
-				name.m_AlignedBuffer.m_Pointer = (void*)memValue; \
-				name.m_AlignedBuffer.m_Length = (length - (ACR_Length_t)((ACR_PointerValue_t)name.m_AlignedBuffer.m_Pointer - (ACR_PointerValue_t)memory)); \
-				ACR_ADD_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF); \
-			} \
-			else \
-			{ \
-				name.m_AlignedBuffer.m_Pointer = ACR_NULL; \
-				name.m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH; \
-				ACR_REMOVE_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF); \
-			} \
-        }
-
-/** free memory used by the buffer
-*/
-#define ACR_ALIGNED_BUFFER_FREE(name) \
-        ACR_BUFFER_FREE(name.m_UnalignedBuffer); \
-		name.m_AlignedBuffer.m_Pointer = ACR_NULL; \
-		name.m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH; \
-        ACR_REMOVE_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF);
+#include "ACR/public/public_alignedbuffer.h"
 
 ////////////////////////////////////////////////////////////
 //

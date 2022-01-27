@@ -125,7 +125,7 @@ ACR_Info_t ACR_AlignedBufferRef(
 		return ACR_INFO_ERROR;
 	}
 
-	ACR_ALIGNED_BUFFER_REFERENCE((*me), ptr, length);
+	ACR_ALIGNED_BUFFER_SET_DATA((*me), ptr, length);
 	if(ACR_ALIGNED_BUFFER_IS_VALID((*me)))
 	{
 		return ACR_INFO_OK;
