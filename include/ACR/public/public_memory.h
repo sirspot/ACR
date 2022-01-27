@@ -49,7 +49,7 @@
 #define _ACR_PUBLIC_MEMORY_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 /** represents an empty value.
     use this instead of 0 to clearly indicate the value

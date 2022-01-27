@@ -57,7 +57,7 @@
 #define _ACR_PUBLIC_CLOCK_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 // defines ACR_HAS_RTC and includes time()
 // functions if desired

@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2021 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -57,7 +57,7 @@
 #define _ACR_PUBLIC_CONFIG_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 /*
     ### Set the following Preprocessor Defines for Confguration Options ###

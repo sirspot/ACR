@@ -123,7 +123,7 @@
        return 0 to mean success while others will return 0
        as an error. This is why ACR defines many more specific
        values that can be used as return codes.
-       See the include file ACR/public_bool_and_empty.h for more details.
+       See the include file ACR/public/public_bool_and_empty.h for more details.
 
     Q: What is an "include"?
     A: An include allows a header to be used
@@ -135,7 +135,7 @@
        as it appears in the file system.
 
 */
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -153,10 +153,10 @@
        microprocessor with no operating system. Code is removed or
        added based on the platform settings using the preprocessor
        commands #ifdef and #ifndef.
-       See the include file ACR/public_config.h for more details.
+       See the include file ACR/public/public_config.h for more details.
 
 */
-#include "ACR/public_config.h"
+#include "ACR/public/public_config.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -179,10 +179,10 @@
         A: A callback function is a variable
            that can act as the function it is
            assigned to.
-           See the include file ACR/public_functions.h for more details.
+           See the include file ACR/public/public_functions.h for more details.
 
 */
-#include "ACR/public_functions.h"
+#include "ACR/public/public_functions.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -210,10 +210,10 @@
        assigning a value but a variable that represents a larger
        area of memory must be initialized in another way.
        see ACR_MEMSET and ACR_CLEAR_MEMORY in the include file
-       ACR/public_memory.h for more details.
+       ACR/public/public_memory.h for more details.
  
 */
-#include "ACR/public_memory.h"
+#include "ACR/public/public_memory.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -236,7 +236,7 @@
        2. the users of the program may be confused by the extra information
 
 */
-#include "ACR/public_debug.h"
+#include "ACR/public/public_debug.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -255,7 +255,7 @@
        address range. Access to the heap is protected
        so that it is possible for the program to gracefully
        handle when it runs out of heap space.
-       See the include file ACR/public_heap.h for more details.
+       See the include file ACR/public/public_heap.h for more details.
 
     Q: What is the stack?
     A: This refers to the area of memory reserved for
@@ -266,7 +266,7 @@
        was allotted. This is called a Stack Overflow.
 
 */
-#include "ACR/public_heap.h"
+#include "ACR/public/public_heap.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -282,9 +282,9 @@
        It is only necessary to understand when a program
        must work with itself or other programs on various
        hardware platforms.
-       See the include file ACR/public_byte_order.h for more details.
+       See the include file ACR/public/public_byte_order.h for more details.
 */
-#include "ACR/public_byte_order.h"
+#include "ACR/public/public_byte_order.h"
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
@@ -325,9 +325,9 @@
     Q: What are flags?
     A: Flags are a method of setting, clearing, and checking
        the state of individual bits
-       See the include file ACR/public_bytes_and_flags.h for more details.
+       See the include file ACR/public/public_bytes_and_flags.h for more details.
 */
-#include "ACR/public_bytes_and_flags.h"
+#include "ACR/public/public_bytes_and_flags.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -365,16 +365,16 @@ typedef unsigned long ACR_Count_t;
        It is good to know this size when performing optimized
        copy operations or when placing data in memory where
        it can be accessed by specialized hardware.
-       See the include file ACR/public_blocks.h for more details.
+       See the include file ACR/public/public_blocks.h for more details.
 */
-#include "ACR/public_blocks.h"
+#include "ACR/public/public_blocks.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
-#include "ACR/public_dates_and_times.h"
+#include "ACR/public/public_dates_and_times.h"
 
 #define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(fourDigitYear)))
 #define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
@@ -395,9 +395,9 @@ typedef unsigned long ACR_Count_t;
        was last set. Devices that do not have an RTC
        can simulate one using a 1 aecond timer but will
        have to correct the time more often due to drift.
-       See the include file ACR/public_clock.h for more details.
+       See the include file ACR/public/public_clock.h for more details.
 */
-#include "ACR/public_clock.h"
+#include "ACR/public/public_clock.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -413,9 +413,9 @@ typedef unsigned long ACR_Count_t;
        includes the exact address of the memory and the number
        of bytes allocated, which is called the length or
        size of the buffer.
-       See the include file ACR/public_buffer.h for more details.
+       See the include file ACR/public/public_buffer.h for more details.
 */
-#include "ACR/public_buffer.h"
+#include "ACR/public/public_buffer.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -434,9 +434,9 @@ typedef unsigned long ACR_Count_t;
        the existing data must be copied. This can be
        complicated to manage using a simple memory buffer
        so a variable buffer may be used instead.
-       See the include file ACR/public_varbuffer.h for more details.
+       See the include file ACR/public/public_varbuffer.h for more details.
 */
-#include "ACR/public_varbuffer.h"
+#include "ACR/public/public_varbuffer.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -755,7 +755,7 @@ typedef unsigned long ACR_Unicode_t;
 // TYPES AND DEFINES - UNIQUE STRING VALUES            //
 //                                                     //
 /////////////////////////////////////////////////////////
-#include "ACR/public_unique_strings.h"
+#include "ACR/public/public_unique_strings.h"
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

@@ -56,16 +56,16 @@
 #define _ACR_PUBLIC_BUFFER_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 // included for ACR_Length_t, ACR_ZERO_LENGTH, ACR_CLEAR_MEMORY, and ACR_NULL
-#include "ACR/public_memory.h"
+#include "ACR/public/public_memory.h"
 
 // included for ACR_Byte_t, ACR_Flags_t, ACR_HAS_FLAG, ACR_ADD_FLAGS, and ACR_REMOVE_FLAGS
-#include "ACR/public_bytes_and_flags.h"
+#include "ACR/public/public_bytes_and_flags.h"
 
 // included for ACR_HAS_MALLOC, ACR_MALLOC and ACR_FREE
-#include "ACR/public_heap.h"
+#include "ACR/public/public_heap.h"
 
 #ifdef ACR_COMPILER_VS2017
 #pragma warning(push)

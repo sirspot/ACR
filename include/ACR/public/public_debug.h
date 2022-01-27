@@ -52,7 +52,7 @@
 #define _ACR_PUBLIC_DEBUG_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 #ifdef ACR_CONFIG_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE

@@ -55,7 +55,7 @@
 #define _ACR_PUBLIC_BLOCKS_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 /** type for an effeciently sized memory block, which is
     probably the largest integer value type

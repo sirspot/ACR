@@ -54,10 +54,10 @@
 #define _ACR_PUBLIC_HEAP_H_
 
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public_bool.h"
+#include "ACR/public/public_bool.h"
 
 // included for ACR_CLEAR_MEMORY and ACR_NULL
-#include "ACR/public_memory.h"
+#include "ACR/public/public_memory.h"
 
 #ifndef ACR_CONFIG_NO_MALLOC
 
