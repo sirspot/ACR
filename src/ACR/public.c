@@ -432,15 +432,16 @@ int ACR_Test(void)
 #ifdef ACR_COMPILER_VS2017
 		#pragma warning(suppress: 4127)
 #endif
-        if(ACR_HAS_MALLOC != ACR_BOOL_FALSE)
+        #if ACR_HAS_MALLOC != ACR_BOOL_FALSE
         {
             ACR_DEBUG_PRINT(messageNumber+3, "ERROR: ACR_BUFFER_ALLOC failed to allocate memory");
             return ACR_FAILURE;
         }
-        else
+        #else
         {
             ACR_DEBUG_PRINT(messageNumber+4, "OK: ACR_HAS_MALLOC is not defined so buffer length is 0");
         }
+        #endif
     }
     else
     {
@@ -656,16 +657,18 @@ ACR_Bool_t ACR_TimeNow(
 
         #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
+        #if ACR_HAS_RTC == ACR_BOOL_FALSE
         // time has never been set and a RTC is not available.
         // set time to zero seconds.
         (*me) = 0;
+        #endif // #if ACR_HAS_RTC == ACR_BOOL_FALSE
     }
 
     return ACR_BOOL_FALSE;
 }
 
 ACR_Bool_t ACR_TimeSet(
-    ACR_Time_t* me)
+    const ACR_Time_t* me)
 {
     ACR_Bool_t result = ACR_BOOL_FALSE;
 
@@ -710,7 +713,7 @@ void ACR_TimeProcessMilliTick(
 
 ACR_Bool_t ACR_DateTimeFromTime(
     ACR_DateTime_t* me,
-    ACR_Time_t* time)
+    const ACR_Time_t* time)
 {
     if(me)
     {
@@ -955,6 +958,9 @@ ACR_Unicode_t ACR_Utf8ToUnicode(
             byteNum += 1;
         }
         while(offset > 0);
+        // Note: warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+        //       can be safely ignored here as it only serves to notify the user that
+        //       the mitigation code will be used if desired
         return c;
     }
     return (ACR_Unicode_t)mem[0];

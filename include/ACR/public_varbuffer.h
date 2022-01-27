@@ -97,26 +97,26 @@ typedef struct ACR_VarBuffer_s
 
 /** set the length of the buffer up to the max length
 */
-#define ACR_VAR_BUFFER_SET_LENGTH(name, length) \
-		if(length <= name.m_MaxLength) \
-		{ \
-            name.m_Buffer.m_Length = length; \
+#define ACR_VAR_BUFFER_SET_LENGTH(name, length)\
+		if(length <= name.m_MaxLength)\
+		{\
+            name.m_Buffer.m_Length = length;\
         }
 
 /** append data to the buffer up to the max length
 */
-#define ACR_VAR_BUFFER_APPEND(name, srcPtr, length) \
-        if(length <= (name.m_MaxLength - name.m_Buffer.m_Length)) \
-        { \
-             if(srcPtr != ACR_NULL) \
-             { \
-                 ACR_MEMCPY(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length, srcPtr, length); \
-             } \
+#define ACR_VAR_BUFFER_APPEND(name, srcPtr, length)\
+        if(length <= (name.m_MaxLength - name.m_Buffer.m_Length))\
+        {\
+             if(srcPtr != ACR_NULL)\
+             {\
+                 ACR_MEMCPY(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length, srcPtr, length);\
+             }\
              else\
              {\
                 ACR_MEMSET(((ACR_Byte_t*)name.m_Buffer.m_Pointer) + name.m_Buffer.m_Length,ACR_EMPTY_VALUE,length);\
              }\
-             name.m_Buffer.m_Length += length; \
+             name.m_Buffer.m_Length += length;\
         }
 
 /** determine if the variable length buffer is valid
@@ -125,42 +125,42 @@ typedef struct ACR_VarBuffer_s
 
 /** assign memory to the buffer
 */
-#define ACR_VAR_BUFFER_REFERENCE(name, memory, length) \
-        if(name.m_Buffer.m_Pointer != ACR_NULL) \
-        { \
-            if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE) \
-            { \
-                ACR_FREE(name.m_Buffer.m_Pointer); \
-            } \
-        } \
-        name.m_Buffer.m_Pointer = (void*)memory; \
-        name.m_Buffer.m_Length = ACR_ZERO_LENGTH; \
-        if(name.m_Buffer.m_Pointer != ACR_NULL) \
-        { \
-            name.m_MaxLength = length; \
-            ACR_ADD_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF); \
-        } \
-        else \
-		{ \
-		    name.m_MaxLength = ACR_ZERO_LENGTH; \
-            ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF); \
+#define ACR_VAR_BUFFER_REFERENCE(name, memory, length)\
+        if(name.m_Buffer.m_Pointer != ACR_NULL)\
+        {\
+            if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)\
+            {\
+                ACR_FREE(name.m_Buffer.m_Pointer);\
+            }\
+        }\
+        name.m_Buffer.m_Pointer = (void*)memory;\
+        name.m_Buffer.m_Length = ACR_ZERO_LENGTH;\
+        if(name.m_Buffer.m_Pointer != ACR_NULL)\
+        {\
+            name.m_MaxLength = length;\
+            ACR_ADD_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF);\
+        }\
+        else\
+		{\
+		    name.m_MaxLength = ACR_ZERO_LENGTH;\
+            ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF);\
         }
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
 /** free memory used by the buffer
 */
-#define ACR_VAR_BUFFER_FREE(name) \
-        if(name.m_Buffer.m_Pointer != ACR_NULL) \
-        { \
-            if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE) \
-            { \
-                ACR_FREE(name.m_Buffer.m_Pointer); \
-            } \
-            name.m_Buffer.m_Pointer = ACR_NULL; \
-        } \
-        name.m_Buffer.m_Length = ACR_ZERO_LENGTH; \
-        name.m_MaxLength = ACR_ZERO_LENGTH; \
+#define ACR_VAR_BUFFER_FREE(name)\
+        if(name.m_Buffer.m_Pointer != ACR_NULL)\
+        {\
+            if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)\
+            {\
+                ACR_FREE(name.m_Buffer.m_Pointer);\
+            }\
+            name.m_Buffer.m_Pointer = ACR_NULL;\
+        }\
+        name.m_Buffer.m_Length = ACR_ZERO_LENGTH;\
+        name.m_MaxLength = ACR_ZERO_LENGTH;\
         ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF)
 
 /** allocate memory for the buffer and change the max length only if needed
@@ -169,55 +169,55 @@ typedef struct ACR_VarBuffer_s
           see ACR_VAR_BUFFER_CHANGE_MAX_LENGTH to change the max length
           without losing any data
 */
-#define ACR_VAR_BUFFER_ALLOC(name, length) \
-        if(name.m_MaxLength < length) \
-		{ \
-			if(name.m_Buffer.m_Pointer != ACR_NULL) \
-			{ \
-				if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE) \
-				{ \
-					ACR_FREE(name.m_Buffer.m_Pointer); \
-				} \
-			} \
-			name.m_Buffer.m_Pointer = (void*)ACR_MALLOC(length+1); \
-			if(name.m_Buffer.m_Pointer != ACR_NULL) \
-			{ \
-                ((ACR_Byte_t*)name.m_Buffer.m_Pointer)[length] = 0; \
-				name.m_MaxLength = length; \
-			} \
-			else \
-			{ \
-				name.m_MaxLength = ACR_ZERO_LENGTH; \
-			} \
-		    ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF); \
-		} \
+#define ACR_VAR_BUFFER_ALLOC(name, length)\
+        if(name.m_MaxLength < length)\
+		{\
+			if(name.m_Buffer.m_Pointer != ACR_NULL)\
+			{\
+				if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)\
+				{\
+					ACR_FREE(name.m_Buffer.m_Pointer);\
+				}\
+			}\
+			name.m_Buffer.m_Pointer = (void*)ACR_MALLOC(length+1);\
+			if(name.m_Buffer.m_Pointer != ACR_NULL)\
+			{\
+                ((ACR_Byte_t*)name.m_Buffer.m_Pointer)[length] = 0;\
+				name.m_MaxLength = length;\
+			}\
+			else\
+			{\
+				name.m_MaxLength = ACR_ZERO_LENGTH;\
+			}\
+		    ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF);\
+		}\
 		name.m_Buffer.m_Length = ACR_ZERO_LENGTH
 
-/** allocate memory for the buffer and change the max length only if needed
-
-    Note: this will always effectively clear all data.
-          see ACR_VAR_BUFFER_CHANGE_MAX_LENGTH to change the max length
-          without losing any data
+/** allocate memory for the buffer and change the max length
+ *  while maintaining all data that is currently in the buffer
 */
-#define ACR_VAR_BUFFER_CHANGE_MAX_LENGTH(name, length) \
-        if(name.m_MaxLength != length) \
-		{ \
-            void* tempPtr = name.m_Buffer.m_Pointer;
-			if(tempPtr != ACR_NULL) \
-			{ \
-				if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF)) \
-				{ \
-					tempPtr = ACR_NULL;\
-				} \
-			} \
-			tempPtr = (void*)ACR_REALLOC(tempPtr, length+1); \
-			if(tempPtr != ACR_NULL) \
-			{ \
-                ((ACR_Byte_t*)tempPtr)[length] = 0; \
-				name.m_MaxLength = length; \
-                name.m_Buffer.m_Pointer = tempPtr;
-                ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF); \
-			} \		    
+#define ACR_VAR_BUFFER_CHANGE_MAX_LENGTH(name, length)\
+        if(name.m_MaxLength != length)\
+		{\
+            if(length >= name.m_Buffer.m_Length)\
+            {\
+                void* tempPtr = name.m_Buffer.m_Pointer;\
+                if(tempPtr != ACR_NULL)\
+                {\
+                    if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF))\
+                    {\
+                        tempPtr = ACR_NULL;\
+                    }\
+                }\
+                tempPtr = (void*)ACR_REALLOC(tempPtr, length+1);\
+                if(tempPtr != ACR_NULL)\
+                {\
+                    ((ACR_Byte_t*)tempPtr)[length] = 0;\
+                    name.m_MaxLength = length;\
+                    name.m_Buffer.m_Pointer = tempPtr;\
+                    ACR_REMOVE_FLAGS(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF);\
+                }\
+            }\
 		}
 
 #else

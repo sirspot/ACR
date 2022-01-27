@@ -168,7 +168,7 @@
 */
 #define ACR_IS_BIG_ENDIAN 0
 #else
-// Note: warning C4906: string literal cast to 'unsigned short *' must be
+// Note: warning C4906: string literal cast to 'unsigned short *' should be
 //       ignored in project settings to use dynamic endianess detection
 #define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
 #define ACR_ENDIAN_DYNAMIC 1
