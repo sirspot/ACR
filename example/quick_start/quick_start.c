@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2020 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -39,14 +39,17 @@
 */
 /** \file quick_start.c
 
-    application to run the built-in test function
+    application to run the built-in common test function
     
 */
-#include "ACR/public.h"
+#include "ACR/test/test_common.h"
+
+// included for ACR_UNUSED
+#include "ACR/public/public_functions.h"
 
 int main(int argc, char** argv)
 {
-	int result = ACR_Test();
+	int result = ACR_TestCommon();
 
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);

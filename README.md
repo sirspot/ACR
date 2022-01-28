@@ -8,14 +8,15 @@ Get ready, get set, ...
 
 ## Project Settings
 - Add "ACR/include" to your include paths
-- Add "ACR/src/public.c" to your project
+- Add "ACR/src/common.c" to your project
+- Add "ACR/src/test/test_common.c" to your project
 
 ## Code
-- Add #include "ACR/public.h" to the top of your C file
-- Call the ACR_Test() function as follows:
+- Add #include "ACR/test/test_common.h" to the top of your C file
+- Call the ACR_TestCommon() function as follows:
 
 ```C
-if(ACR_Test() == ACR_SUCCESS)
+if(ACR_TestCommon() == ACR_SUCCESS)
 {
     // OK, ACR library is ready for use
 }

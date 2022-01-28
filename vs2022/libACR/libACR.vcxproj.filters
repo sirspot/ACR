@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\ACR">
+      <UniqueIdentifier>{d104f985-4311-434c-ac1f-46b6d33040a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ACR">
+      <UniqueIdentifier>{53af7ec7-e4c8-45e7-965e-87b6f824b4a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ACR\public">
+      <UniqueIdentifier>{43fcc09b-c7d5-4cf4-93f6-5c215b87650f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\ACR\public.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\buffer.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\varbuffer.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\string.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\alignedbuffer.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_alignedbuffer.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_blocks.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_bool.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_buffer.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_byte_order.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_bytes_and_flags.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_clock.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_config.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_dates_and_times.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_debug.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_functions.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_heap.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_memory.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_unique_strings.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_varbuffer.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\common.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_count.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_decimal.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_info.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_math.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_string.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_units.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\ACR\buffer.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\varbuffer.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\string.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\alignedbuffer.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\common.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

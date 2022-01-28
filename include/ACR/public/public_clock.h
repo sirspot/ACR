@@ -76,11 +76,8 @@
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
         #endif
         #ifdef ACR_COMPILER_VS2017
-            #pragma warning(push)
-            // disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
-            #pragma warning(disable:4820)
+            // Note: disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
             #include <time.h>
-            #pragma warning(pop)
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)

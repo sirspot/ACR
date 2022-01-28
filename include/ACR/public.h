@@ -286,30 +286,6 @@
 */
 #include "ACR/public/public_byte_order.h"
 
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-    /** byte order swap of 64 bit value
-    */
-    #define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
-                                        (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
-                                        (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
-                                        (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
-                                        (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
-                                        (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
-                                        (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
-                                        (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
-    #ifdef ACR_ENDIAN_DYNAMIC
-        #define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
-    #else
-        #if ACR_IS_BIG_ENDIAN == 0
-            #define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
-        #else
-            #define ACR_BYTE_ORDER_64(x) (x)
-        #endif // #if ACR_IS_BIG_ENDIAN == 0
-    #endif // #ifdef ACR_ENDIAN_DYNAMIC
-
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - BYTES AND FLAGS
@@ -334,22 +310,7 @@
 // TYPES AND DEFINES - COUNTING
 //
 ////////////////////////////////////////////////////////////
-
-/** type for a typical count such as the number of items in an array
-	\see ACR_MAX_COUNT for the maximum value that can be
-	stored by this data type
-*/
-typedef unsigned long ACR_Count_t;
-
-/** used for setting a count explicitly to zero
-*/
-#define ACR_ZERO_COUNT 0
-
-/** max value that can be stored by the ACR_Count_t type such that
-    it will not overflow when added to 1 
-    (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
-*/
-#define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
+#include "ACR/public/public_count.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -375,9 +336,6 @@ typedef unsigned long ACR_Count_t;
 //
 ////////////////////////////////////////////////////////////
 #include "ACR/public/public_dates_and_times.h"
-
-#define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(fourDigitYear)))
-#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
 
 ////////////////////////////////////////////////////////////
 //
@@ -461,185 +419,21 @@ typedef unsigned long ACR_Count_t;
 // TYPES AND DEFINES - COMMON INFORMATIONAL VALUES
 //
 ////////////////////////////////////////////////////////////
-
-/** info values that can be used instead of
-    true or false for options and return values
-
-    for variable init:
-
-        ACR_Info_t result = ACR_INFO_UNKNOWN;
-
-    for comparison:
-        
-        if(result == ACR_INFO_YES)
-        {
-            // the result is yes
-        }
-        else if(result == ACR_INFO_NO)
-        {
-            // the result is no
-        }
-        else
-        {
-            // an unexpected result
-        }
-
-    special case for boolean values
-
-        only use ACR_INFO_TRUE and ACR_INFO_FALSE to check
-        explicitly for those values. see notes on
-        ACR_BOOL_FALSE for other boolean comparisons
-
-        good example:
-
-        ACR_Info_t success = ACR_INFO_FALSE;
-        if(success == ACR_INFO_TRUE)
-        {
-            // success
-        }
-        else
-        {
-            // no success
-        }
-
-        bad example:
-
-        ACR_Info_t success = ACR_INFO_FALSE;
-        // Note: this is a bad example because this non-zero
-        //       success value will be interpreted as "true"
-        //       even though the intention was for it to be
-        //       a false value
-        if(success)
-        {
-            // success
-        }
-        else
-        {
-            // no success
-        }
-
-    special case for program or thread return value:
-
-        use ACR_SUCCESS for successful execution
-        and any other return codes can be used as
-        an error.
-
-        do not use 0, ACR_INFO_EQUAL, or ACR_INFO_OK as
-        a program or thread return code because they are
-        either confusing or will not have the intended
-        results
-
-        good example:        
-        
-        // program or thread exit with no error
-        return ACR_SUCCESS;
-
-        good example:
-
-        // program or thread exit error
-        return ACR_INFO_ERROR;
-        
-        bad example:
-
-        // program or thread exit with no error
-        // Note: this is a bad example because this non-zero
-        //       return value will be interpreted as an
-        //       error
-        return ACR_INFO_OK;
-
-*/
-typedef enum ACR_Info_e
-{
-    //
-    // COMPARISON
-    //
-    ACR_INFO_EQUAL = 0,
-    ACR_INFO_NOT_EQUAL,
-    ACR_INFO_LESS,
-    ACR_INFO_GREATER,
-    ACR_INFO_UNKNOWN,
-
-    //
-    // POSITIVE,       NEGATIVE
-    //
-    ACR_INFO_TRUE,     ACR_INFO_FALSE,
-    ACR_INFO_OK,       ACR_INFO_ERROR,
-    ACR_INFO_ENABLED,  ACR_INFO_DISABLED,
-    ACR_INFO_YES,      ACR_INFO_NO,
-    ACR_INFO_ON,       ACR_INFO_OFF,
-    ACR_INFO_START,    ACR_INFO_STOP,
-    ACR_INFO_ACCEPT,   ACR_INFO_IGNORE,
-    ACR_INFO_VALID,    ACR_INFO_INVALID,
-
-    //
-    // POSITION
-    //
-    ACR_INFO_TOP,      ACR_INFO_BOTTOM,
-    ACR_INFO_FIRST,    ACR_INFO_LAST,
-    ACR_INFO_PREVIOUS, ACR_INFO_NEXT,
-    ACR_INFO_CURRENT,
-
-    // DIRECTION
-    ACR_INFO_UP,       ACR_INFO_DOWN,
-    ACR_INFO_LEFT,     ACR_INFO_RIGHT,
-
-    // AGE
-    ACR_INFO_OLD,      ACR_INFO_NEW,
-
-    // INSTRUCTION
-    ACR_INFO_BEGIN,
-    ACR_INFO_READY,
-    ACR_INFO_WAIT,
-    ACR_INFO_GO,
-    ACR_INFO_END,
-
-    ACR_INFO_COUNT
-
-} ACR_Info_t;
+#include "ACR/public/public_info.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - DECIMAL VALUES
 //
 ////////////////////////////////////////////////////////////
-
-/** stores a decimal value
-*/
-typedef float ACR_Decimal_t;
-
-/** default tolerance for comparison of decimal values
-    \see ACR_DecimalCompare()
-*/
-#define ACR_DEFAULT_TOLERANCE 0.0001
-
-/** compare two decimal values
-    \param a
-    \param b
-    \param t the absolute value of the difference
-            between a and b where they will be assumed
-            to be equal values. use ACR_DEFAULT_TOLERANCE
-            if unsure
-    \returns - ACR_INFO_EQUAL if the decimals are equal
-               within the specified tolerance (t)
-             - ACR_INFO_LESS if a is less than b
-             - ACR_INFO_GREATER a is greater than b
-*/
-#define ACR_DECIMAL_TOLERANCE_COMPARE(a,b,t) (((a-t)>b)?ACR_INFO_GREATER:((a+t)<b)?ACR_INFO_LESS:ACR_INFO_EQUAL)
-#define ACR_DECIMAL_COMPARE(a,b) (ACR_DECIMAL_TOLERANCE_COMPARE(a,b,ACR_DEFAULT_TOLERANCE))
+#include "ACR/public/public_decimal.h"
 
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - MATH
 //
 ////////////////////////////////////////////////////////////
-
-/** the value of pie
-*/
-#define ACR_PI 3.14159265359
-
-/** the circumference of a circle with the specified radius
-*/
-#define ACR_CIRCUMFERENCE(radius) (2*ACR_PI*radius)
+#include "ACR/public/public_math.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -656,51 +450,14 @@ typedef float ACR_Decimal_t;
 //       chcp (again) should return 65001
 //
 ////////////////////////////////////////////////////////////
-
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(push)
-// disable warning C4820: padding added after data member
-#pragma warning(disable:4820)
-#endif
-/** type for string data
-/// \todo use buffer flags to optionally mark the string data const 
-*/
-typedef struct ACR_String_s
-{
-    ACR_Buffer_t m_Buffer;
-    ACR_Count_t m_Count;
-} ACR_String_t;
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(pop)
-#endif
-
-/** define a string on the stack with the specified name
-*/
-#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_ZERO_COUNT};
-
-/** assign memory to the string
-*/
-#define ACR_STRING_REFERENCE(name, memory, length, count) ACR_BUFFER_SET_DATA(name.m_Buffer, memory, length); name.m_Count = count;
-
-/** type for unicode characters
-*/
-typedef unsigned long ACR_Unicode_t;
-
-/** given the first UTF8 byte value determine the number of
-    bytes uses to encode the character
-*/
-#define ACR_UTF8_BYTE_COUNT(c) (((c & 0x80) != 0)?((c & 0x40) != 0)?((c & 0x20) != 0)?((c & 0x10) != 0)?4:3:2:1:1)
+#include "ACR/public/public_string.h"
 
 /////////////////////////////////////////////////////////
 //                                                     //
 // TYPES AND DEFINES - UNITS OF MEASURE                //
 //                                                     //
 /////////////////////////////////////////////////////////
-
-#define ACR_DEGREES_C_TO_F(c) ((c*1.8)+32.0)
-#define ACR_DEGREES_F_TO_C(f) ((f-32.0)/1.8)
-#define ACR_MEASURE_INCHES_TO_CM(i) (i*2.54)
-#define ACR_MEASURE_CM_TO_INCHES(cm) (cm/2.54)
+#include "ACR/public/public_units.h"
 
 /////////////////////////////////////////////////////////
 //                                                     //
@@ -708,258 +465,5 @@ typedef unsigned long ACR_Unicode_t;
 //                                                     //
 /////////////////////////////////////////////////////////
 #include "ACR/public/public_unique_strings.h"
-
-////////////////////////////////////////////////////////////
-// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
-////////////////////////////////////////////////////////////
-#ifdef __cplusplus                                        //
-extern "C" {                                              //
-#endif                                                    //
-////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS
-//
-// Note: warning C4711: function selected for automatic inline expansion can be
-//       ignored in project settings to avoid unnecessary warnings for these function
-//
-////////////////////////////////////////////////////////////
-
-/** internal test of ACR library functions
-    \returns ACR_SUCCESS or ACR_FAILURE
-*/
-int ACR_Test(void);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - COMMON INFORMATIONAL VALUES
-//
-////////////////////////////////////////////////////////////
-
-/** get the info value as a string
-    \param info the info value \see enum ACR_Info_e
-    \returns a reference to a string
-*/
-ACR_String_t ACR_InfoToString(
-    ACR_Info_t info);
-
-/** get the info value from a string
-    \param src a reference to a string
-    \returns an info value from \see enum ACR_Info_e or
-             ACR_INFO_UNKNOWN if not found
-*/
-ACR_Info_t ACR_InfoFromString(
-    ACR_String_t src);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - DATE AND TIME VALUES
-//
-////////////////////////////////////////////////////////////
-
-/** get the number of days in the specified month
-    \param month the month
-           \see enum ACR_Month_e
-    \param isLeapYear set to ACR_BOOL_TRUE to get leap year days (only affects February)
-           \see ACR_YearIsLeapYear()
-    \returns the number of days in the month
-*/
-int ACR_DaysPerMonth(
-    ACR_Month_t month,
-    ACR_Bool_t isLeapYear);
-
-/** get the day of week value as a string
-    \param dayOfWeek the day of week value
-           \see enum ACR_DayOfWeek_e
-    \returns a reference to a string
-*/
-ACR_String_t ACR_DayOfWeekToString(
-    ACR_DayOfWeek_t dayOfWeek);
-
-/** get the day of week value from a string
-    \param src a reference to a string
-    \returns a value from \see enum ACR_DayOfWeek_e or
-             ACR_DAY_OF_WEEK_UNKNOWN if not found
-*/
-ACR_DayOfWeek_t ACR_DayOfWeekFromString(
-    ACR_String_t src);
-
-/** get the month value as a string
-    \param month the month
-           \see enum ACR_Month_e
-    \returns a reference to a string
-*/
-ACR_String_t ACR_MonthToString(
-    ACR_Month_t month);
-
-/** get the month value from a string
-    \param src a reference to a string
-    \returns a value from \see enum ACR_Month_e or
-             ACR_MONTH_UNKNOWN if not found
-*/
-ACR_Month_t ACR_MonthFromString(
-    ACR_String_t src);
-
-/** \param fourDigitYear any four digit year
-    \returns ACR_BOOL_TRUE if the year is a leap year
-*/
-ACR_Bool_t ACR_YearIsLeapYear(
-    int fourDigitYear);
-
-/** set the time to the current system time
-    \param me the time
-    \returns ACR_BOOL_TRUE if successful
-*/
-ACR_Bool_t ACR_TimeNow(
-    ACR_Time_t* me);
-
-/** attempt to set the RTC to the specified time
-    \param me the time to set the RTC to
-    \returns ACR_BOOL_TRUE if successful
-*/
-ACR_Bool_t ACR_TimeSet(
-    const ACR_Time_t* me);
-
-/** when there is no RTC, call this function
-    once per second (or as close as possible)
-    to simulate the time
-    \param seconds the number of seconds since the last call to this function (typically 1 is desired)
-*/
-void ACR_TimeProcessSecondTick(
-    ACR_Time_t seconds);
-
-/** where there is no RTC, call this function
-    once per millisecond (or as close as possible)
-    to simulate the time
-    \param milliseconds the number of milliseconds since the last call to this function (typically 10 or less is desired)
-*/
-void ACR_TimeProcessMilliTick(
-    ACR_Time_t milliseconds);
-
-/** set the date time data from the specified time
-    \param me the date time
-    \param time the time
-    \returns ACR_BOOL_TRUE if successful
-*/
-ACR_Bool_t ACR_DateTimeFromTime(
-    ACR_DateTime_t* me,
-    const ACR_Time_t* time);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - SIMPLE UTF8 STRINGS
-//                    AND UNICODE CHARACTERS
-//
-////////////////////////////////////////////////////////////
-
-/** selects the position of the next character
-  \param mem the start of the UTF8 encoded string data
-  \param memLength the length of mem (use ACR_MAX_LENGTH if unsure)
-  \param pos current byte offset into the string, which
-         will be updated to that of the next character if
-         successful
-  \returns ACR_INFO_OK or ACR_INFO_ERROR
-*/
-ACR_Info_t ACR_Utf8NextChar(
-        const ACR_Byte_t* mem,
-        ACR_Length_t memLength,
-        ACR_Length_t* pos);
-
-/** selects the position of the previous character
-  \param mem start of the UTF8 encoded string data
-  \param memLength the length of mem (use ACR_MAX_LENGTH if unsure)
-  \param pos current byte offset in the string, which will
-         be updated to that of the previous character if
-         successful
-  \returns ACR_INFO_OK or ACR_INFO_ERROR
-*/
-ACR_Info_t ACR_Utf8PrevChar(
-        const ACR_Byte_t* mem,
-        ACR_Length_t memLength,
-        ACR_Length_t* pos);
-
-/** convert a unicode charcter to its lower-case
-    representation
-*/
-ACR_Unicode_t ACR_UnicodeToLower(
-    ACR_Unicode_t u);
-
-/** convert a unicode charcter to its upper-case
-    representation
-*/
-ACR_Unicode_t ACR_UnicodeToUpper(
-    ACR_Unicode_t u);
-
-/** convert UTF8 encoded data to a unicode value
-    \param mem a valid pointer to the UTF8 encoded character
-           in memory
-    \param bytes the number of bytes for this UTF8 encoded
-           unicode value. use ACR_UTF8_BYTE_COUNT(mem[0])
-           if unsure
-    \returns the unicode value
-*/
-ACR_Unicode_t ACR_Utf8ToUnicode(
-    const ACR_Byte_t* mem,
-    int bytes);
-
-/** get a reference to a null-terminated string in memory 
-    with support for UTF8 encoding
-    \param src a pointer to a null-terminated string in
-           memory
-    \param srcLength the max number of bytes from src this
-           function will search. use ACR_MAX_LENGTH if
-           unsure
-    \param maxCharacters the max number of characters this
-           function will count. use ACR_MAX_COUNT if unsure
-    \returns a string referennce
-*/
-ACR_String_t ACR_StringFromMemory(
-    ACR_Byte_t* src,
-    ACR_Length_t srcLength,
-    ACR_Count_t maxCharacters);
-
-/** compare a string to a null-terminated string in memory
-    with support for UTF8 encoding
-    \param string the known string to compare to
-    \param src a pointer to a null-terminated string in
-           memory
-    \param srcLength the max number of bytes from mem this
-           function will search. use ACR_MAX_LENGTH if 
-           unsure
-    \param maxCharacters the max number of characters this
-           function will compare. use ACR_MAX_COUNT if 
-           unsure
-    \param caseSensitive set to ACR_INFO_YES for 
-           case-sensitive comparison (faster) or ACR_INFO_NO
-           for case-insensitive (slower)
-    \returns - ACR_INFO_EQUAL if the strings are equal up
-               to maxCharacters
-             - ACR_INFO_LESS if src has less characters or
-               is less than string
-             - ACR_INFO_GREATER if src has more characters
-               or is greater than string
-             - ACR_INFO_INVALID if src is invalid
-*/
-ACR_Info_t ACR_StringCompareToMemory(
-    ACR_String_t string,
-    const ACR_Byte_t* src,
-    ACR_Length_t srcLength,
-    ACR_Count_t maxCharacters,
-    ACR_Info_t caseSensitive);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - OTHER
-//
-////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////
-// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
-////////////////////////////////////////////////////////////
-#ifdef __cplusplus                                        //
-}                                                         //
-#endif                                                    //
-////////////////////////////////////////////////////////////
 
 #endif

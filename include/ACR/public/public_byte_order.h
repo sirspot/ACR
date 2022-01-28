@@ -195,4 +195,28 @@
     #endif // #if ACR_IS_BIG_ENDIAN == 0
 #endif // #ifdef ACR_ENDIAN_DYNAMIC
 
+#if ACR_USE_64BIT != 0
+
+    /** byte order swap of 64 bit value
+    */
+    #define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
+                                        (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
+                                        (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
+                                        (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
+                                        (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
+                                        (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
+                                        (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
+                                        (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
+    #ifdef ACR_ENDIAN_DYNAMIC
+        #define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
+    #else
+        #if ACR_IS_BIG_ENDIAN == 0
+            #define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
+        #else
+            #define ACR_BYTE_ORDER_64(x) (x)
+        #endif // #if ACR_IS_BIG_ENDIAN == 0
+    #endif // #ifdef ACR_ENDIAN_DYNAMIC
+
+#endif // #if ACR_USE_64BIT != 0
+
 #endif

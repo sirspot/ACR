@@ -44,6 +44,9 @@
 */
 #include "ACR/varbuffer.h"
 
+// included for ACR_UNUSED
+#include "ACR/public/public_functions.h"
+
 //
 // PROTOTYPES
 //

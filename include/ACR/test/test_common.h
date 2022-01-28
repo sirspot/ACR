@@ -38,32 +38,35 @@
 
 */
 
-/** \file public_debug.h
+/** \file test_common.h
  
-    This header provides debug printing.
-    It is included automatically with public.h
-
-    This header gaurantees the following will be defined:
-    ACR_IS_DEBUG    as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    ACR_DEBUG_PRINT as a macro
-
+    Defines test functions for common.h
 */
-#ifndef _ACR_PUBLIC_DEBUG_H_
-#define _ACR_PUBLIC_DEBUG_H_
+#ifndef _ACR_TEST_COMMON_H_
+#define _ACR_TEST_COMMON_H_
 
-// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public/public_bool.h"
+////////////////////////////////////////////////////////////
+// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
+////////////////////////////////////////////////////////////
+#ifdef __cplusplus                                        //
+extern "C" {                                              //
+#endif                                                    //
+////////////////////////////////////////////////////////////
 
-#ifdef ACR_CONFIG_DEBUG
-#define ACR_IS_DEBUG ACR_BOOL_TRUE
-// included for printf
-// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
-// Note: disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
-#include <stdio.h>
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
-#else
-#define ACR_IS_DEBUG ACR_BOOL_FALSE
-#define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_CONFIG_DEBUG
+// Note: warning C4711: function selected for automatic
+//       inline expansion can be safely ignored
+
+/** test of ACR library common functions
+    \returns ACR_SUCCESS or ACR_FAILURE
+*/
+int ACR_TestCommon(void);
+
+////////////////////////////////////////////////////////////
+// ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
+////////////////////////////////////////////////////////////
+#ifdef __cplusplus                                        //
+}                                                         //
+#endif                                                    //
+////////////////////////////////////////////////////////////
 
 #endif

@@ -38,32 +38,39 @@
 
 */
 
-/** \file public_debug.h
+/** \file public_decimal.h
  
-    This header provides debug printing.
-    It is included automatically with public.h
-
-    This header gaurantees the following will be defined:
-    ACR_IS_DEBUG    as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    ACR_DEBUG_PRINT as a macro
+    This header contains types and values for decimal values.
 
 */
-#ifndef _ACR_PUBLIC_DEBUG_H_
-#define _ACR_PUBLIC_DEBUG_H_
+#ifndef _ACR_PUBLIC_DECIMAL_H_
+#define _ACR_PUBLIC_DECIMAL_H_
 
-// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public/public_bool.h"
+// included for ACR_INFO_GREATER, ACR_INFO_LESS, and ACR_INFO_EQUAL
+#include "ACR/public/public_info.h"
 
-#ifdef ACR_CONFIG_DEBUG
-#define ACR_IS_DEBUG ACR_BOOL_TRUE
-// included for printf
-// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
-// Note: disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
-#include <stdio.h>
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
-#else
-#define ACR_IS_DEBUG ACR_BOOL_FALSE
-#define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_CONFIG_DEBUG
+/** stores a decimal value
+*/
+typedef float ACR_Decimal_t;
+
+/** default tolerance for comparison of decimal values
+    \see ACR_DecimalCompare()
+*/
+#define ACR_DEFAULT_TOLERANCE 0.0001
+
+/** compare two decimal values
+    \param a
+    \param b
+    \param t the absolute value of the difference
+            between a and b where they will be assumed
+            to be equal values. use ACR_DEFAULT_TOLERANCE
+            if unsure
+    \returns - ACR_INFO_EQUAL if the decimals are equal
+               within the specified tolerance (t)
+             - ACR_INFO_LESS if a is less than b
+             - ACR_INFO_GREATER a is greater than b
+*/
+#define ACR_DECIMAL_TOLERANCE_COMPARE(a,b,t) (((a-t)>b)?ACR_INFO_GREATER:((a+t)<b)?ACR_INFO_LESS:ACR_INFO_EQUAL)
+#define ACR_DECIMAL_COMPARE(a,b) (ACR_DECIMAL_TOLERANCE_COMPARE(a,b,ACR_DEFAULT_TOLERANCE))
 
 #endif

@@ -38,32 +38,30 @@
 
 */
 
-/** \file public_debug.h
+/** \file public_count.h
  
-    This header provides debug printing.
-    It is included automatically with public.h
-
-    This header gaurantees the following will be defined:
-    ACR_IS_DEBUG    as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    ACR_DEBUG_PRINT as a macro
+    This header contains types and values for counting.
+    It can be used standalone from the entire library or is
+    included automatically with public.h
 
 */
-#ifndef _ACR_PUBLIC_DEBUG_H_
-#define _ACR_PUBLIC_DEBUG_H_
+#ifndef _ACR_PUBLIC_COUNT_H_
+#define _ACR_PUBLIC_COUNT_H_
 
-// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public/public_bool.h"
+/** type for a typical count such as the number of items in an array
+    \see ACR_MAX_COUNT for the maximum value that can be
+    stored by this data type
+*/
+typedef unsigned long ACR_Count_t;
 
-#ifdef ACR_CONFIG_DEBUG
-#define ACR_IS_DEBUG ACR_BOOL_TRUE
-// included for printf
-// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
-// Note: disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
-#include <stdio.h>
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
-#else
-#define ACR_IS_DEBUG ACR_BOOL_FALSE
-#define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_CONFIG_DEBUG
+/** used for setting a count explicitly to zero
+*/
+#define ACR_ZERO_COUNT 0
+
+/** max value that can be stored by the ACR_Count_t type such that
+    it will not overflow when added to 1
+    (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
+*/
+#define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
 
 #endif

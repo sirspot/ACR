@@ -44,6 +44,9 @@
 */
 #include "ACR/buffer.h"
 
+// included for ACR_UNUSED
+#include "ACR/public/public_functions.h"
+
 ////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS
@@ -185,6 +188,7 @@ void ACR_BufferShiftLeft(
 	}
 
     /// \todo shift left
+	ACR_UNUSED(length);
 }
 
 /**********************************************************/
@@ -198,4 +202,5 @@ void ACR_BufferShiftRight(
 	}
 
     /// \todo shift right
+	ACR_UNUSED(length);
 }

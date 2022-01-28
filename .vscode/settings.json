@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "public.h": "c",
+        "common.h": "c",
+        "public_decimal.h": "c"
+    }
+}

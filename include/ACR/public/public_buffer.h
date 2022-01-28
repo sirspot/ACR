@@ -67,16 +67,13 @@
 // included for ACR_HAS_MALLOC, ACR_MALLOC and ACR_FREE
 #include "ACR/public/public_heap.h"
 
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(push)
-// disable warning C4820: padding added after data member
-#pragma warning(disable:4820)
-#endif
 /** type for reference to a memory area.
     - prevents use of malloc and free directly.
     - prevents use of void pointers without associated memory length
 	- include "ACR/buffer.h" for easy and safe functions
 	- see ACR_BUFFER defines for safe access via macros
+
+	Note: disable warning C4820: padding added after data member
 */
 typedef struct ACR_Buffer_s
 {
@@ -95,9 +92,6 @@ typedef struct ACR_Buffer_s
 	ACR_Flags_t m_Flags;
 
 } ACR_Buffer_t;
-#ifdef ACR_COMPILER_VS2017
-#pragma warning(pop)
-#endif
 
 /** buffer flags to change default behavior
 */

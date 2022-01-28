@@ -140,6 +140,7 @@ ACR_Info_t ACR_VarBufferAllocate(
 	}
 
 	ACR_VAR_BUFFER_ALLOC((*me), length);
+
 	if(ACR_VAR_BUFFER_IS_VALID((*me)))
 	{
 		return ACR_INFO_OK;
@@ -206,7 +207,10 @@ ACR_Info_t ACR_VarBufferAppend(
 		{
 			if(srcPtr != ACR_NULL)
 			{
-				memcpy(((ACR_Byte_t*)me->m_Buffer.m_Pointer) + me->m_Buffer.m_Length, srcPtr, (size_t)length);
+				// Note: warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+				//       can be safely ignored here as it only serves to notify the user that
+				//       the mitigation code will be used if desired
+				ACR_MEMCPY(((ACR_Byte_t*)me->m_Buffer.m_Pointer) + me->m_Buffer.m_Length, srcPtr, length);
 			}
 			me->m_Buffer.m_Length += length;
 			return ACR_INFO_OK;

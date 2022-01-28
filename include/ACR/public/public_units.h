@@ -38,32 +38,19 @@
 
 */
 
-/** \file public_debug.h
+/** \file public_units.h
  
-    This header provides debug printing.
-    It is included automatically with public.h
-
-    This header gaurantees the following will be defined:
-    ACR_IS_DEBUG    as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    ACR_DEBUG_PRINT as a macro
+    This header contains unit conversions.
+    It can be used standalone from the entire library or is
+    included automatically with public.h
 
 */
-#ifndef _ACR_PUBLIC_DEBUG_H_
-#define _ACR_PUBLIC_DEBUG_H_
+#ifndef _ACR_PUBLIC_UNITS_H_
+#define _ACR_PUBLIC_UNITS_H_
 
-// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
-#include "ACR/public/public_bool.h"
-
-#ifdef ACR_CONFIG_DEBUG
-#define ACR_IS_DEBUG ACR_BOOL_TRUE
-// included for printf
-// Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
-// Note: disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
-#include <stdio.h>
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
-#else
-#define ACR_IS_DEBUG ACR_BOOL_FALSE
-#define ACR_DEBUG_PRINT(number, format, ...)
-#endif // #ifdef ACR_CONFIG_DEBUG
+#define ACR_TEMPERATURE_C_TO_F(c) ((c*1.8)+32.0)
+#define ACR_TEMPERATURE_F_TO_C(f) ((f-32.0)/1.8)
+#define ACR_MEASURE_INCHES_TO_CM(i) (i*2.54)
+#define ACR_MEASURE_CM_TO_INCHES(cm) (cm/2.54)
 
 #endif
