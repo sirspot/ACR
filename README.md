@@ -6,6 +6,17 @@ Get ready, get set, ...
 
 # Quick start!
 
+- Click the Gitpod link above.
+- Open example/quick_start/quick_start.c
+- Press F5 or click the green start arrow to begin debugging
+- Step through the test code by pressing Alt+F11 or by clicking the "Step Into" icon on the debug controls
+- Complete the test immediately by pressing F5 to continue
+- The Debug Console will show the output of the test
+
+# Quick start, but on your own.
+
+Using your favorite IDE and C compiler, you can call the same test function as the quick start example. Here's how:
+
 ## Project Settings
 - Add "ACR/include" to your include paths
 - Add "ACR/src/common.c" to your project
@@ -65,10 +76,13 @@ Note: All of the functions in each example are completely
 | path        | notes                                                                                |
 | ----------- | ------------------------------------------------------------------------------------ |
 | ACR/        | contains the entire ACR library code, examples, and projects                         |
+| ACR/bin     | vscode will place output files here                                                  |
 | ACR/example | contains example code for each feature of this library                               |
 | ACR/include | contains all of the .h header files                                                  |
+| ACR/qt      | contains Qt Creator projects for the library and each example                        |
 | ACR/src     | contains all of the .c source files                                                  |
 | ACR/vs2017  | contains a Visual Studio 2017 solution and projects for the library and each example |
+| ACR/vs2022  | contains a Visual Studio 2022 solution and projects for the library and each example |
 
 ## Features
 
@@ -92,7 +106,11 @@ Note: All of the functions in each example are completely
 - Floating point comparisons
 - Basic UTF8 string handling and unicode conversion
 
-## Top Uses
+## No dependecies
+
+    Without adding a .c source file to your project, the include file "ACR/public.h"
+    provides data structures and macros to help with many common tasks.
+    Here is a brief overview of those that have absolutely no dependecies:
 
     ACR_DEBUG_PRINT     interface to printf() that only
                         writes messages to stdout
@@ -128,6 +146,31 @@ Note: All of the functions in each example are completely
                         a direct if(a==b) type of comparison
                         because of possible rounding.
                         see "TYPES AND DEFINES - DECIMAL VALUES" for details.
+
+## More on public.h
+
+    The public.h include file is used as a simple means to include
+    all of the headers in the include/ACR/public folder. Many of these
+    headers can be used on their own but some build upon another.
+
+    When a public header requires something defined in another file,
+    a comment starting with "included for" will define what was used.
+
+    But, not everything can be done nicely in a single header file. That's
+    why there are additional headers and source files to make *easy things*
+    easier and *hard things* faster
+
+## Modules
+
+    It is common to refer to a header and a source file that work together
+    as a "module". Here are a few of the modules that come with ACR:
+
+    | module            | notes                                                                                |
+    | ----------------- | ------------------------------------------------------------------------------------ |
+    | common            | provides public functions to some of the lowest level public.h features              |
+    | buffer            | public_buffer.h provides types and macros but this module takes it one step further
+                          to provide public functions with access to a private data structure... (todo, make it private)
+
 
 # Acknowledgments
 

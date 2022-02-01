@@ -67,12 +67,14 @@
 #ifndef ACR_CONFIG_NO_RTC
     #ifndef ACR_CONFIG_NO_LIBC
         #ifdef ACR_COMPILER_CLANG
+            // included for time(), gmtime_r()
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
         #endif
         #ifdef ACR_COMPILER_GCC
+            // included for time(), gmtime_r()
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
@@ -80,6 +82,7 @@
         #endif
         #ifdef ACR_COMPILER_VS2017
             // Note: disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
+            // included for time(), gmtime_s()
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
