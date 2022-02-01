@@ -11,6 +11,7 @@
             "target": "${workspaceFolder}/bin/LastBuild.exe",
             "cwd": "${workspaceFolder}",
             "valuesFormatting": "parseText",
+            "preLaunchTask": "Build Active File",
             "printCalls": false,
             "showDevDebugOutput": false,
             "autorun": ["break main"]
