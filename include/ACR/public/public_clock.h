@@ -59,6 +59,9 @@
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
 #include "ACR/public/public_bool.h"
 
+// included for ACR_COMPILER_CLANG, ACR_COMPILER_GCC, ACR_COMPILER_VS2017
+#include "ACR/public/public_config.h"
+
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
 #ifndef ACR_CONFIG_NO_RTC

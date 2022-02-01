@@ -1,3 +1,0 @@
--I/workspace/ACR/include
--DACR_PLATFORM_GITPOD
--DACR_CONFIG_DEBUG

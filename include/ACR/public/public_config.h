@@ -82,7 +82,7 @@
         ACR_PLATFORM_GITPOD         Gitpod
         
                                     using Visual Studio Code
-                                    compiling with gcc
+                                    compiling with clang
 
     For additional control over the configuration or if using an
     alternate development environment, the following options can

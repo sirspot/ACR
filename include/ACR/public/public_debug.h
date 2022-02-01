@@ -54,12 +54,18 @@
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
 #include "ACR/public/public_bool.h"
 
+// included for ACR_COMPILER_CLANG
+#include "ACR/public/public_config.h"
+
 #ifdef ACR_CONFIG_DEBUG
 #define ACR_IS_DEBUG ACR_BOOL_TRUE
 // included for printf
 // Note: this ignores ACR_CONFIG_NO_LIBC intentionally for debug only
 // Note: disable warning C4710: 'int printf(const char *const ,...)': function not inlined (when it was requested)
 #include <stdio.h>
+#ifdef ACR_COMPILER_CLANG
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
 #define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE

@@ -45,6 +45,9 @@
 // included for ACR_INFO_STR_*, ACR_DAY_STR_*, and ACR_MONTH_STR_*
 #include "ACR/public/public_unique_strings.h"
 
+// included for ACR_PLATFORM_MAC, ACR_PLATFORM_WIN, ACR_PLATFORM_GITPOD
+#include "ACR/public/public_config.h"
+
 //#define ACR_USE_UTF8_LOCALE
 
 #ifdef ACR_USE_UTF8_LOCALE

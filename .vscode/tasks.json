@@ -1,41 +1,24 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build Active File",
             "type": "shell",
-            "label": "build active file",
-            "command": "/usr/bin/gcc",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
-            ],
-            "options": {
-                "cwd": "/usr/bin"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "build example quick_start debug",
             "command": "/usr/bin/gcc",
             "args": [
                 "-Wall",
                 "-pedantic",
-                "-ggdb",
+                "-g",
+                "-O0",
                 "-DACR_PLATFORM_GITPOD",
                 "-DACR_CONFIG_DEBUG",
                 "-I${workspaceFolder}/include",
-                "${workspaceFolder}/src/ACR/public.c",
-                "${workspaceFolder}/example/quick_start/quick_start.c",
+                "${workspaceFolder}/src/ACR/common.c",
+                "${workspaceFolder}/src/ACR/test/test_common.c",
+                "${file}",
                 "-o",
-                "${workspaceFolder}/bin/debug_quick_start"
+                "${workspaceFolder}/bin/LastBuild.exe"
             ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
         }
-    ],
-    "version": "2.0.0"
+    ]
 }
