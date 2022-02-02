@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2020 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -57,6 +57,10 @@
 #define ACR_BUFFER_BYTE_COUNT_PER_SHIFT 256
 #endif
 
+/** predefined buffer object type
+*/
+typedef struct ACR_BufferObj_s ACR_BufferObj_t;
+
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
 ////////////////////////////////////////////////////////////
@@ -83,7 +87,7 @@ extern "C" {                                              //
 		  before the buffer can be used effectively.
 */
 ACR_Info_t ACR_BufferNew(
-	ACR_Buffer_t** mePtr);
+	ACR_BufferObj_t** mePtr);
 
 /** free a buffer allocated on the heap
     Note: this automatically calls ACR_BufferDeInit() on
@@ -92,7 +96,7 @@ ACR_Info_t ACR_BufferNew(
 	       be set to ACR_NULL after the memory is freed
 */
 void ACR_BufferDelete(
-	ACR_Buffer_t** mePtr);
+	ACR_BufferObj_t** mePtr);
 
 /** prepare a buffer
 
@@ -102,12 +106,12 @@ void ACR_BufferDelete(
 		  before the buffer can be used effectively.
 */
 void ACR_BufferInit(
-	ACR_Buffer_t* me);
+	ACR_BufferObj_t* me);
 
 /** free buffer memory
 */
 void ACR_BufferDeInit(
-	ACR_Buffer_t* me);
+	ACR_BufferObj_t* me);
 
 /** allocate memory for the buffer
 	\param me the buffer
@@ -118,7 +122,7 @@ void ACR_BufferDeInit(
 	           the memory will be freed before any new memory is allocated
 */
 ACR_Info_t ACR_BufferAllocate(
-	ACR_Buffer_t* me,
+	ACR_BufferObj_t* me,
 	ACR_Length_t length);
 
 /** use the specified memory for the buffer
@@ -131,25 +135,25 @@ ACR_Info_t ACR_BufferAllocate(
 			   the memory will be freed before the reference is set
 */
 ACR_Info_t ACR_BufferRef(
-	ACR_Buffer_t* me,
+	ACR_BufferObj_t* me,
 	void* ptr,
 	ACR_Length_t length);
 
 /** clear the buffer by filling with ACR_EMPTY_VALUE
 */
 void ACR_BufferClear(
-	ACR_Buffer_t* me);
+	ACR_BufferObj_t* me);
 
 /** shift all data in the buffer to the left by the specified length
 */
 void ACR_BufferShiftLeft(
-	ACR_Buffer_t* me,
+	ACR_BufferObj_t* me,
 	ACR_Length_t length);
 
 /** shift all data in the buffer to the right by the specified length
 */
 void ACR_BufferShiftRight(
-	ACR_Buffer_t* me,
+	ACR_BufferObj_t* me,
 	ACR_Length_t length);
 
 ////////////////////////////////////////////////////////////

@@ -19,8 +19,8 @@ Using your favorite IDE and C compiler, you can call the same test function as t
 
 ## Project Settings
 - Add "ACR/include" to your include paths
-- Add "ACR/src/common.c" to your project
-- Add "ACR/src/test/test_common.c" to your project
+- Add "ACR/src/ACR/common.c" to your project
+- Add "ACR/src/ACR/test/test_common.c" to your project
 
 ## Code
 - Add #include "ACR/test/test_common.h" to the top of your C file
@@ -102,7 +102,8 @@ Note: All of the functions in each example are completely
   - days of the week
   - months of year
   - real-time clock support via <time.h>
-- Memory buffer and variable length buffer
+- Memory buffer, aligned
+ buffer, and variable length buffer
 - Floating point comparisons
 - Basic UTF8 string handling and unicode conversion
 
@@ -110,7 +111,7 @@ Note: All of the functions in each example are completely
 
     Without adding a .c source file to your project, the include file "ACR/public.h"
     provides data structures and macros to help with many common tasks.
-    Here is a brief overview of those that have absolutely no dependecies:
+    Here is a brief overview of those:
 
     ACR_DEBUG_PRINT     interface to printf() that only
                         writes messages to stdout
@@ -153,8 +154,9 @@ Note: All of the functions in each example are completely
     all of the headers in the include/ACR/public folder. Many of these
     headers can be used on their own but some build upon another.
 
-    When a public header requires something defined in another file,
-    a comment starting with "included for" will define what was used.
+    Any time something is defined in another file,
+    a comment starting with "included for" will 
+    define what was used.
 
     But, not everything can be done nicely in a single header file. That's
     why there are additional headers and source files to make *easy things*
