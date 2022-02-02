@@ -44,8 +44,16 @@
 */
 #include "ACR/buffer.h"
 
+#ifdef ACR_TEST_INCLUDE_PRIVATE
+// included for ACR_BufferObj_t
+#include "ACR/private/private_buffer.h"
+#endif
+
 // included for ACR_UNUSED
 #include "ACR/public/public_functions.h"
+
+// included for ACR_DEBUG_PRINT
+#include "ACR/public/public_debug.h"
 
 //
 // PROTOTYPES
@@ -95,8 +103,9 @@ int main(int argc, char** argv)
 /**********************************************************/
 int StackTest(void)
 {
+#ifdef ACR_TEST_INCLUDE_PRIVATE
 	int result = ACR_SUCCESS;
-	ACR_Buffer_t buffer;
+	ACR_BufferObj_t buffer;
 
 	ACR_BufferInit(&buffer);
 	if(ACR_BufferAllocate(&buffer, 5000) == ACR_INFO_OK)
@@ -116,13 +125,17 @@ int StackTest(void)
 	ACR_BufferDeInit(&buffer);
 
 	return result;
+#else
+	// OK - skip private tests
+	return ACR_SUCCESS;
+#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 }
 
 /**********************************************************/
 int HeapTest(void)
 {
 	int result = ACR_SUCCESS;
-	ACR_Buffer_t* bufferPtr;
+	ACR_BufferObj_t* bufferPtr;
 
 	ACR_BufferNew(&bufferPtr);
 	if(ACR_BufferAllocate(bufferPtr, 5000) == ACR_INFO_OK)
@@ -147,6 +160,7 @@ int HeapTest(void)
 /**********************************************************/
 int LowLevelTest(void)
 {
+#ifdef ACR_TEST_INCLUDE_PRIVATE
 	ACR_BUFFER(buffer);
 
 	ACR_BUFFER_ALLOC(buffer, 5000);
@@ -169,11 +183,16 @@ int LowLevelTest(void)
 	}
 
 	return ACR_SUCCESS;
+#else
+    // OK - skip private tests
+    return ACR_SUCCESS;
+#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 }
 
 /**********************************************************/
 int VerboseTest(void)
 {
+#ifdef ACR_TEST_INCLUDE_PRIVATE
 	ACR_BUFFER(buffer);
 	ACR_Length_t testAllocateBytes = 5000;
 
@@ -214,4 +233,8 @@ int VerboseTest(void)
 	}
 
 	return ACR_SUCCESS;
+#else
+    // OK - skip private tests
+    return ACR_SUCCESS;
+#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 }

@@ -45,7 +45,11 @@
 #ifndef _ACR_BUFFER_H_
 #define _ACR_BUFFER_H_
 
-#include "ACR/public.h"
+// included for ACR_Info_t
+#include "ACR/public/public_info.h"
+
+// included for ACR_Length_t
+#include "ACR/public/public_memory.h"
 
 /** predefined buffer object type
 */

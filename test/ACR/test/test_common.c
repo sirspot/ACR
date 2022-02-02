@@ -41,8 +41,22 @@
 */
 #include "ACR/test/test_common.h"
 
-#include "ACR/public.h"
 #include "ACR/common.h"
+
+// included for ACR_BYTE_ORDER_16, ACR_BYTE_ORDER_32, ACR_BYTE_ORDER_64
+#include "ACR/public/public_byte_order.h"
+
+// included for AMI_Decimal_t, ACR_DECIMAL_TOLERANCE_COMPARE
+#include "ACR/public/public_decimal.h"
+
+// included for ACR_INFO_STR_FALSE, ACR_INFO_STR_TRUE
+#include "ACR/public/public_unique_strings.h"
+
+// included for ACR_FAILURE, ACR_SUCCESS
+#include "ACR/public/public_functions.h"
+
+// included for ACR_DEBUG_PRINT
+#include "ACR/public/public_debug.h"
 
 int ACR_TestCommon(void)
 {

@@ -47,6 +47,9 @@
 
 #include "ACR/buffer.h"
 
+// included for ACR_Buffer_t
+#include "ACR/public/public_buffer.h"
+
 #ifndef ACR_BUFFER_BYTE_COUNT_PER_SHIFT
 /** this is used by ACR_BufferShiftLeft() and ACR_BufferShiftRight() to
     determine the amount of stack memory used for a temporary location to

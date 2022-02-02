@@ -44,6 +44,9 @@
 */
 #include "ACR/private/private_buffer.h"
 
+// included for ACR_UNUSED
+#include "ACR/public/public_functions.h"
+
 ////////////////////////////////////////////////////////////
 //
 // PUBLIC FUNCTIONS
