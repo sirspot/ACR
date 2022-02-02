@@ -6,16 +6,29 @@
             "type": "shell",
             "command": "/usr/bin/gcc",
             "args": [
+                // all warnings
                 "-Wall",
                 "-pedantic",
+                // debug with no optimizations
                 "-g",
                 "-O0",
+                // config defines
                 "-DACR_PLATFORM_GITPOD",
                 "-DACR_CONFIG_DEBUG",
+                // includes
                 "-I${workspaceFolder}/include",
+                "-I${workspaceFolder}/test",
+                // modules
+                "${workspaceFolder}/src/ACR/alignedbuffer.c",
+                "${workspaceFolder}/src/ACR/buffer.c",
                 "${workspaceFolder}/src/ACR/common.c",
-                "${workspaceFolder}/src/ACR/test/test_common.c",
+                "${workspaceFolder}/src/ACR/string.c",
+                "${workspaceFolder}/src/ACR/varbuffer.c",
+                // tests
+                "${workspaceFolder}/test/ACR/test/test_common.c",
+                // active file
                 "${file}",
+                // linker output
                 "-o",
                 "${workspaceFolder}/bin/LastBuild.exe"
             ],

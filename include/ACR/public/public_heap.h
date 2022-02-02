@@ -117,7 +117,22 @@
             // etc
         }
 */
-#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_SIZE(n,t,sizeof(t))
+#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_SIZE(n,t,(sizeof(t)))
+
+/** similar to malloc but automatically defines the variable and clears the memory
+ 
+    example:
+
+        int main()
+        {
+            ACR_NEW_BY_TYPE(twoDateTime, ACR_DateTime_t, 2);
+
+            twoDateTime[1].tm_sec = 30;
+            twoDateTime[1].tm_min = 1;
+            // etc
+        }
+*/
+#define ACR_NEW_BY_COUNT(n, t, c) ACR_NEW_BY_SIZE(n,t,(sizeof(t)*c))
 
 /** similar to free but checks the pointer for null and sets it to null when freed
 */

@@ -39,17 +39,10 @@
 */
 /** \file buffer.c
 
-    functions for access to the ACR_BufferObj_t type
+    public and private functions for access to the ACR_BufferObj_t type
 
 */
-#include "ACR/buffer.h"
-
-/** private buffer type
-*/
-struct ACR_BufferObj_t
-{
-    ACR_Buffer_t m_Base;
-};
+#include "ACR/private/private_buffer.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -64,15 +57,13 @@ ACR_Info_t ACR_BufferNew(
     ACR_Info_t result = ACR_INFO_ERROR;
 	if(mePtr != ACR_NULL)
 	{
-		ACR_BUFFER(buffer);
-
-		ACR_BUFFER_ALLOC(buffer, sizeof(ACR_Buffer_t));
-		if(ACR_BUFFER_IS_VALID(buffer))
+		ACR_NEW_BY_TYPE(newBuffer, ACR_BufferObj_t);
+		if(newBuffer)
 		{
-			ACR_BufferInit((ACR_Buffer_t*)buffer.m_Pointer);
+			ACR_BufferInit(newBuffer);
 			result = ACR_INFO_OK;
 		}
-		(*mePtr) = (ACR_Buffer_t*)buffer.m_Pointer;
+		(*mePtr) = newBuffer;
 	}
 	return result;
 }
@@ -83,39 +74,10 @@ void ACR_BufferDelete(
 {
 	if(mePtr != ACR_NULL)
 	{
-		ACR_BUFFER(buffer);
-
 		ACR_BufferDeInit((*mePtr));
-		ACR_BUFFER_SET_DATA(buffer, (*mePtr), sizeof(ACR_Buffer_t));
-		ACR_BUFFER_FORCE_FREE(buffer);
+		ACR_FREE((*mePtr));
 		(*mePtr) = ACR_NULL;
 	}
-}
-
-/**********************************************************/
-void ACR_BufferInit(
-	ACR_BufferObj_t* me)
-{
-	if(me == ACR_NULL)
-	{
-		return;
-	}
-
-	me->m_Length = ACR_ZERO_LENGTH;
-	me->m_Pointer = ACR_NULL;
-	me->m_Flags = ACR_BUFFER_FLAGS_NONE;
-}
-
-/**********************************************************/
-void ACR_BufferDeInit(
-	ACR_BufferObj_t* me)
-{
-	if(me == ACR_NULL)
-	{
-		return;
-	}
-
-	ACR_BUFFER_FREE((*me));
 }
 
 /**********************************************************/
@@ -130,12 +92,12 @@ ACR_Info_t ACR_BufferAllocate(
 
 	if(length == 0)
 	{
-		ACR_BUFFER_FREE((*me));
+		ACR_BUFFER_FREE(me->m_Base);
 		return ACR_INFO_ERROR;
 	}
 
-	ACR_BUFFER_ALLOC((*me), length);
-	if(ACR_BUFFER_IS_VALID((*me)))
+	ACR_BUFFER_ALLOC(me->m_Base, length);
+	if(ACR_BUFFER_IS_VALID(me->m_Base))
 	{
 		return ACR_INFO_OK;
 	}
@@ -156,12 +118,12 @@ ACR_Info_t ACR_BufferRef(
 
 	if(length == 0)
 	{
-		ACR_BUFFER_FREE((*me));
+		ACR_BUFFER_FREE(me->m_Base);
 		return ACR_INFO_ERROR;
 	}
 
-	ACR_BUFFER_SET_DATA((*me), ptr, length);
-	if(ACR_BUFFER_IS_VALID((*me)))
+	ACR_BUFFER_SET_DATA(me->m_Base, ptr, length);
+	if(ACR_BUFFER_IS_VALID(me->m_Base))
 	{
 		return ACR_INFO_OK;
 	}
@@ -178,7 +140,7 @@ void ACR_BufferClear(
 		return;
 	}
 
-	ACR_BUFFER_CLEAR((*me));
+	ACR_BUFFER_CLEAR(me->m_Base);
 }
 
 /**********************************************************/
@@ -207,4 +169,36 @@ void ACR_BufferShiftRight(
 
     /// \todo shift right
 	ACR_UNUSED(length);
+}
+
+////////////////////////////////////////////////////////////
+//
+// PRIVATE FUNCTIONS
+//
+////////////////////////////////////////////////////////////
+
+/**********************************************************/
+void ACR_BufferInit(
+	ACR_BufferObj_t* me)
+{
+	if(me == ACR_NULL)
+	{
+		return;
+	}
+
+	me->m_Base.m_Length = ACR_ZERO_LENGTH;
+	me->m_Base.m_Pointer = ACR_NULL;
+	me->m_Base.m_Flags = ACR_BUFFER_FLAGS_NONE;
+}
+
+/**********************************************************/
+void ACR_BufferDeInit(
+	ACR_BufferObj_t* me)
+{
+	if(me == ACR_NULL)
+	{
+		return;
+	}
+
+	ACR_BUFFER_FREE(me->m_Base);
 }

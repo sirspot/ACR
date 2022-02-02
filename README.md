@@ -6,10 +6,10 @@ Get ready, get set, ...
 
 # Quick start!
 
-- Click the Gitpod link above.
+- Click the Gitpod link at the top of this README
 - Open example/quick_start/quick_start.c
-- Press F5 or click the green start arrow to begin debugging
-- Step through the test code by pressing Alt+F11 or by clicking the "Step Into" icon on the debug controls
+- Press F5 (or select Debug and click the green start arrow to begin debugging)
+- Step through the test code by pressing Alt+F11 (or by clicking the "Step Into" icon on the debug controls)
 - Complete the test immediately by pressing F5 to continue
 - The Debug Console will show the output of the test
 
@@ -19,8 +19,9 @@ Using your favorite IDE and C compiler, you can call the same test function as t
 
 ## Project Settings
 - Add "ACR/include" to your include paths
+- Add "ACR/test" to your include paths
 - Add "ACR/src/ACR/common.c" to your project
-- Add "ACR/src/ACR/test/test_common.c" to your project
+- Add "ACR/test/ACR/test/test_common.c" to your project
 
 ## Code
 - Add #include "ACR/test/test_common.h" to the top of your C file
@@ -56,20 +57,20 @@ To create a C library that makes *easy things* easier and
 ## Examples
 
 The fastest way to learn how to use the features provided
-by this library is to look at the example projects.
+by this library is to look at the tests.
 
 For example:
-- Open the source file /example/test_varbuffer/test_varbuffer.c
+- Open the source file /test/ACR/test/test_varbuffer.c
 - Find the main() function
 - The functions called by main() are ordered from
   simple to advanced. In this case, StackTest() is the
   first function called so it is the most simple function 
   in the test_varbuffer.c example
 
-Note: All of the functions in each example are completely 
+Note: All of the functions in each test are completely 
       self-contained and can be copied into your own project
       with ease (just don't forget to also grab the #include
-      header(s) from the top of the example file)
+      header(s) from the top of the test file)
 
 ## Structure
 
@@ -81,6 +82,7 @@ Note: All of the functions in each example are completely
 | ACR/include | contains all of the .h header files                                                  |
 | ACR/qt      | contains Qt Creator projects for the library and each example                        |
 | ACR/src     | contains all of the .c source files                                                  |
+| ACR/test    | contains test code for each feature of this library                                  |
 | ACR/vs2017  | contains a Visual Studio 2017 solution and projects for the library and each example |
 | ACR/vs2022  | contains a Visual Studio 2022 solution and projects for the library and each example |
 
@@ -109,70 +111,68 @@ Note: All of the functions in each example are completely
 
 ## No dependecies
 
-    Without adding a .c source file to your project, the include file "ACR/public.h"
-    provides data structures and macros to help with many common tasks.
-    Here is a brief overview of those:
+Without adding a .c source file to your project, the include file "ACR/public.h"
+provides data structures and macros to help with many common tasks.
+Here is a brief overview of those:
 
-    ACR_DEBUG_PRINT     interface to printf() that only
-                        writes messages to stdout
-                        when ACR_CONFIG_DEBUG is defined.
-                        see "TYPES AND DEFINES - DEBUG" for details.
+ACR_DEBUG_PRINT     interface to printf() that only
+                    writes messages to stdout
+                    when ACR_CONFIG_DEBUG is defined.
+                    see "TYPES AND DEFINES - DEBUG" for details.
 
-    ACR_BYTE_ORDER_16   ensures a value is stored
-    ACR_BYTE_ORDER_32   in big endian byte order
-    ACR_BYTE_ORDER_64   see "TYPES AND DEFINES - ENDIANNESS" for details.
+ACR_BYTE_ORDER_16   ensures a value is stored
+ACR_BYTE_ORDER_32   in big endian byte order
+ACR_BYTE_ORDER_64   see "TYPES AND DEFINES - ENDIANNESS" for details.
 
-    ACR_Buffer_t        a simple struct with macros
-                        to handle allocation and freeing
-                        of memory safely.
-                        see "TYPES AND DEFINES - SIMPLE MEMORY BUFFER" for details.
-                        for ease of use see "ACR/buffer.h"
+ACR_Buffer_t        a simple struct with macros
+                    to handle allocation and freeing
+                    of memory safely.
+                    see "TYPES AND DEFINES - SIMPLE MEMORY BUFFER" for details.
+                    for ease of use see "ACR/buffer.h"
 
-    ACR_VarBuffer_t     a simple struct with macros to 
-                        handle allocation of memory
-                        safely while freeing memory only
-                        when necessary to grow the
-                        memory area.
-                        see "TYPES AND DEFINES - VARIABLE LENGTH MEMORY BUFFER" for details.
-                        for ease of use see "ACR/varbuffer.h"
+ACR_VarBuffer_t     a simple struct with macros to 
+                    handle allocation of memory
+                    safely while freeing memory only
+                    when necessary to grow the
+                    memory area.
+                    see "TYPES AND DEFINES - VARIABLE LENGTH MEMORY BUFFER" for details.
+                    for ease of use see "ACR/varbuffer.h"
 
-    ACR_String_t        a struct for access to strings
-                        with support for UTF8 encoding.
-                        see "TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS" for details.
-                        for ease of use see "ACR/string.h"
+ACR_String_t        a struct for access to strings
+                    with support for UTF8 encoding.
+                    see "TYPES AND DEFINES - SIMPLE UTF8 STRINGS AND UNICODE CHARACTERS" for details.
+                    for ease of use see "ACR/string.h"
 
-    ACR_DECIMAL_COMPARE compare decimal values within a
-                        default tolerance of 0.0001 which
-                        is many cases is safer than performing
-                        a direct if(a==b) type of comparison
-                        because of possible rounding.
-                        see "TYPES AND DEFINES - DECIMAL VALUES" for details.
+ACR_DECIMAL_COMPARE compare decimal values within a
+                    default tolerance of 0.0001 which
+                    is many cases is safer than performing
+                    a direct if(a==b) type of comparison
+                    because of possible rounding.
+                    see "TYPES AND DEFINES - DECIMAL VALUES" for details.
 
 ## More on public.h
 
-    The public.h include file is used as a simple means to include
-    all of the headers in the include/ACR/public folder. Many of these
-    headers can be used on their own but some build upon another.
+The public.h include file is used as a simple means to include
+all of the headers in the include/ACR/public folder. Many of these
+headers can be used on their own but some build upon another.
 
-    Any time something is defined in another file,
-    a comment starting with "included for" will 
-    define what was used.
+Any time something is defined in another file,
+a comment starting with "included for" will 
+define what was used.
 
-    But, not everything can be done nicely in a single header file. That's
-    why there are additional headers and source files to make *easy things*
-    easier and *hard things* faster
+But, not everything can be done nicely in a single header file. That's
+why there are additional headers and source files to make *easy things*
+easier and *hard things* faster
 
 ## Modules
 
-    It is common to refer to a header and a source file that work together
-    as a "module". Here are a few of the modules that come with ACR:
+It is common to refer to a header and a source file that work together
+as a "module". Here are a few of the modules that come with ACR:
 
-    | module            | notes                                                                                |
-    | ----------------- | ------------------------------------------------------------------------------------ |
-    | common            | provides public functions to some of the lowest level public.h features              |
-    | buffer            | public_buffer.h provides types and macros but this module takes it one step further
-                          to provide public functions with access to a private data structure... (todo, make it private)
-
+| module            | notes                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| common            | provides public functions to some of the lowest level public.h features                         |
+| buffer            | uses public_buffer.h to create a protected buffer object type                                   |
 
 # Acknowledgments
 
