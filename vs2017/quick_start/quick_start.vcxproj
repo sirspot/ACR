@@ -49,7 +49,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../ACR/include;../../../ACR/test</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ACR_CONFIG_DEBUG;ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711;5045;4820;4710;4127</DisableSpecificWarnings>
@@ -63,7 +63,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../ACR/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../ACR/include;../../../ACR/test</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -75,16 +75,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\example\quick_start\quick_start.c" />
-    <ClCompile Include="..\..\src\ACR\test\test_common.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\libACR\libACR.vcxproj">
       <Project>{7c91db52-6fd2-4f80-8082-a879006216c9}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\ACR\test\test_common.h" />
+    <ClCompile Include="..\..\example\quick_start\quick_start.c" />
+    <ClCompile Include="..\..\test\ACR\test\test_common.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\ACR\test\test_common.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

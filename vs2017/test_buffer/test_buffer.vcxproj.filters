@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\example\test_buffer\test_buffer.c">
+    <ClCompile Include="..\..\test\ACR\test\test_buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

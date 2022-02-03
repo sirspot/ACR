@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\example\quick_start\quick_start.c">
+    <ClCompile Include="..\..\test\ACR\test\test_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ACR\test\test_common.c">
+    <ClCompile Include="..\..\example\quick_start\quick_start.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\ACR\test\test_common.h">
+    <ClInclude Include="..\..\test\ACR\test\test_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
