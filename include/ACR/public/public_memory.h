@@ -152,14 +152,14 @@ typedef unsigned long ACR_Length_t;
     */
     #define ACR_MEMSET(p,v,s) \
     {\
-        char* pc=(char*)p;\
-        char vc=(char)v;
-        ACR_Length_t sc=(ACR_Length_t)s;\
-        while(sc>0)\
+        char* c=(char*)p;\
+        char d=(char)v;\
+        ACR_Length_t l=(ACR_Length_t)s;\
+        while(l>0)\
         {\
-            (*pc)=vc;\
-            pc++;\
-            sc--;\
+            (*c)=d;\
+            c++;\
+            l--;\
         }\
     }
 
@@ -197,15 +197,15 @@ typedef unsigned long ACR_Length_t;
     */
     #define ACR_MEMCPY(d,s,l) \
     {\
-        char* pd=(char*)d;\
-        char* ps=(char*)s;\
-        ACR_Length_t ln=(ACR_Length_t)l;\
-        while(ln>0)\
+        char* c=(char*)d;\
+        char* v=(char*)s;\
+        ACR_Length_t n=(ACR_Length_t)l;\
+        while(n>0)\
         {\
-            (*pd)=(*ps);\
-            pd++;
-            ps++;
-            ln--;\
+            (*c)=(*v);\
+            c++;\
+            v++;\
+            n--;\
         }\
     }
 

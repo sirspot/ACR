@@ -51,7 +51,7 @@
 // included for ACR_Length_t
 #include "ACR/public/public_memory.h"
 
-/** predefined buffer object type
+/** predefined object type
 */
 typedef struct ACR_BufferObj_s ACR_BufferObj_t;
 

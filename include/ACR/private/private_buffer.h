@@ -42,8 +42,8 @@
     private functions for access to the ACR_BufferObj_t type
 
 */
-#ifndef _ACR_BUFFER_PRIVATE_H_
-#define _ACR_BUFFER_PRIVATE_H_
+#ifndef _ACR_PRIVATE_BUFFER_H_
+#define _ACR_PRIVATE_BUFFER_H_
 
 #include "ACR/buffer.h"
 

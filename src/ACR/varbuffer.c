@@ -241,7 +241,7 @@ ACR_Info_t ACR_VarBufferPrepend(
 			}
 			if(srcPtr != ACR_NULL)
 			{
-				memcpy(((ACR_Byte_t*)me->m_Buffer.m_Pointer), srcPtr, (size_t)length);
+				ACR_MEMCPY(me->m_Buffer.m_Pointer, srcPtr, length);
 			}
 			return ACR_INFO_OK;
 		}

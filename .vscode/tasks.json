@@ -15,6 +15,7 @@
                 // config defines
                 "-DACR_PLATFORM_GITPOD",
                 "-DACR_CONFIG_DEBUG",
+                //"-DACR_CONFIG_NO_LIBC",
                 // includes
                 "-I${workspaceFolder}/include",
                 "-I${workspaceFolder}/test",
@@ -22,6 +23,7 @@
                 "${workspaceFolder}/src/ACR/alignedbuffer.c",
                 "${workspaceFolder}/src/ACR/buffer.c",
                 "${workspaceFolder}/src/ACR/common.c",
+                "${workspaceFolder}/src/ACR/heap.c",
                 "${workspaceFolder}/src/ACR/string.c",
                 "${workspaceFolder}/src/ACR/varbuffer.c",
                 // tests

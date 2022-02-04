@@ -56,7 +56,7 @@
 // included for ACR_Info_t
 #include "ACR/public/public_info.h"
 
-// included for ACR_Month_t, ACR_DayOfWeek_t
+// included for ACR_Month_t and ACR_DayOfWeek_t
 #include "ACR/public/public_dates_and_times.h"
 
 // included for ACR_Time_t and ACR_DateTime_t

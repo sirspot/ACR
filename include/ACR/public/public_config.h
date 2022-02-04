@@ -131,6 +131,10 @@
                                        system headers from being included and will
                                        provide additional details upon use.
 
+        ACR_CONFIG_HEAP_SIZE       specified in bytes, this configures the heap
+                                   size for ACR/heap.h when ACR_CONFIG_NO_LIBC
+                                   is defined but ACR_CONFIG_NO_MALLOC is not
+
 */
 
 /** MAC OS X
@@ -195,14 +199,14 @@
 */
 #ifdef ACR_PLATFORM_GITPOD
 
-        #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-        #define ACR_PLATFORM_NAME "gitpod"
-        #define ACR_HAS_IDE ACR_BOOL_TRUE
-        #define ACR_IDE_VSCODE
-        #define ACR_IDE_NAME "vscode"
-        #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-        #define ACR_COMPILER_GCC
-        #define ACR_COMPILER_NAME "gcc"
+    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+    #define ACR_PLATFORM_NAME "gitpod"
+    #define ACR_HAS_IDE ACR_BOOL_TRUE
+    #define ACR_IDE_VSCODE
+    #define ACR_IDE_NAME "vscode"
+    #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+    #define ACR_COMPILER_GCC
+    #define ACR_COMPILER_NAME "gcc"
 
 #endif // ACR_PLATFORM_GITPOD
 

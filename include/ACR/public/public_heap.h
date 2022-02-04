@@ -44,10 +44,11 @@
     It is included automatically with public.h
 
     This header gaurantees the following will be defined:
-    ACR_HAS_MALLOC as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
-    ACR_MALLOC     as a macro to allocate memory or return ACR_NULL if memory cannot be allocated
-    ACR_FREE       as a macro to free previously allocated memory
-    ACR_DELETE     as a macro safer version of ACR_FREE
+    ACR_HAS_MALLOC     as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_MALLOC         as a macro to allocate memory or return ACR_NULL if memory cannot be allocated
+    ACR_FREE           as a macro to free previously allocated memory
+    ACR_DELETE         as a macro safer version of ACR_FREE
+    ACR_HEAP_IS_GLOBAL as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
 
 */
 #ifndef _ACR_PUBLIC_HEAP_H_
@@ -60,30 +61,26 @@
 #include "ACR/public/public_memory.h"
 
 #ifndef ACR_CONFIG_NO_MALLOC
-
     #ifndef ACR_CONFIG_NO_LIBC
         /** defined when malloc is available
             Note: to remove malloc from this library define
                   ACR_CONFIG_NO_LIBC in your preprocessor
         */
         #define ACR_HAS_MALLOC ACR_BOOL_TRUE
+        #define ACR_HEAP_IS_GLOBAL ACR_BOOL_FALSE
         // included for malloc and free
         #include <stdlib.h>
         #define ACR_MALLOC(s) malloc((size_t)s)
-        #define ACR_FREE(p) free(p);
-        #define ACR_REALLOC(p,s) realloc(p, (size_t)s);
+        #define ACR_FREE(p) free(p)
+        #define ACR_REALLOC(p,s) realloc(p, (size_t)s)
     #else
-        // ACR_BOOL_TRUE
-        #define ACR_HAS_MALLOC ACR_BOOL_FALSE
-        /// \todo create a simple built-in malloc
-        #define ACR_MALLOC(s) ACR_NULL
-        /// \todo create a simple built-in free
-        #define ACR_FREE(p)
-        /// \todo create a simple built-in realloc
-        #define ACR_REALLOC(p,s) ACR_NULL
+        // Note: src/ACR/heap.c must be added to any project
+        //       that wishes to use ACR/heap.h
+        #include "ACR/heap.h"
     #endif // #ifndef ACR_CONFIG_NO_LIBC
 #else
     #define ACR_HAS_MALLOC ACR_BOOL_FALSE
+    #define ACR_HEAP_IS_GLOBAL ACR_BOOL_FALSE
     #define ACR_MALLOC(s) ACR_NULL
     #define ACR_FREE(p)
     #define ACR_REALLOC(p,s) ACR_NULL
