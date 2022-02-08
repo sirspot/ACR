@@ -51,6 +51,9 @@
 // included for ACR_Length_t
 #include "ACR/public/public_memory.h"
 
+// included for ACR_Byte_t
+#include "ACR/public/public_bytes_and_flags.h"
+
 /** predefined object type
 */
 typedef struct ACR_BufferObj_s ACR_BufferObj_t;
@@ -107,7 +110,7 @@ ACR_Info_t ACR_BufferAllocate(
 /** use the specified memory for the buffer
 	\param me the buffer
 	\param ptr pointer to the start of the memory to access
-	\length the length of the memory at ptr 1 to ACR_MAX_LENGTH
+	\param length the length of the memory at ptr 1 to ACR_MAX_LENGTH
 	\returns ACR_INFO_OK or ACR_INFO_ERROR
 
 	IMPORTANT: if the buffer has memory allocated,
@@ -119,21 +122,35 @@ ACR_Info_t ACR_BufferRef(
 	ACR_Length_t length);
 
 /** clear the buffer by filling with ACR_EMPTY_VALUE
+	\param me the buffer
 */
 void ACR_BufferClear(
 	ACR_BufferObj_t* me);
 
-/** shift all data in the buffer to the left by the specified length
+/** set the byte value at the specified position
+	\param me the buffer
+	\param pos the position in the buffer
+	\param value the value
+	\returns ACR_INFO_OK or ACR_INFO_ERROR
 */
-void ACR_BufferShiftLeft(
+ACR_Info_t ACR_BufferSetByteAt(
 	ACR_BufferObj_t* me,
-	ACR_Length_t length);
+	ACR_Length_t pos,
+	ACR_Byte_t value);
 
-/** shift all data in the buffer to the right by the specified length
+/** shift all data in the buffer
+	\param me the buffer
+	\param shiftBytes the number of bytes to shift by
+	\param direction ACR_INFO_LEFT or ACR_INFO_RIGHT
+	\param wrap set to ACR_BOOL_TRUE if the data shifted right should
+		   be copied to the left or ACR_BOOL_FALSE to make no effort
+		   to save the data shifted out of the buffer
 */
-void ACR_BufferShiftRight(
+void ACR_BufferShift(
 	ACR_BufferObj_t* me,
-	ACR_Length_t length);
+	ACR_Length_t shiftBytes,
+	ACR_Info_t direction,
+	ACR_Bool_t wrap);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

@@ -137,8 +137,8 @@ void ACR_HeapInit(
     void* ptr,
     ACR_Length_t length)
 {
-    me->m_Heap = ACR_NULL;
-    me->m_HeapLength = ACR_ZERO_LENGTH;
+    me->m_Heap = ptr;
+    me->m_HeapLength = length;
     me->m_NextFreePos = 0;
     me->m_HeaderCount = ACR_ZERO_COUNT;
     me->m_FreeCount = ACR_ZERO_COUNT;
@@ -250,7 +250,7 @@ void* ACR_HeapRealloc(
             // into the requested reallocation. But, instead,
             // just try to allocate like normal and copy
             // the existing data to the new location
-            void* newPtr = ACR_HeapAlloc(me, bytes);
+            newPtr = ACR_HeapAlloc(me, bytes);
             if(newPtr)
             {
                 ACR_MEMCPY(newPtr, ptr, headerPtr->m_Bytes);

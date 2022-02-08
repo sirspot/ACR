@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2020 Adam C. Rosenberg
+    Copyright (C) 2018 - 2022 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -44,6 +44,9 @@
 */
 #include "ACR/buffer.h"
 
+// uncomment the following line to include tests for private buffer functions
+#define ACR_TEST_INCLUDE_PRIVATE
+
 #ifdef ACR_TEST_INCLUDE_PRIVATE
 // included for ACR_BufferObj_t
 #include "ACR/private/private_buffer.h"
@@ -59,13 +62,13 @@
 // PROTOTYPES
 //
 
-/** simple example to use a buffer on the stack
-*/
-int StackTest(void);
-
 /** simple example to use a buffer on the heap
 */
 int HeapTest(void);
+
+/** simple example to use a buffer on the stack
+*/
+int StackTest(void);
 
 /** simple example to use a buffer at a low level
 */
@@ -87,11 +90,16 @@ int main(int argc, char** argv)
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);
 
-	result |= StackTest();
 	result |= HeapTest();
-	result |= LowLevelTest();
 
+#ifdef ACR_TEST_INCLUDE_PRIVATE
+	result |= StackTest();
+	result |= LowLevelTest();
 	result |= VerboseTest();
+#else
+	// OK - skip private tests
+	ACR_DEBUG_PRINT(1, "TEST skipped private tests");
+#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 
 	return result;
 }
@@ -101,6 +109,46 @@ int main(int argc, char** argv)
 //
 
 /**********************************************************/
+int HeapTest(void)
+{
+	int result = ACR_SUCCESS;
+	ACR_BufferObj_t* bufferPtr;
+
+	ACR_BufferNew(&bufferPtr);
+	if(ACR_BufferAllocate(bufferPtr, 10) == ACR_INFO_OK)
+	{
+		//
+		// OK - 5000 byte buffer ready for use
+		//
+
+		// placing data to test shift left
+		for (ACR_Length_t i = 0; i < 10; i++)
+		{
+			ACR_BufferSetByteAt(bufferPtr, i, (ACR_Byte_t)(i % 256)+1);
+		}
+		ACR_BufferShift(bufferPtr, 9, ACR_INFO_LEFT, ACR_BOOL_FALSE);
+
+		// placing data to test shift right
+		for (ACR_Length_t i = 0; i < 10; i++)
+		{
+			ACR_BufferSetByteAt(bufferPtr, i, (ACR_Byte_t)(i % 256)+1);
+		}
+		ACR_BufferShift(bufferPtr, 9, ACR_INFO_RIGHT, ACR_BOOL_FALSE);
+
+		// optional step to clear the buffer
+		ACR_BufferClear(bufferPtr);
+	}
+	else
+	{
+		// failed to allocate 5000 bytes
+		result = ACR_FAILURE;
+	}
+	ACR_BufferDelete(&bufferPtr);
+
+	return result;
+}
+
+/**********************************************************/
 int StackTest(void)
 {
 #ifdef ACR_TEST_INCLUDE_PRIVATE
@@ -108,7 +156,7 @@ int StackTest(void)
 	ACR_BufferObj_t buffer;
 
 	ACR_BufferInit(&buffer);
-	if(ACR_BufferAllocate(&buffer, 5000) == ACR_INFO_OK)
+	if (ACR_BufferAllocate(&buffer, 5000) == ACR_INFO_OK)
 	{
 		//
 		// OK - 5000 byte buffer ready for use
@@ -129,32 +177,6 @@ int StackTest(void)
 	// OK - skip private tests
 	return ACR_SUCCESS;
 #endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
-}
-
-/**********************************************************/
-int HeapTest(void)
-{
-	int result = ACR_SUCCESS;
-	ACR_BufferObj_t* bufferPtr;
-
-	ACR_BufferNew(&bufferPtr);
-	if(ACR_BufferAllocate(bufferPtr, 5000) == ACR_INFO_OK)
-	{
-		//
-		// OK - 5000 byte buffer ready for use
-		//
-
-		// optional step to clear the buffer
-		ACR_BufferClear(bufferPtr);
-	}
-	else
-	{
-		// failed to allocate 5000 bytes
-		result = ACR_FAILURE;
-	}
-	ACR_BufferDelete(&bufferPtr);
-
-	return result;
 }
 
 /**********************************************************/

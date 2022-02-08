@@ -107,6 +107,7 @@
     <ClCompile Include="..\..\src\ACR\alignedbuffer.c" />
     <ClCompile Include="..\..\src\ACR\buffer.c" />
     <ClCompile Include="..\..\src\ACR\common.c" />
+    <ClCompile Include="..\..\src\ACR\heap.c" />
     <ClCompile Include="..\..\src\ACR\string.c" />
     <ClCompile Include="..\..\src\ACR\varbuffer.c" />
   </ItemGroup>

@@ -122,5 +122,8 @@
     <ClCompile Include="..\..\src\ACR\common.c">
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ACR\heap.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
