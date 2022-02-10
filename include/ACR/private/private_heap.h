@@ -116,7 +116,7 @@ void ACR_HeapDeInit(
     and return a pointer to the memory
     \param me the heap
     \param bytes the number of bytes to attempt to allocated
-    \returns a pointer to the newly allocated memory or AMI_NULL on failure
+    \returns a pointer to the newly allocated memory or ACR_NULL on failure
 */
 void* ACR_HeapAlloc(
     ACR_HeapObj_t* me,
@@ -136,7 +136,7 @@ void ACR_HeapFree(
     \param ptr existing allocated memory pointer
     \param bytes new size desired
     \returns either a pointer to the newly allocated memory and ptr is no longer valid
-             or on failure AMI_NULL and ptr remains valid but at its original allocation size.    
+             or on failure ACR_NULL and ptr remains valid but at its original allocation size.    
 */
 void* ACR_HeapRealloc(
     ACR_HeapObj_t* me,

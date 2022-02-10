@@ -53,19 +53,37 @@
 //
 ////////////////////////////////////////////////////////////
 
-/** shift left without wrap
+/** shift left without wrap helper for ACR_BufferShift(me, shiftBytes, ACR_INFO_LEFT, ACR_INFO_FALSE)
 */
 void _ACR_BufferShiftLeftNoWrap(
     ACR_Byte_t* ptr,
     ACR_Length_t length,
     ACR_Length_t shiftBytes);
 
-/** shift right without wrap
+/** shift right without wrap helper for ACR_BufferShift(me, shiftBytes, ACR_INFO_RIGHT, ACR_INFO_FALSE)
 */
 void _ACR_BufferShiftRightNoWrap(
     ACR_Byte_t* ptr,
     ACR_Length_t length,
     ACR_Length_t shiftBytes);
+
+/** shift left with wrap helper for ACR_BufferShift(me, shiftBytes, ACR_INFO_LEFT, ACR_INFO_TRUE)
+*/
+void _ACR_BufferShiftLeftWrap(
+    ACR_Byte_t* ptr,
+    ACR_Length_t length,
+    ACR_Length_t shiftBytes,
+    ACR_Byte_t* swapPtr,
+    ACR_Length_t swapLength);
+
+/** shift right with wrap helper for ACR_BufferShift(me, shiftBytes, ACR_INFO_RIGHT, ACR_INFO_TRUE)
+*/
+void _ACR_BufferShiftRightWrap(
+    ACR_Byte_t* ptr,
+    ACR_Length_t length,
+    ACR_Length_t shiftBytes,
+    ACR_Byte_t* swapPtr,
+    ACR_Length_t swapLength);
 
 ////////////////////////////////////////////////////////////
 //
@@ -129,7 +147,7 @@ ACR_Info_t ACR_BufferAllocate(
 }
 
 /**********************************************************/
-ACR_Info_t ACR_BufferRef(
+ACR_Info_t ACR_BufferSetData(
     ACR_BufferObj_t* me,
     void* ptr,
     ACR_Length_t length)
@@ -155,6 +173,18 @@ ACR_Info_t ACR_BufferRef(
 }
 
 /**********************************************************/
+ACR_Length_t ACR_BufferGetLength(
+	ACR_BufferObj_t* me)
+{
+    if(me)
+    {
+        return me->m_Base.m_Length;
+    }
+
+    return 0;
+}
+
+/**********************************************************/
 void ACR_BufferClear(
     ACR_BufferObj_t* me)
 {
@@ -164,6 +194,77 @@ void ACR_BufferClear(
     }
 
     ACR_BUFFER_CLEAR(me->m_Base);
+}
+
+/**********************************************************/
+ACR_Info_t ACR_BufferCopyToBuffer(
+	ACR_BufferObj_t* me,
+	ACR_Length_t srcPos,
+	ACR_BufferObj_t* dest,
+	ACR_Length_t destPos,
+	ACR_Length_t length)
+{
+    if (me == ACR_NULL || dest == ACR_NULL)
+    {
+        return ACR_INFO_ERROR;
+    }
+
+    if ((me->m_Base.m_Pointer == ACR_NULL) ||
+        (dest->m_Base.m_Pointer == ACR_NULL))
+    {
+        return ACR_INFO_INVALID;
+    }
+
+    if((srcPos + length) > me->m_Base.m_Length)
+    {
+        return ACR_INFO_GREATER;
+    }
+
+    if((destPos + length) > dest->m_Base.m_Length)
+    {
+        return ACR_INFO_LESS;
+    }
+
+    ACR_Byte_t* srcPtr = ((ACR_Byte_t*)me->m_Base.m_Pointer) + srcPos;
+    ACR_Byte_t* destPtr = ((ACR_Byte_t*)dest->m_Base.m_Pointer) + destPos;
+    ACR_MEMCPY(destPtr, srcPtr, length);
+
+    return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t ACR_BufferCopyToMemory(
+	ACR_BufferObj_t* me,
+	ACR_Length_t srcPos,
+	void* destPtr,
+	ACR_Length_t destLength,
+	ACR_Length_t length)
+{
+    if (me == ACR_NULL)
+    {
+        return ACR_INFO_ERROR;
+    }
+
+    if ((me->m_Base.m_Pointer == ACR_NULL) ||
+        (destPtr == ACR_NULL))
+    {
+        return ACR_INFO_INVALID;
+    }
+
+    if((srcPos + length) > me->m_Base.m_Length)
+    {
+        return ACR_INFO_GREATER;
+    }
+
+    if(destLength < length)
+    {
+        return ACR_INFO_LESS;
+    }
+
+    ACR_Byte_t* srcPtr = ((ACR_Byte_t*)me->m_Base.m_Pointer) + srcPos;
+    ACR_MEMCPY(destPtr, srcPtr, length);
+
+    return ACR_INFO_OK;
 }
 
 /**********************************************************/
@@ -177,13 +278,47 @@ ACR_Info_t ACR_BufferSetByteAt(
         return ACR_INFO_ERROR;
     }
 
-    if ((me->m_Base.m_Pointer == ACR_NULL) ||
-        (pos >= me->m_Base.m_Length))
+    if (me->m_Base.m_Pointer == ACR_NULL)
+    {
+        return ACR_INFO_INVALID;
+    }
+
+    if (pos >= me->m_Base.m_Length)
+    {
+        return ACR_INFO_GREATER;
+    }
+
+    ((ACR_Byte_t*)me->m_Base.m_Pointer)[pos] = value;
+
+    return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t ACR_BufferGetByteAt(
+	ACR_BufferObj_t* me,
+	ACR_Length_t pos,
+	ACR_Byte_t* value)
+{
+    if (me == ACR_NULL)
     {
         return ACR_INFO_ERROR;
     }
 
-    ((ACR_Byte_t*)me->m_Base.m_Pointer)[pos] = value;
+    if (me->m_Base.m_Pointer == ACR_NULL)
+    {
+        return ACR_INFO_INVALID;
+    }
+
+    if (pos >= me->m_Base.m_Length)
+    {
+        return ACR_INFO_GREATER;
+    }
+
+    if(value)
+    {
+        (*value) = ((ACR_Byte_t*)me->m_Base.m_Pointer)[pos];
+    }
+
     return ACR_INFO_OK;
 }
 
@@ -202,8 +337,29 @@ void ACR_BufferShift(
     if (wrap)
     {
         // wrap
-        //ACR_Byte_t swap[ACR_BUFFER_BYTE_COUNT_PER_SHIFT];
-        //ACR_Length_t swapLength;
+        ACR_Byte_t swapStackData[ACR_BUFFER_BYTE_COUNT_PER_SHIFT];
+        if (direction == ACR_INFO_LEFT)
+        {
+            _ACR_BufferShiftLeftWrap(
+                (ACR_Byte_t*)me->m_Base.m_Pointer,
+                me->m_Base.m_Length,
+                shiftBytes,
+                swapStackData,
+                ACR_BUFFER_BYTE_COUNT_PER_SHIFT);
+        }
+        else if (direction == ACR_INFO_RIGHT)
+        {
+            _ACR_BufferShiftRightWrap(
+                (ACR_Byte_t*)me->m_Base.m_Pointer,
+                me->m_Base.m_Length,
+                shiftBytes,
+                swapStackData,
+                ACR_BUFFER_BYTE_COUNT_PER_SHIFT);
+        }
+        else
+        {
+            // invalid direction
+        }
     }
     else
     {
@@ -270,7 +426,7 @@ void _ACR_BufferShiftLeftNoWrap(
     // this will only need to be calculated if destFree is greater than 0
     ACR_Length_t srcAvailable;
 
-    /* How to visualize shifting data to the left
+    /* How to visualize shifting data to the left <----
 
         buffer       (0) |--------------------------------------------| (length)
                          |                                            |
@@ -286,7 +442,7 @@ void _ACR_BufferShiftLeftNoWrap(
                                 ^     copied each loop
                                 ^
 
-        destFree      (destPos) |-------|-----------------------------| (length - destPos)
+        destFree      (destPos) |xxxxxxx|-----------------------------| (length)
                                 | --> shrinks this way                |
 
 
@@ -296,18 +452,16 @@ void _ACR_BufferShiftLeftNoWrap(
                                         ^     copied each loop
                                         ^
 
-        srcAvailable           (srcPos) |-------|---------------------| (length - srcPos)
+        srcAvailable           (srcPos) |xxxxxxx|---------------------| (length)
                                         | --> shrinks this way        |
 
 
-        shiftBytes             (srcPos) |-------| (srcPos + shiftBytes)
+        shiftBytes             (srcPos) |xxxxxxx| (srcPos + shiftBytes)
                                         |       |
-
-                      (destPos) | <----   each loop copies at most
-                                |-------| this number of bytes
-                                          to destPos
-
-
+                                      <----
+                      (destPos) |-------|     each loop copies at most
+                                |       |     this number of bytes
+                                              to destPos
     */
 
     // keep copying bytes until there is no more space at destPos
@@ -375,10 +529,14 @@ void _ACR_BufferShiftRightNoWrap(
     }
 
     // the position used as the source of the data.
+    // and also the amount of source data available.
+    // (srcAvailable variable is not needed)
     ACR_Length_t srcPos = (length - shiftBytes);
 
     // the position from the start of the buffer
     // used as the destination to copy data to
+    // and also the amount of space free
+    // (destFree variable is not needed)
     ACR_Length_t destPos = length;
 
     /* How to visualize shifting data to the right
@@ -403,16 +561,15 @@ void _ACR_BufferShiftRightNoWrap(
                                 copied each loop  ^
                                                   ^
 
-        shiftBytes                       (srcPos) |------| (srcPos + shiftBytes)
+        shiftBytes                       (srcPos) |xxxxxx| (srcPos + shiftBytes)
                                                   |      |
-
-                          each loop copies at most ----> | (destPos)
+                                                       ---->
+                          each loop copies at most       | (destPos)
                           this number of bytes           |------|
-                          to destPos        
+                          to destPos
 
     */
 
-    // keep copying bytes until there is no more space at destPos
     do
     {
         if (srcPos < shiftBytes)
@@ -420,7 +577,7 @@ void _ACR_BufferShiftRightNoWrap(
             // not enough source data.
             // reduce shiftBytes to just the source available.
             // Note: a previous check was made that ensures
-            //       srcAvailable is greater than 0 so shiftBytes
+            //       srcPos is greater than 0 so shiftBytes
             //       will also be greater than 0
             shiftBytes = srcPos;
         }
@@ -445,9 +602,141 @@ void _ACR_BufferShiftRightNoWrap(
             break;
         }
 
+        // keep copying bytes until there is no more space at destPos
     }
     while (destPos > 0);
 
+}
+
+/**********************************************************/
+void _ACR_BufferShiftLeftWrap(
+    ACR_Byte_t* ptr,
+    ACR_Length_t length,
+    ACR_Length_t shiftBytes,
+    ACR_Byte_t* swapPtr,
+    ACR_Length_t swapLength)
+{
+    if ((ptr == ACR_NULL) || 
+        (length == ACR_ZERO_LENGTH))
+    {
+        // nothing to shift
+        return;
+    }
+
+    if((swapPtr == ACR_NULL) ||
+       (swapLength == 0))
+    {
+        // no swap space
+        return;
+    }
+
+    // only shift bytes the necessary
+    // amount for the final data position
+    // to be correct
+    shiftBytes %= length;
+
+    /* See _ACR_BufferShiftLeftNoWrap() for how to visualize shifting data to the left
+       and this additional information to visualize the wrapped data
+
+        buffer       (0) |xxxxxx--------------------------------abcdef| (length)
+                         |                                            |
+
+                             |                                    ^
+                             | copy data from the buffer          |
+                             | into the swap so that it           |
+                             | can be placed back into            |
+                             | the buffer after the shift         |
+                             V                                    |
+        swapPtr      (0) |abcdef| (swapLength)                 |abcdef|
+ 
+    */
+
+    while(shiftBytes > 0)
+    {
+        // determine the max number of bytes
+        // that can be shifted during this loop
+        ACR_Length_t currentShift = swapLength;
+        if(currentShift > shiftBytes)
+        {
+            // reduce the number of bytes to just
+            // those that remain to be shifted
+            currentShift = shiftBytes;
+        }
+
+        // make a copy of the data at the start
+        // of the buffer for this shift
+        // Note: a previous check ensured currentShift is less than length
+        ACR_MEMCPY(swapPtr, ptr, currentShift);
+        _ACR_BufferShiftLeftNoWrap(ptr, length, currentShift);
+        ACR_MEMCPY(&ptr[length - currentShift], swapPtr, currentShift);
+        shiftBytes -= currentShift;
+    }
+    
+}
+
+/**********************************************************/
+void _ACR_BufferShiftRightWrap(
+    ACR_Byte_t* ptr,
+    ACR_Length_t length,
+    ACR_Length_t shiftBytes,
+    ACR_Byte_t* swapPtr,
+    ACR_Length_t swapLength)
+{
+    if ((ptr == ACR_NULL) || 
+        (length == ACR_ZERO_LENGTH))
+    {
+        // nothing to shift
+        return;
+    }
+
+    if((swapPtr == ACR_NULL) ||
+       (swapLength == 0))
+    {
+        // no swap space
+        return;
+    }
+
+    // only shift bytes the necessary
+    // amount for the final data position
+    // to be correct
+    shiftBytes %= length;
+
+    /* See _ACR_BufferShiftLeftNoWrap() for how to visualize shifting data to the left
+       and this additional information to visualize the wrapped data
+
+        buffer       (0) |abcdef--------------------------------xxxxxx| (length)
+                         |                                            |
+
+                             ^                                    |
+                             |         copy data from the buffer  |
+                             |         into the swap so that it   |
+                             |         can be placed back into    |
+                             |         the buffer after the shift |
+                             |                                    V
+        swapPtr      (0) |abcdef|        (length - shiftBytes) |abcdef| (length + swapLength)
+ 
+    */
+
+    while(shiftBytes > 0)
+    {
+        // determine the max number of bytes
+        // that can be shifted during this loop
+        ACR_Length_t currentShift = swapLength;
+        if(currentShift > shiftBytes)
+        {
+            // reduce the number of bytes to just
+            // those that remain to be shifted
+            currentShift = shiftBytes;
+        }
+
+        // make a copy of the data at the start
+        // of the buffer for this shift
+        // Note: a previous check ensured currentShift is less than length
+        ACR_MEMCPY(swapPtr, &ptr[length - currentShift], currentShift);
+        _ACR_BufferShiftRightNoWrap(ptr, length, currentShift);
+        ACR_MEMCPY(ptr, swapPtr, currentShift);
+        shiftBytes -= currentShift;
+    }
 }
 
 ////////////////////////////////////////////////////////////

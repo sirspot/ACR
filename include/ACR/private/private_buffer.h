@@ -85,7 +85,7 @@ extern "C" {                                              //
 
 	Note: memory for the buffer must be allocated
 		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferRef()
+		  referenced by calling ACR_BufferSetData()
 		  before the buffer can be used effectively.
 */
 void ACR_BufferInit(

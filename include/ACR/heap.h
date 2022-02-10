@@ -103,7 +103,7 @@ extern "C" {                                              //
 /** allocate this many bytes on the global heap
     and return a pointer to the memory
     \param bytes the number of bytes to attempt to allocated
-    \returns a pointer to the newly allocated memory or AMI_NULL on failure
+    \returns a pointer to the newly allocated memory or ACR_NULL on failure
 */
 void* ACR_GlobalHeapAlloc(
     ACR_Length_t bytes);
@@ -119,7 +119,7 @@ void ACR_GlobalHeapFree(
     \param ptr existing allocated memory pointer
     \param bytes new size desired
     \returns either a pointer to the newly allocated memory and ptr is no longer valid
-             or on failure AMI_NULL and ptr remains valid but at its original allocation size.    
+             or on failure ACR_NULL and ptr remains valid but at its original allocation size.    
 */
 void* ACR_GlobalHeapRealloc(
     void* ptr,

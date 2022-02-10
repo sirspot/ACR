@@ -80,7 +80,7 @@ extern "C" {                                              //
 
 	Note: memory for the buffer must be allocated
 		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferRef()
+		  referenced by calling ACR_BufferSetData()
 		  before the buffer can be used effectively.
 */
 ACR_Info_t ACR_BufferNew(
@@ -116,10 +116,18 @@ ACR_Info_t ACR_BufferAllocate(
 	IMPORTANT: if the buffer has memory allocated,
 			   the memory will be freed before the reference is set
 */
-ACR_Info_t ACR_BufferRef(
+ACR_Info_t ACR_BufferSetData(
 	ACR_BufferObj_t* me,
 	void* ptr,
 	ACR_Length_t length);
+
+/** get the buffer length
+	\param me the buffer
+	\returns the buffer length
+	Note: if me is ACR_NULL the buffer length returned is still 0
+*/
+ACR_Length_t ACR_BufferGetLength(
+	ACR_BufferObj_t* me);
 
 /** clear the buffer by filling with ACR_EMPTY_VALUE
 	\param me the buffer
@@ -127,24 +135,88 @@ ACR_Info_t ACR_BufferRef(
 void ACR_BufferClear(
 	ACR_BufferObj_t* me);
 
+/** copy from one buffer to another
+	\param me the buffer to copy from. this is the source of the data
+	\param srcPos the position within the source buffer to copy from
+	\param dest the buffer to copy to. this is the destination of the data
+	\param destPos the position in the destination buffer to copy to
+	\param length the number of bytes to copy
+	\returns ACR_INFO_OK on success
+	         or ACR_INFO_GREATER if srcPos + length is greater than the source buffer length
+	         or ACR_INFO_LESS if destPos + length is greater than the destination buffer length
+			 or ACR_INFO_INVALID if either buffer has no memory
+			 or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_BufferCopyToBuffer(
+	ACR_BufferObj_t* me,
+	ACR_Length_t srcPos,
+	ACR_BufferObj_t* dest,
+	ACR_Length_t destPos,
+	ACR_Length_t length);
+
+/** copy from a buffer into any memory location
+	\param me the buffer to copy from. this is the source of the data
+	\param srcPos the position within the source buffer to copy from
+	\param destPtr a pointer to the location in memory to copy to.
+	               this is the destination of the data
+	\param destLength the amount of space available at the destination
+	                  memory address. this value must be greater than
+					  or equal to length or the copy will not occur
+	\param length the number of bytes to copy
+	\returns ACR_INFO_OK on success
+	         or ACR_INFO_GREATER if srcPos + length is greater than the source buffer length
+	         or ACR_INFO_LESS if destLength is less than length
+			 or ACR_INFO_INVALID if either buffer has no memory or destPtr is ACR_NULL
+			 or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_BufferCopyToMemory(
+	ACR_BufferObj_t* me,
+	ACR_Length_t srcPos,
+	void* destPtr,
+	ACR_Length_t destLength,
+	ACR_Length_t length);
+
 /** set the byte value at the specified position
 	\param me the buffer
 	\param pos the position in the buffer
 	\param value the value
-	\returns ACR_INFO_OK or ACR_INFO_ERROR
+	\returns ACR_INFO_OK
+	         or ACR_INFO_GREATER if pos is too large
+			 or ACR_INFO_INVALID if the buffer has no memory
+	         or ACR_INFO_ERROR
 */
 ACR_Info_t ACR_BufferSetByteAt(
 	ACR_BufferObj_t* me,
 	ACR_Length_t pos,
 	ACR_Byte_t value);
 
+/** get the byte value at the specified position
+	\param me the buffer
+	\param pos the position in the buffer
+	\param value the location to store the value
+	\returns ACR_INFO_OK
+	         or ACR_INFO_GREATER if pos is too large
+			 or ACR_INFO_INVALID if the buffer has no memory
+	         or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_BufferGetByteAt(
+	ACR_BufferObj_t* me,
+	ACR_Length_t pos,
+	ACR_Byte_t* value);
+
 /** shift all data in the buffer
 	\param me the buffer
 	\param shiftBytes the number of bytes to shift by
+	       Note: if this value is larger than ACR_BUFFER_BYTE_COUNT_PER_SHIFT
+		         defined in ACR/private/private_buffer.h then a shift with
+				 wrap set to ACR_BOOL_TRUE will be less effecient. you may
+				 override this value in your project settings to find the
+				 best per-shift maximum for your application
 	\param direction ACR_INFO_LEFT or ACR_INFO_RIGHT
 	\param wrap set to ACR_BOOL_TRUE if the data shifted right should
 		   be copied to the left or ACR_BOOL_FALSE to make no effort
-		   to save the data shifted out of the buffer
+		   to save the data shifted out of the buffer, which will fill
+		   the free space with empty data
 */
 void ACR_BufferShift(
 	ACR_BufferObj_t* me,

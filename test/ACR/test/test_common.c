@@ -46,7 +46,7 @@
 // included for ACR_BYTE_ORDER_16, ACR_BYTE_ORDER_32, ACR_BYTE_ORDER_64
 #include "ACR/public/public_byte_order.h"
 
-// included for AMI_Decimal_t, ACR_DECIMAL_TOLERANCE_COMPARE
+// included for ACR_Decimal_t, ACR_DECIMAL_TOLERANCE_COMPARE
 #include "ACR/public/public_decimal.h"
 
 // included for ACR_INFO_STR_FALSE, ACR_INFO_STR_TRUE
