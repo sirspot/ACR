@@ -130,7 +130,7 @@ void* ACR_GlobalHeapRealloc(
 /** non-standard but very fast function to free all
     allocated global heap memory.
 */
-void ACR_GlobalHeapFreeAll();
+void ACR_GlobalHeapFreeAll(void);
 
 #endif
 

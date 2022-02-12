@@ -44,7 +44,7 @@
 */
 #include "ACR/buffer.h"
 
-// uncomment the following line to include tests for private buffer functions
+// comment/uncomment the following line to for testing private buffer functions
 #define ACR_TEST_INCLUDE_PRIVATE
 
 #ifdef ACR_TEST_INCLUDE_PRIVATE
@@ -117,23 +117,74 @@ int HeapTest(void)
 	ACR_BufferNew(&bufferPtr);
 	if(ACR_BufferAllocate(bufferPtr, 10) == ACR_INFO_OK)
 	{
+		ACR_Byte_t compareValue = 0;
+		ACR_Length_t shiftBytes = 9;
+		ACR_Length_t bufferLength = ACR_BufferGetLength(bufferPtr);
+		ACR_Byte_t byteValue;
 		//
-		// OK - 5000 byte buffer ready for use
+		// OK - buffer ready for use
 		//
-
-		// placing data to test shift left
-		for (ACR_Length_t i = 0; i < 10; i++)
-		{
-			ACR_BufferSetByteAt(bufferPtr, i, (ACR_Byte_t)(i % 256)+1);
-		}
-		ACR_BufferShift(bufferPtr, 9, ACR_INFO_LEFT, ACR_BOOL_FALSE);
 
 		// placing data to test shift right
-		for (ACR_Length_t i = 0; i < 10; i++)
+		for (ACR_Length_t i = 0; i < bufferLength; i++)
 		{
-			ACR_BufferSetByteAt(bufferPtr, i, (ACR_Byte_t)(i % 256)+1);
+			byteValue = (ACR_Byte_t)(i % 256) + 1;
+			ACR_BufferSetByteAt(bufferPtr, i, byteValue);
+			if (i == (bufferLength - shiftBytes - 1))
+			{
+				compareValue = byteValue;
+			}
 		}
-		ACR_BufferShift(bufferPtr, 9, ACR_INFO_RIGHT, ACR_BOOL_FALSE);
+		ACR_BufferShift(bufferPtr, shiftBytes, ACR_INFO_RIGHT, ACR_BOOL_FALSE);
+		ACR_BufferGetByteAt(bufferPtr, bufferLength - 1, &byteValue);
+		if (byteValue != compareValue)
+		{
+			// failed to move the value at position
+			// shiftBytes to the end of the buffer
+			result = ACR_FAILURE;
+		}
+
+		// placing data to test shift left
+		shiftBytes = 9;
+		for (ACR_Length_t i = 0; i < bufferLength; i++)
+		{
+			byteValue = (ACR_Byte_t)(i % 256) + 1;
+			ACR_BufferSetByteAt(bufferPtr, i, byteValue);
+			if (i == shiftBytes)
+			{
+				compareValue = byteValue;
+			}
+		}
+		ACR_BufferShift(bufferPtr, shiftBytes, ACR_INFO_LEFT, ACR_BOOL_FALSE);
+		ACR_BufferGetByteAt(bufferPtr, 0, &byteValue);
+		if (byteValue != compareValue)
+		{
+			// failed to move the value at position
+			// shiftBytes to the start of the buffer
+			result = ACR_FAILURE;
+		}
+
+		// use the same buffer object for a different
+		// area of memory, which will automatically free
+		// the dynamically allocated memory
+		ACR_Byte_t smallArray[64];
+		for (ACR_Length_t i = 0; i < 64; i++)
+		{
+			smallArray[i] = (ACR_Byte_t)(i + 64);
+		}
+		ACR_BufferGetByteAt(bufferPtr, 0, &byteValue);
+		ACR_BufferSetData(bufferPtr, smallArray, sizeof(smallArray));
+		ACR_BufferGetByteAt(bufferPtr, 0, &compareValue);
+		if (byteValue == compareValue)
+		{
+			// failed to select the smallArray as the new buffer data
+			result = ACR_FAILURE;
+		}
+		if (compareValue != 64)
+		{
+			// smallArray value at pos 0 should have been 64
+			result = ACR_FAILURE;
+		}
 
 		// optional step to clear the buffer
 		ACR_BufferClear(bufferPtr);
@@ -168,6 +219,10 @@ int StackTest(void)
 	else
 	{
 		// failed to allocate 5000 bytes
+		// Note: if ACR_CONFIG_NO_LIBC was defined then ACR_CONFIG_HEAP_SIZE
+		//       can be defined in your project settings to increase or
+		//       decrease the total amount of heap memory available.
+		//       the default at this time is 2MB
 		result = ACR_FAILURE;
 	}
 	ACR_BufferDeInit(&buffer);

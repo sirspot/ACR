@@ -47,6 +47,9 @@
 // included for ACR_UNUSED
 #include "ACR/public/public_functions.h"
 
+// included for ACR_VALUE_AT()
+#include "ACR/public/public_count.h"
+
 ////////////////////////////////////////////////////////////
 //
 // HELPER FUNCTIONS
@@ -288,7 +291,7 @@ ACR_Info_t ACR_BufferSetByteAt(
         return ACR_INFO_GREATER;
     }
 
-    ((ACR_Byte_t*)me->m_Base.m_Pointer)[pos] = value;
+    ACR_VALUE_AT(ACR_Byte_t, me->m_Base.m_Pointer, pos) = value;
 
     return ACR_INFO_OK;
 }
@@ -316,7 +319,7 @@ ACR_Info_t ACR_BufferGetByteAt(
 
     if(value)
     {
-        (*value) = ((ACR_Byte_t*)me->m_Base.m_Pointer)[pos];
+        (*value) = ACR_VALUE_AT(ACR_Byte_t, me->m_Base.m_Pointer, pos);
     }
 
     return ACR_INFO_OK;

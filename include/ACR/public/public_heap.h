@@ -48,7 +48,10 @@
     ACR_MALLOC         as a macro to allocate memory or return ACR_NULL if memory cannot be allocated
     ACR_FREE           as a macro to free previously allocated memory
     ACR_DELETE         as a macro safer version of ACR_FREE
-    ACR_HEAP_IS_GLOBAL as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
+    ACR_HEAP_IS_GLOBAL as either ACR_BOOL_TRUE or ACR_BOOL_FALSE.
+                       the only case where this will be set to
+                       ACR_BOOL_TRUE is when ACR_CONFIG_NO_LIBC is
+                       set but ACR_CONFIG_NO_MALLOC is not set
 
 */
 #ifndef _ACR_PUBLIC_HEAP_H_

@@ -118,7 +118,7 @@ void* ACR_GlobalHeapRealloc(
 }
 
 /**********************************************************/
-void ACR_GlobalHeapFreeAll()
+void ACR_GlobalHeapFreeAll(void)
 {
     ACR_HeapFreeAll(&g_ACR_Heap);
 }

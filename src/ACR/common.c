@@ -432,7 +432,7 @@ ACR_Bool_t ACR_DateTimeFromTime(
                     //
                     // calculate the day of the year from the tempTime
                     //
-                    me->tm_yday = (tempTime / ACR_SEC_PER_DAY);
+                    me->tm_yday = (int)(tempTime / ACR_SEC_PER_DAY);
                     tempTime -= (me->tm_yday * ACR_SEC_PER_DAY);
 
                     //
@@ -475,11 +475,11 @@ ACR_Bool_t ACR_DateTimeFromTime(
                     // temp time is now just the time of day in seconds.
                     // covert to hours, minutes, seconds.
                     //
-                    me->tm_hour = (tempTime / ACR_SEC_PER_HOUR);
+                    me->tm_hour = (int)(tempTime / ACR_SEC_PER_HOUR);
                     tempTime -= (me->tm_hour * ACR_SEC_PER_HOUR);
-                    me->tm_min = (tempTime / ACR_SEC_PER_MIN);
+                    me->tm_min = (int)(tempTime / ACR_SEC_PER_MIN);
                     tempTime -= (me->tm_min * ACR_SEC_PER_MIN);
-                    me->tm_sec = tempTime;
+                    me->tm_sec = (int)tempTime;
 
                     // indicate using UTC time
                     me->tm_gmtoff = 0;

@@ -48,6 +48,9 @@
 #ifndef _ACR_PUBLIC_BYTE_ORDER_H_
 #define _ACR_PUBLIC_BYTE_ORDER_H_
 
+// included for ACR_USE_64BIT
+#include "ACR/public/public_memory.h"
+
 ////////////////////////////////////////////////////////////
 //
 // ### New to C? ###

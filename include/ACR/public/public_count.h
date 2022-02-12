@@ -64,4 +64,21 @@ typedef unsigned long ACR_Count_t;
 */
 #define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
 
+/** get a pointer to a data item in an array
+    \param t the data type
+    \param p the pointer
+    \param i the position 0 to length-1 where
+             length is the number of data items in the array
+*/
+#define ACR_VALUE_AT(t,p,i) ((t*)p)[i]
+
+/** get a pointer to a data item in an array
+    \param t the data type
+    \param p the pointer
+    \param i the position 0 to length-1 where
+             length is the number of data items in the array
+*/
+#define ACR_POINTER_AT(t,p,i) (&ACR_VALUE_AT(t,p,i))
+
+
 #endif

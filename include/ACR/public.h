@@ -44,10 +44,17 @@
 
    ### Getting Started Quickly ###
 
-   Complete example programs are found in ACR/example.
-   More detailed tests are found in the ACR/test folder.
+   Complete example programs are found in "/ACR/example".
+   More detailed tests are found in "/ACR/test".
    For those familiar with C, the fastest way to get started
-   is to look at ACR_TestCommon() found in test_common.c
+   is to look at ACR_TestCommon() found in
+   "/ACR/test/ACR/test/test_common.c"
+
+   Note: That's not a typo, the tests really are placed in
+         a folder called "/ACR/test/ACR/test". This
+         makes it easy to include test header files like
+         any other header file in this library by placing
+         "/ACR/test" in the project settings include path.
 
    ### New to C? ###
 
@@ -55,7 +62,7 @@
    A: Many topics are covered by this header. Each topic
       begins with a large comment block and will follow
       with additional details. Look for "New to C?" for
-      detailed explanations of each topic.
+      detailed explanations.
 
    Q: What is a "header"?
    A: A header (.h file) is a file that predefines the names of
@@ -119,6 +126,7 @@
       return 0 to mean success while others will return 0
       as an error. This is why ACR defines many more specific
       values that can be used as return codes.
+      See the include file ACR/public/public_info.h for more details.
 
 */
 #include "ACR/public/public_bool.h"
@@ -256,7 +264,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-   Include the file ACR/public/public_heap.h to
+   Include the file "ACR/public/public_heap.h" to
    define ACR_MALLOC(), ACR_REALLOC(), and ACR_FREE()
 
    The heap can be disabled entirely in this library
@@ -265,8 +273,8 @@
    If you need a heap but your platform doesn't provide one,
    define ACR_CONFIG_NO_LIBC in your project settings
    and ACR will implement a rudimentary heap instead.
-   The source file src/ACR/heap.c must be added to your
-   project for this to work. see ACR/heap.h for details.
+   The source file /ACR/src/ACR/heap.c must be added to your
+   project for this to work. see "ACR/heap.h" for details.
 
    Instead of using the heap, a program can use global
    variables for large amounts of data and the stack
@@ -292,7 +300,11 @@
       was allotted. This is called a Stack Overflow.
 
    Q: What is a global variable?
-   A: 
+   A: A global variable is defined outside of any function
+      and thus is accessible by all functions (or at least
+      all functions within the same source file). The memory
+      for the variable is allocated at run-time and will
+      remain available for the life of the program.
 
 */
 #include "ACR/public/public_heap.h"
@@ -304,6 +316,10 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file ACR/public/public_byte_order.h to
+    define ACR_IS_BIG_ENDIAN, ACR_BYTE_ORDER_16(), ACR_BYTE_ORDER_32(),
+    and ACR_BYTE_ORDER_64()
+
     ### New to C? ###
 
     Q: What is endianness?
@@ -322,6 +338,10 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file ACR/public/public_byte_order.h to
+    define ACR_Byte_t, ACR_Flags_t, ACR_HAS_FLAG(),
+    ACR_ADD_FLAGS(), and ACR_REMOVE_FLAGS()
+
     ### New to C? ###
 
     Q: What is a byte?
@@ -339,6 +359,28 @@
 // TYPES AND DEFINES - COUNTING
 //
 ////////////////////////////////////////////////////////////
+
+/**
+
+    Include the file ACR/public/public_count.h to define
+    ACR_Count_t, ACR_ZERO_COUNT, ACR_MAX_COUNT, ACR_POINTER_AT(),
+    ACR_VALUE_AT()
+
+
+    ### New to C? ###
+
+    Q: What is an array?
+    A: An array is an ordered list of data. Each position
+       within the list contains the same type of data.
+       The type can be a single byte or can be an entire
+       data structure.
+
+    Q: What is zero-indexed?
+    A: In C, the position of each data item in an array
+       begins at index 0 and ends at the array length minus 1.
+       See the include file "ACR/public/public_count.h" for more details.
+
+*/
 #include "ACR/public/public_count.h"
 
 ////////////////////////////////////////////////////////////
@@ -348,13 +390,26 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file ACR/public/public_blocks.h to define
+    ACR_Block_t, ACR_Blocks_t, ACR_MIN_BLOCKS_NEEDED(), 
+    ACR_MIN_BLOCKS_NEEDED_BY_SIZE(), ACR_LENGTH_TO_BLOCKS(), and
+    ACR_LENGTH_TO_BLOCKS_BY_SIZE()
+
+    Use ACR_Block_t to store the number of blocks when counting
+    by block number. Use ACR_Blocks_t to store not only the number
+    of blocks but also the number of extra bytes when working
+    with data that is not a multiple of the block size.
+
     ### New to C? ###
 
     Q: What is a memory block?
-    A: This refers to the smallest addressable memory size.
-       It is good to know this size when performing optimized
-       copy operations or when placing data in memory where
-       it can be accessed by specialized hardware.
+    A: This refers to sequential memory addresses. Although
+       a block size can change depending on the purpose, each
+       platform has a standard block size that it uses for
+       addressing and copying data. It is good to know this
+       size when performing optimized copy operations or
+       when placing data in memory where it can be accessed 
+       by specialized hardware.
        See the include file ACR/public/public_blocks.h for more details.
 */
 #include "ACR/public/public_blocks.h"
@@ -366,12 +421,21 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file ACR/public/public_dates_and_times.h to
+    define months as an enum and type ACR_Month_t,
+    day of the week as an enum and type ACR_DayOfWeek_t,
+    ACR_HOUR_PER_DAY, ACR_MIN_PER_HOUR, ACR_SEC_PER_MIN,
+    ACR_MILLI_PER_SEC, and many more time constants
+
+    If you are looking for the current date or time, this isn't it.
+    See "ACR/public/public_clock.h" for more details.
+
     ### New to C? ###
 
-   Q: What is an "enum"?
-   A: An enum, short for enumeration, is a list of names
-      with a number assigned to each name. The names are
-      used by the preprocessor just like a define.
+    Q: What is an "enum"?
+    A: An enum, short for enumeration, is a list of names
+        with a number assigned to each name. The names are
+        used by the preprocessor just like a define.
 
 */
 #include "ACR/public/public_dates_and_times.h"
@@ -383,6 +447,16 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file ACR/public/public_clock.h to define
+    ACR_HAS_RTC, ACR_TIME_NOW(), ACR_DATETIME_FROM_TIME(),
+    ACR_Time_t, ACR_DateTime_t, ACR_DATETIME_NOW(), 
+    ACR_DATETIME_YEAR(), ACR_DATETIME_MONTH(), ACR_DATETIME_HOUR(),
+    and more
+
+    If your platform doesn't have an RTC, define ACR_CONFIG_NO_RTC
+    in your project settings and see ACR_TimeProcessSecondTick() in
+    "ACR/common.h" for how to simulate a real-time clock
+
     ### New to C? ###
 
     Q: What is a Real Time Clock (RTC)?
@@ -390,9 +464,10 @@
        that is tasked with keeping an accurate count of
        the amount of time that has past since the time
        was last set. Devices that do not have an RTC
-       can simulate one using a 1 aecond timer but will
+       can simulate one using a 1 second timer but will
        have to correct the time more often due to drift.
-       See the include file ACR/public/public_clock.h for more details.
+       See the include file ACR/public/public_clock.h for
+       more details.
 */
 #include "ACR/public/public_clock.h"
 

@@ -141,6 +141,10 @@
         const char *tm_zone; /* Timezone abbreviation.           */
     } ACR_DateTime_t;
 
+    // Note: src/ACR/common.c must be added to any project
+    //       that wishes to use ACR/common.h
+    #include "ACR/common.h"
+
     #define ACR_TIME_NOW(name) ACR_TimeNow(&name)
     #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&name,&time)
 
