@@ -161,17 +161,17 @@ typedef unsigned long ACR_Unsigned_32bit_t;
 //           Little Endian: ACR_CONFIG_LITTLE_ENDIAN
 //
 #ifdef ACR_CONFIG_BIG_ENDIAN
-/** the system is big endian because ACR_CONFIG_BIG_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
+    /** the system is big endian because ACR_CONFIG_BIG_ENDIAN
+        was set in the preprocessor
+    */
+    #define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
 #else
-#ifdef ACR_CONFIG_LITTLE_ENDIAN
-/** the system is NOT big endian because ACR_CONFIG_LITTLE_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
-#endif // #ifdef ACR_CONFIG_LITTLE_ENDIAN
+    #ifdef ACR_CONFIG_LITTLE_ENDIAN
+        /** the system is NOT big endian because ACR_CONFIG_LITTLE_ENDIAN
+            was set in the preprocessor
+        */
+        #define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
+    #endif // #ifdef ACR_CONFIG_LITTLE_ENDIAN
 #endif // #ifdef ACR_CONFIG_BIG_ENDIAN
 
 //
@@ -180,32 +180,35 @@ typedef unsigned long ACR_Unsigned_32bit_t;
 //
 #ifndef ACR_IS_BIG_ENDIAN
 
-#ifndef ACR_CONFIG_NO_LIBC
-// included for BIG_ENDIAN or LITTLE_ENDIAN
-#include <stdlib.h>
-#endif
+    #ifndef ACR_CONFIG_NO_LIBC
+        // included for BYTE_ORDER, BIG_ENDIAN, and LITTLE_ENDIAN
+        #include <endian.h>
+    #endif
 
-#ifdef BIG_ENDIAN
-/** the system is big endian because BIG_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
-#else
-#ifdef LITTLE_ENDIAN
-/** the system is NOT big endian because LITTLE_ENDIAN
-    was set in the preprocessor
-*/
-#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
-#else
+    #ifdef BYTE_ORDER
+        #if BYTE_ORDER == BIG_ENDIAN
+            /** the system is big endian
+            */
+            #define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
+        #else
+            #if BYTE_ORDER == LITTLE_ENDIAN
+                /** the system is NOT big endian
+                */
+                #define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
+            #endif // #if BYTE_ORDER == LITTLE_ENDIAN
+        #endif // #if BYTE_ORDER == BIG_ENDIAN
+    #endif // #ifdef BYTE_ORDER
+#endif // #ifndef ACR_IS_BIG_ENDIAN
+
+//
+// using dynamic endian if ACR_IS_BIG_ENDIAN is not known
+//
+#ifndef ACR_IS_BIG_ENDIAN
+#define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
 // Note: warning C4906: string literal cast to 'ACR_Unsigned_16bit_t *' should be
 //       ignored in project settings to use dynamic endianess detection
 #define ACR_IS_BIG_ENDIAN (*(ACR_Unsigned_16bit_t*)"\0\xff" < 0x100)
-#define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
-#endif // #ifdef LITTLE_ENDIAN
-#endif // #ifdef BIG_ENDIAN
-#endif // #ifndef ACR_IS_BIG_ENDIAN
-
-#ifndef ACR_ENDIAN_DYNAMIC
+#else
 #define ACR_ENDIAN_DYNAMIC ACR_BOOL_FALSE
 #endif
 

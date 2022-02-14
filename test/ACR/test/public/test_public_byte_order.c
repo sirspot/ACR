@@ -86,7 +86,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            ACR_DEBUG_PRINT(3, "OK: Little Endian ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(3, "OK: Little Endian because ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     else
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            ACR_DEBUG_PRINT(5, "OK: Big Endian ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
+            ACR_DEBUG_PRINT(5, "OK: Big Endian because ACR_IS_BIG_ENDIAN is %s", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)?ACR_INFO_STR_FALSE:ACR_INFO_STR_TRUE);
         }
     }
     systemEndianValue = ACR_BYTE_ORDER_16(bigEndian);
