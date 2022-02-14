@@ -22,6 +22,9 @@
     <Filter Include="Header Files\ACR\public">
       <UniqueIdentifier>{43fcc09b-c7d5-4cf4-93f6-5c215b87650f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ACR\private">
+      <UniqueIdentifier>{354e658a-f506-4e76-838c-42060653e597}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\ACR\public.h">
@@ -105,6 +108,15 @@
     <ClInclude Include="..\..\include\ACR\public\public_units.h">
       <Filter>Header Files\ACR\public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\ACR\heap.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\private\private_buffer.h">
+      <Filter>Header Files\ACR\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\private\private_heap.h">
+      <Filter>Header Files\ACR\private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ACR\buffer.c">
@@ -120,6 +132,9 @@
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ACR\common.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\heap.c">
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
   </ItemGroup>

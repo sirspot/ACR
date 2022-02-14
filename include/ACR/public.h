@@ -65,8 +65,8 @@
       detailed explanations.
 
    Q: What is a "header"?
-   A: A header (.h file) is a file that predefines the names of
-      various functions and values that are then fully
+   A: A header (.h file) is a file that predefines the 
+      names of functions and values that are then fully
       defined by the source file. In many cases it is
       only necessary to read the header file to
       understand what the code in a source file does.
@@ -90,7 +90,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-   Include the file ACR/public/public_bool.h to
+   Include the file "ACR/public/public_bool.h" to
    define ACR_BOOL_FALSE and ACR_BOOL_TRUE and the
    data type ACR_Bool_t.
 
@@ -109,8 +109,8 @@
    A: A define is a name assigned to a value. Before the code
       is compiled, a preprocessor will replace the name with
       the value. The value can be any valid code such as numbers, 
-      "strings", or even code snippets that can accept parameters
-      (these are called Macros)
+      text "strings", or even code snippets that can accept 
+      parameters (these are called Macros)
 
    Q: What is a "typedef"?
    A: A typedef is a way to expand the types of data that
@@ -126,7 +126,7 @@
       return 0 to mean success while others will return 0
       as an error. This is why ACR defines many more specific
       values that can be used as return codes.
-      See the include file ACR/public/public_info.h for more details.
+      See the include file "ACR/public/public_info.h" for more details.
 
 */
 #include "ACR/public/public_bool.h"
@@ -138,7 +138,7 @@
 ////////////////////////////////////////////////////////////
 
 /* 
-   Include the file ACR/public/public_config.h to
+   Include the file "ACR/public/public_config.h" to
    define ACR_HAS_PLATFORM, ACR_PLATFORM_NAME,
    ACR_HAS_IDE, ACR_IDE_NAME, ACR_HAS_COMPILER,
    and ACR_COMPILER_NAME.
@@ -167,7 +167,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-   Include the file ACR/public/public_functions.h to
+   Include the file "ACR/public/public_functions.h" to
    define ACR_SUCCESS, ACR_FAILURE, ACR_UNUSED(),
    and ACR_TYPEDEF_CALLBACK()
 
@@ -196,7 +196,7 @@
 ////////////////////////////////////////////////////////////
 
 /** 
-   Include the file ACR/public/public_memory.h to
+   Include the file "ACR/public/public_memory.h" to
    define ACR_EMPTY_VALUE, ACR_USE_64BIT, ACR_Length_t,
    ACR_ZERO_LENGTH, ACR_MAX_LENGTH, ACR_MEMSET(), ACR_MEMCPY(),
    ACR_NULL, and ACR_PointerValue_t
@@ -235,7 +235,7 @@
 
 /** 
 
-   Include the file ACR/public/public_debug.h to
+   Include the file "ACR/public/public_debug.h" to
    define ACR_IS_DEBUG and ACR_DEBUG_PRINT()
 
    ACR_DEBUG_PRINT() is an especially handy macro that
@@ -273,7 +273,7 @@
    If you need a heap but your platform doesn't provide one,
    define ACR_CONFIG_NO_LIBC in your project settings
    and ACR will implement a rudimentary heap instead.
-   The source file /ACR/src/ACR/heap.c must be added to your
+   The source file "/ACR/src/ACR/heap.c" must be added to your
    project for this to work. see "ACR/heap.h" for details.
 
    Instead of using the heap, a program can use global
@@ -297,39 +297,27 @@
       variable data. It is best to use the stack sparingly
       for large datasets because the program will terminate
       unexpectedly if it tries to use more stack memory than
-      was allotted. This is called a Stack Overflow.
+      was allotted. This is called a Stack Overflow and is
+      the namesake for the popular website.
 
    Q: What is a global variable?
    A: A global variable is defined outside of any function
       and thus is accessible by all functions (or at least
       all functions within the same source file). The memory
       for the variable is allocated at run-time and will
-      remain available for the life of the program.
+      remain available at the same address and same size for
+      the life of the program. The opposite of a global
+      variable is a local variable.
+
+   Q: What is a local variable?
+   A: A local variable is defined within a function. When
+      the function is called, memory is allocated on the
+      stack for the variable and when the function is
+      complete (or returns) the memory is released from
+      the stack and made available to future function calls.
 
 */
 #include "ACR/public/public_heap.h"
-
-////////////////////////////////////////////////////////////
-//
-// TYPES AND DEFINES - ENDIANNESS
-//
-////////////////////////////////////////////////////////////
-
-/**
-    Include the file ACR/public/public_byte_order.h to
-    define ACR_IS_BIG_ENDIAN, ACR_BYTE_ORDER_16(), ACR_BYTE_ORDER_32(),
-    and ACR_BYTE_ORDER_64()
-
-    ### New to C? ###
-
-    Q: What is endianness?
-    A: This refers to the order bytes are stored in memory.
-       It is only necessary to understand when a program
-       must work with itself or other programs on various
-       hardware platforms.
-       See the include file ACR/public/public_byte_order.h for more details.
-*/
-#include "ACR/public/public_byte_order.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -338,21 +326,76 @@
 ////////////////////////////////////////////////////////////
 
 /**
-    Include the file ACR/public/public_byte_order.h to
+    Include the file "ACR/public/public_byte_order.h" to
     define ACR_Byte_t, ACR_Flags_t, ACR_HAS_FLAG(),
     ACR_ADD_FLAGS(), and ACR_REMOVE_FLAGS()
 
     ### New to C? ###
 
     Q: What is a byte?
-    A: A byte is a group of 8 bits.
-       
+    A: A byte is a group of 8 bits and is typically the smallest
+       amount of memory that a variable can use to store a value.
+
     Q: What are flags?
     A: Flags are a method of setting, clearing, and checking
-       the state of individual bits
-       See the include file ACR/public/public_bytes_and_flags.h for more details.
+       the state of individual bits within one or more bytes
+
 */
 #include "ACR/public/public_bytes_and_flags.h"
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - ENDIANNESS
+//
+////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_byte_order.h" to
+    define ACR_Unsigned_16bit_t, ACR_Unsigned_32bit_t, 
+    ACR_IS_BIG_ENDIAN, ACR_BYTE_ORDER_16(), ACR_BYTE_ORDER_32(),
+    and ACR_BYTE_ORDER_64()
+
+    ### New to C? ###
+
+    Q: What is endianness?
+    A: This refers to the order that multi-byte values
+       are stored in memory. It is only necessary to
+       understand when a program must work with itself
+       or other programs on platforms that differ in
+       endianness.
+       See the include file "ACR/public/public_byte_order.h" for more details.
+
+    Q: What is a multi-byte value?
+    A: A multi-byte value is any value that requires
+       more than 8 bits to represent. Standard sizes
+       include 16 bit, 32 bit, and 64 bit but there
+       are times where other sizes may be used.
+       Some examples:
+
+       A 16 bit value such as one stored by the ACR_16bit_t
+       type can store decimal values -32,768 to 32,767
+       but is not used often because the simple int type can
+       usually store that or more.
+
+       ACR_Unsigned_16bit_t can store decimal values 0 to 65,535
+       and is most used for IP (Internet Protocol) port numbers
+
+       ACR_32bit_t can store decimal values -2,147,483,648 to 2,147,483,647
+       and is most famously used for Unix Timestamps to count the
+       number of seconds since January 1st, 1970. There is a problem in
+       the near future similar to the Y2K problem when this type will rollover
+       to its smallest negative value on Tuesday, January 19th, 2038.
+
+       ACR_Unsigned_32bit_t can store decimal values 0 to 4,294,967,295
+       and that's why the FAT32 filesystem's max file size is 4GB.
+
+       Examples of non-standard multibyte values are:
+       256bit - commonly used for encryption
+        24bit - commonly used for high definition digital audio
+        10bit - commonly used to represent colors in digital video
+
+*/
+#include "ACR/public/public_byte_order.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -362,10 +405,9 @@
 
 /**
 
-    Include the file ACR/public/public_count.h to define
+    Include the file "ACR/public/public_count.h" to define
     ACR_Count_t, ACR_ZERO_COUNT, ACR_MAX_COUNT, ACR_POINTER_AT(),
     ACR_VALUE_AT()
-
 
     ### New to C? ###
 
@@ -374,6 +416,15 @@
        within the list contains the same type of data.
        The type can be a single byte or can be an entire
        data structure.
+
+       A nice way to represent an array is as a single row
+       of a spreadsheet like this. Note that the position
+       of column A is 0 and the position of column H is 7
+
+       0    1    2    3    4    5    6    7
+       -----------------------------------------
+       | A  | B  | C  | D  | E  | F  | G  | H  |
+       -----------------------------------------
 
     Q: What is zero-indexed?
     A: In C, the position of each data item in an array
@@ -390,7 +441,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-    Include the file ACR/public/public_blocks.h to define
+    Include the file "ACR/public/public_blocks.h" to define
     ACR_Block_t, ACR_Blocks_t, ACR_MIN_BLOCKS_NEEDED(), 
     ACR_MIN_BLOCKS_NEEDED_BY_SIZE(), ACR_LENGTH_TO_BLOCKS(), and
     ACR_LENGTH_TO_BLOCKS_BY_SIZE()
@@ -404,13 +455,14 @@
 
     Q: What is a memory block?
     A: This refers to sequential memory addresses. Although
-       a block size can change depending on the purpose, each
+       a block size varies depending on the purpose, each
        platform has a standard block size that it uses for
        addressing and copying data. It is good to know this
        size when performing optimized copy operations or
        when placing data in memory where it can be accessed 
        by specialized hardware.
-       See the include file ACR/public/public_blocks.h for more details.
+       See the include file "ACR/public/public_blocks.h" and
+       "ACR/public/public_alignedbuffer.h" for more details.
 */
 #include "ACR/public/public_blocks.h"
 

@@ -78,6 +78,9 @@
     <ClInclude Include="..\..\include\ACR\alignedbuffer.h" />
     <ClInclude Include="..\..\include\ACR\buffer.h" />
     <ClInclude Include="..\..\include\ACR\common.h" />
+    <ClInclude Include="..\..\include\ACR\heap.h" />
+    <ClInclude Include="..\..\include\ACR\private\private_buffer.h" />
+    <ClInclude Include="..\..\include\ACR\private\private_heap.h" />
     <ClInclude Include="..\..\include\ACR\public.h" />
     <ClInclude Include="..\..\include\ACR\public\public_alignedbuffer.h" />
     <ClInclude Include="..\..\include\ACR\public\public_blocks.h" />

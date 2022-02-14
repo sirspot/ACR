@@ -22,6 +22,9 @@
     <Filter Include="Header Files\ACR\public">
       <UniqueIdentifier>{43fcc09b-c7d5-4cf4-93f6-5c215b87650f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ACR\private">
+      <UniqueIdentifier>{03d49c78-3ddc-45b7-b450-8b442d42ec29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\ACR\public.h">
@@ -104,6 +107,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\ACR\public\public_units.h">
       <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\private\private_buffer.h">
+      <Filter>Header Files\ACR\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\private\private_heap.h">
+      <Filter>Header Files\ACR\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\heap.h">
+      <Filter>Header Files\ACR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
