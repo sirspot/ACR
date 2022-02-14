@@ -42,10 +42,15 @@
     application to run the built-in common test function
     
 */
+
+// included for ACR_TestCommon()
 #include "ACR/test/test_common.h"
 
 // included for ACR_UNUSED
 #include "ACR/public/public_functions.h"
+
+// included for ACR_ENDIAN_DYNAMIC
+#include "ACR/public/public_byte_order.h"
 
 int main(int argc, char** argv)
 {

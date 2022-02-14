@@ -48,6 +48,9 @@
 #ifndef _ACR_PUBLIC_BYTE_ORDER_H_
 #define _ACR_PUBLIC_BYTE_ORDER_H_
 
+// included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
+#include "ACR/public/public_bool.h"
+
 // included for ACR_USE_64BIT
 #include "ACR/public/public_memory.h"
 
@@ -118,20 +121,37 @@
 //      
 ////////////////////////////////////////////////////////////
 
+/** 16 bit signed value
+*/
+typedef short ACR_16bit_t;
+
+/** 16 bit unsigned value
+*/
+typedef unsigned short ACR_Unsigned_16bit_t;
+
 /** byte order swap of 16 bit value
 */
-#define ACR_BYTE_ORDER_SWAP_16(x)   (((((unsigned short)(x)) & 0x00ff) << 8) | \
-                                     ((((unsigned short)(x)) & 0xff00) >> 8))
+#define ACR_BYTE_ORDER_SWAP_16(x)   (((((ACR_Unsigned_16bit_t)(x)) & 0x00ff) << 8) | \
+                                     ((((ACR_Unsigned_16bit_t)(x)) & 0xff00) >> 8))
+
+
+/** 32 bit signed value
+*/
+typedef long ACR_32bit_t;
+
+/** 32 bit unsigned value
+*/
+typedef unsigned long ACR_Unsigned_32bit_t;
 
 /** byte order swap of 32 bit value
 */
-#define ACR_BYTE_ORDER_SWAP_32(x)   ((((unsigned long)(x) & 0x000000ffUL) << 24) | \
-                                     (((unsigned long)(x) & 0x0000ff00UL) <<  8) | \
-                                     (((unsigned long)(x) & 0x00ff0000UL) >>  8) | \
-                                     (((unsigned long)(x) & 0xff000000UL) >> 24))
+#define ACR_BYTE_ORDER_SWAP_32(x)   ((((ACR_Unsigned_32bit_t)(x) & 0x000000ffUL) << 24) | \
+                                     (((ACR_Unsigned_32bit_t)(x) & 0x0000ff00UL) <<  8) | \
+                                     (((ACR_Unsigned_32bit_t)(x) & 0x00ff0000UL) >>  8) | \
+                                     (((ACR_Unsigned_32bit_t)(x) & 0xff000000UL) >> 24))
 
 //
-// defines ACR_IS_BIG_ENDIAN as 1 or 0
+// defines ACR_IS_BIG_ENDIAN
 //
 // Optional: If you already know the endianess of your
 //           system then set the preprocessor define as
@@ -144,82 +164,98 @@
 /** the system is big endian because ACR_CONFIG_BIG_ENDIAN
     was set in the preprocessor
 */
-#define ACR_IS_BIG_ENDIAN 1
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
 #else
 #ifdef ACR_CONFIG_LITTLE_ENDIAN
 /** the system is NOT big endian because ACR_CONFIG_LITTLE_ENDIAN
     was set in the preprocessor
 */
-#define ACR_IS_BIG_ENDIAN 0
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
 #endif // #ifdef ACR_CONFIG_LITTLE_ENDIAN
 #endif // #ifdef ACR_CONFIG_BIG_ENDIAN
 
 //
-// defines ACR_IS_BIG_ENDIAN as 1 or
-// 0 if not previously defined
+// defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
+// ACR_BOOL_FALSE if not previously defined
 //
 #ifndef ACR_IS_BIG_ENDIAN
+
+#ifndef ACR_CONFIG_NO_LIBC
+// included for BIG_ENDIAN or LITTLE_ENDIAN
+#include <stdlib.h>
+#endif
+
 #ifdef BIG_ENDIAN
 /** the system is big endian because BIG_ENDIAN
     was set in the preprocessor
 */
-#define ACR_IS_BIG_ENDIAN 1
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_TRUE
 #else
 #ifdef LITTLE_ENDIAN
 /** the system is NOT big endian because LITTLE_ENDIAN
     was set in the preprocessor
 */
-#define ACR_IS_BIG_ENDIAN 0
+#define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
 #else
-// Note: warning C4906: string literal cast to 'unsigned short *' should be
+// Note: warning C4906: string literal cast to 'ACR_Unsigned_16bit_t *' should be
 //       ignored in project settings to use dynamic endianess detection
-#define ACR_IS_BIG_ENDIAN (*(unsigned short *)"\0\xff" < 0x100)
-#define ACR_ENDIAN_DYNAMIC 1
+#define ACR_IS_BIG_ENDIAN (*(ACR_Unsigned_16bit_t*)"\0\xff" < 0x100)
+#define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
 #endif // #ifdef LITTLE_ENDIAN
 #endif // #ifdef BIG_ENDIAN
 #endif // #ifndef ACR_IS_BIG_ENDIAN
+
+#ifndef ACR_ENDIAN_DYNAMIC
+#define ACR_ENDIAN_DYNAMIC ACR_BOOL_FALSE
+#endif
 
 //
 // defines ACR_BYTE_ORDER_16 and ACR_BYTE_ORDER_32
 // to swap byte order to big endian when needed
 //
-// Note: public.h also defines ACR_BYTE_ORDER_64 when 64bit support is enabled
-//
-#ifdef ACR_ENDIAN_DYNAMIC
+#if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
     #define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_16(x):x)
     #define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_32(x):x)
 #else
-    #if ACR_IS_BIG_ENDIAN == 0
+    #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
         #define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
         #define ACR_BYTE_ORDER_32(x) (ACR_BYTE_ORDER_SWAP_32(x))
     #else
         #define ACR_BYTE_ORDER_16(x) (x)
         #define ACR_BYTE_ORDER_32(x) (x)
-    #endif // #if ACR_IS_BIG_ENDIAN == 0
-#endif // #ifdef ACR_ENDIAN_DYNAMIC
+    #endif // #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
+#endif // #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
 
-#if ACR_USE_64BIT != 0
+#if ACR_USE_64BIT == ACR_BOOL_TRUE
+
+    /** 64 bit signed value
+    */
+    typedef long long ACR_64bit_t;
+
+    /** 64 bit unsigned value
+    */
+    typedef unsigned long long ACR_Unsigned_64bit_t;
 
     /** byte order swap of 64 bit value
     */
-    #define ACR_BYTE_ORDER_SWAP_64(x)   ((((unsigned long long)(x) & 0x00000000000000ffULL) << 56) | \
-                                        (((unsigned long long)(x) & 0x000000000000ff00ULL) << 40) | \
-                                        (((unsigned long long)(x) & 0x0000000000ff0000ULL) << 24) | \
-                                        (((unsigned long long)(x) & 0x00000000ff000000ULL) <<  8) | \
-                                        (((unsigned long long)(x) & 0x000000ff00000000ULL) >>  8) | \
-                                        (((unsigned long long)(x) & 0x0000ff0000000000ULL) >> 24) | \
-                                        (((unsigned long long)(x) & 0x00ff000000000000ULL) >> 40) | \
-                                        (((unsigned long long)(x) & 0xff00000000000000ULL) >> 56))
-    #ifdef ACR_ENDIAN_DYNAMIC
+    #define ACR_BYTE_ORDER_SWAP_64(x)   ((((ACR_Unsigned_64bit_t)(x) & 0x00000000000000ffULL) << 56) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x000000000000ff00ULL) << 40) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x0000000000ff0000ULL) << 24) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x00000000ff000000ULL) <<  8) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x000000ff00000000ULL) >>  8) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x0000ff0000000000ULL) >> 24) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0x00ff000000000000ULL) >> 40) | \
+                                        (((ACR_Unsigned_64bit_t)(x) & 0xff00000000000000ULL) >> 56))
+    #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
         #define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
     #else
-        #if ACR_IS_BIG_ENDIAN == 0
+        #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
             #define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
         #else
             #define ACR_BYTE_ORDER_64(x) (x)
-        #endif // #if ACR_IS_BIG_ENDIAN == 0
-    #endif // #ifdef ACR_ENDIAN_DYNAMIC
+        #endif // #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
+    #endif // #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
 
-#endif // #if ACR_USE_64BIT != 0
+#endif // ACR_USE_64BIT == ACR_BOOL_TRUE
 
 #endif

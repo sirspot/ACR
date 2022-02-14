@@ -61,13 +61,13 @@
 int ACR_TestCommon(void)
 {
     // ENDIANNESS
-    unsigned short systemEndianValue = 0x0001;
-    unsigned short bigEndian = ACR_BYTE_ORDER_16(systemEndianValue);
-    unsigned long systemEndianValue32 = 0x00000001UL;
-    unsigned long bigEndian32 = ACR_BYTE_ORDER_32(systemEndianValue32);
+    ACR_Unsigned_16bit_t systemEndianValue = 0x0001;
+    ACR_Unsigned_16bit_t bigEndian = ACR_BYTE_ORDER_16(systemEndianValue);
+    ACR_Unsigned_32bit_t systemEndianValue32 = 0x00000001UL;
+    ACR_Unsigned_32bit_t bigEndian32 = ACR_BYTE_ORDER_32(systemEndianValue32);
     #if ACR_USE_64BIT == ACR_BOOL_TRUE
-    unsigned long long systemEndianValue64 = 0x0000000000000001ULL;
-    unsigned long long bigEndian64 = ACR_BYTE_ORDER_64(systemEndianValue64);
+    ACR_Unsigned_64bit_t systemEndianValue64 = 0x0000000000000001ULL;
+    ACR_Unsigned_64bit_t bigEndian64 = ACR_BYTE_ORDER_64(systemEndianValue64);
     #endif
     // BYTES
     ACR_Byte_t byte = ACR_MAX_BYTE;
@@ -102,6 +102,12 @@ int ACR_TestCommon(void)
     //
     // ENDIANNESS
     //
+    #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
+    ACR_DEBUG_PRINT(1, "OK: ACR_ENDIAN_DYNAMIC is true");
+    #else
+    ACR_DEBUG_PRINT(2, "OK: ACR_ENDIAN_DYNAMIC is false");
+    #endif
+
     #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 100;
     #endif
