@@ -116,6 +116,11 @@ static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
     ACR_INFO_STR_GO,        // ACR_INFO_GO
     ACR_INFO_STR_END,       // ACR_INFO_END
 
+    // MODE
+    ACR_INFO_STR_READ,      // ACR_INFO_READ
+    ACR_INFO_STR_WRITE,     // ACR_INFO_WRITE
+    ACR_INFO_STR_READ_WRITE,// ACR_INFO_READ_WRITE
+
     ""                      // ACR_INFO_COUNT
 };
 

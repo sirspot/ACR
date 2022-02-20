@@ -136,6 +136,8 @@
 // *** Q ***
 
 // *** R ***
+#define ACR_INFO_STR_READ "read"
+#define ACR_INFO_STR_READ_WRITE "read_write"
 #define ACR_INFO_STR_READY "ready"
 #define ACR_INFO_STR_RIGHT "right"
 
@@ -162,6 +164,7 @@
 // *** W ***
 #define ACR_INFO_STR_WAIT "wait"
 #define ACR_DAY_STR_WEDNESDAY "wednesday"
+#define ACR_INFO_STR_WRITE "write"
 
 // *** X ***
 // *** Y ***

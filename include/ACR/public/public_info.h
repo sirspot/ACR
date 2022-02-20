@@ -181,6 +181,11 @@ typedef enum ACR_Info_e
     ACR_INFO_GO,
     ACR_INFO_END,
 
+    // MODE
+    ACR_INFO_READ,
+    ACR_INFO_WRITE,
+    ACR_INFO_READ_WRITE,
+
     ACR_INFO_COUNT
 
 } ACR_Info_t;
