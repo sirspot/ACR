@@ -637,6 +637,24 @@
 // TYPES AND DEFINES - FILES                           //
 //                                                     //
 /////////////////////////////////////////////////////////
+
+/**
+    ### New to C? ###
+
+    Q: What is a file?
+    A: While most users would say a file is found on
+       a hard drive or other storage device, a programmer
+       would define a file more generically as anything
+       that can be read or written.
+
+    Q: How do I read and write files to a hard drive?
+    A: A hard drive must be formatted with a file system
+       to read and write files.
+       See "ACR/public/public_filesystem.h" for more details. 
+       
+*/
 #include "ACR/public/public_file.h"
+#include "ACR/public/public_filesystem.h"
+
 
 #endif

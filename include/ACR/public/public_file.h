@@ -38,13 +38,12 @@
 
 */
 
-/** \file public_functions.h
+/** \file public_file.h
  
-    This header makes defining callback function types easy.
-    It also provides basic function return values and
-    unused parameter macro.
-    It can be used standalone from the entire library or
-    is included automatically with public.h
+    This header helps define a generic interface to files whether
+    they are in memory, part of a file system, or streamed across
+    a network connection.
+    It is included automatically with public.h
 
     See public.h for more information.
 
@@ -159,6 +158,5 @@ typedef struct ACR_InterfaceFile_s
 /** define a file interface on the stack with the specified name
 */
 #define ACR_FILE_INTERFACE(name) ACR_FileInterface_t name = {ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL}
-
 
 #endif

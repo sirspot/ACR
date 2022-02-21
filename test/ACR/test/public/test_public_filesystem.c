@@ -37,12 +37,12 @@
     ******************************************************
 
 */
-/** \file test_public_file.c
+/** \file test_public_filesystem.c
 
-    application to test "ACR/public/public_file.h"
+    application to test "ACR/public/public_filesystem.h"
 
 */
-#include "ACR/public/public_file.h"
+#include "ACR/public/public_filesystem.h"
 
 // included for ACR_UNUSED, ACR_FAILURE, and ACR_SUCCESS
 #include "ACR/public/public_functions.h"
@@ -50,24 +50,12 @@
 // included for ACR_DEBUG_PRINT
 #include "ACR/public/public_debug.h"
 
-// included for ACR_INFO_STR_OK and ACR_INFO_STR_ERROR
-#include "ACR/public/public_unique_strings.h"
+// included for ACR_Length_t
+#include "ACR/public/public_memory.h"
 
 //
 // MAIN
 //
-
-ACR_Info_t _TestFileRead(
-    ACR_VarBuffer_t* dest,
-    void* userPtr)
-{
-    int* callCount = (int*)userPtr;
-    if(callCount)
-    {
-        (*callCount) = (*callCount) + 1;
-    }
-    return ACR_INFO_OK;
-}
 
 int main(int argc, char** argv)
 {
@@ -76,13 +64,26 @@ int main(int argc, char** argv)
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);
 
-    ACR_FILE_INTERFACE(fileInterface);
-    fileInterface.m_Read = _TestFileRead;
-    int callCount = 0;
-    ACR_VAR_BUFFER(varBuffer);
-    ACR_Info_t readResult = fileInterface.m_Read(&varBuffer, &callCount);
+    const char path[] = "test_public_filesystem.txt";
+    ACR_Length_t length;
+    ACR_BUFFER(buffer);
+    ACR_Bool_t append;
+    ACR_Length_t startPos;
 
-	ACR_DEBUG_PRINT(1,"OK read result is %s and call count is %d", readResult == ACR_INFO_OK ? (const char*)ACR_INFO_STR_OK : (const char*)ACR_INFO_STR_ERROR, callCount);
+    append = ACR_BOOL_FALSE;
+    ACR_BUFFER_SET_DATA(buffer, path, sizeof(path)-1);
+    ACR_FILESYSTEM_FILE_WRITE(path,length,buffer,append);
+	ACR_DEBUG_PRINT(1,"OK %d bytes written to %s", (int)length, path);
 
+    ACR_FILESYSTEM_FILE_LENGTH(path,length);
+	ACR_DEBUG_PRINT(1,"OK %s length is %d", path, (int)length);
+
+    startPos = 0;
+    ACR_BUFFER_ALLOC(buffer,length);
+    ACR_FILESYSTEM_FILE_READ(path,length,buffer,startPos);
+	ACR_DEBUG_PRINT(1,"OK %d bytes read from %s", (int)length, path);
+	ACR_DEBUG_PRINT(1,"OK read: \"%.*s\"", (int)buffer.m_Length, (const char*)buffer.m_Pointer);
+    ACR_BUFFER_FREE(buffer);
+  
 	return result;
 }
