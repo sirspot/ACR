@@ -161,18 +161,18 @@ static char* g_ACRMonthStringLookup[ACR_MONTH_COUNT+1] =
 */
 unsigned char g_ACRMonthDaysLookup[ACR_MONTH_COUNT+1] =
 {
-    31, // ACR_MONTH_JANUARY
-    28, // ACR_MONTH_FEBRUARY
-    31, // ACR_MONTH_MARCH
-    30, // ACR_MONTH_APRIL
-    31, // ACR_MONTH_MAY
-    30, // ACR_MONTH_JUNE
-    31, // ACR_MONTH_JULY
-    31, // ACR_MONTH_AUGUST
-    30, // ACR_MONTH_SEPTEMBER
-    31, // ACR_MONTH_OCTOBER
-    30, // ACR_MONTH_NOVEMBER
-    31, // ACR_MONTH_DECEMBER
+    31, // ACR_MONTH_JANUARY      0      A
+    28, // ACR_MONTH_FEBRUARY     1           C
+    31, // ACR_MONTH_MARCH        2      A
+    30, // ACR_MONTH_APRIL        3         B
+    31, // ACR_MONTH_MAY          4      A
+    30, // ACR_MONTH_JUNE         5         B
+    31, // ACR_MONTH_JULY         6      A
+    31, // ACR_MONTH_AUGUST       7      A
+    30, // ACR_MONTH_SEPTEMBER    8         B
+    31, // ACR_MONTH_OCTOBER      9      A
+    30, // ACR_MONTH_NOVEMBER     10        B
+    31, // ACR_MONTH_DECEMBER     11     A
     0   // ACR_MONTH_COUNT
 };
 
@@ -283,21 +283,7 @@ ACR_Month_t ACR_MonthFromString(
 ACR_Bool_t ACR_YearIsLeapYear(
     int fourDigitYear)
 {
-    ACR_Bool_t isLeapTear = ACR_BOOL_FALSE;
-
-    if(fourDigitYear % 400 == 0)
-    {
-        isLeapTear = ACR_BOOL_TRUE;
-    }
-    else if(fourDigitYear % 100 != 0)
-    {
-        if(fourDigitYear % 4 == 0)
-        {
-            isLeapTear = ACR_BOOL_TRUE;
-        }
-    }
-
-    return isLeapTear;
+    return (ACR_Bool_t)ACR_YEAR_IS_LEAP_YEAR(fourDigitYear);
 }
 
 ACR_Bool_t ACR_TimeNow(
@@ -448,9 +434,10 @@ ACR_Bool_t ACR_DateTimeFromTime(
                         int tempDays = 0;
                         int tempMonth = ACR_MONTH_JANUARY;
                         int tempDaysToFirstOfMonth = 0;
+                        ACR_Bool_t isLeapYear = ACR_YearIsLeapYear(tempYear);
                         do
                         {
-                            int daysInMonth = ACR_DAYS_PER_MONTH(tempYear, tempMonth);
+                            int daysInMonth = ACR_DaysPerMonth(tempMonth, isLeapYear);
                             tempDays += daysInMonth;
                             if(tempDays > me->tm_yday)
                             {

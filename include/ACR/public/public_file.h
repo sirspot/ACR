@@ -44,9 +44,7 @@
     they are in memory, part of a file system, or streamed across
     a network connection.
     It is included automatically with public.h
-
-    See public.h for more information.
-
+    
 */
 #ifndef _ACR_PUBLIC_FILE_H_
 #define _ACR_PUBLIC_FILE_H_

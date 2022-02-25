@@ -109,9 +109,6 @@ ACR_Info_t ACR_InfoFromString(
 //
 ////////////////////////////////////////////////////////////
 
-#define ACR_DAYS_PER_MONTH(fourDigitYear, month) (ACR_DaysPerMonth(month, ACR_YearIsLeapYear(fourDigitYear)))
-#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YearIsLeapYear(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
-
 /** get the number of days in the specified month
     \param month the month
            \see enum ACR_Month_e

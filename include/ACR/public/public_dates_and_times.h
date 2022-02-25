@@ -98,6 +98,8 @@ typedef enum ACR_Month_e
 #define ACR_MONTH_UNKNOWN (ACR_MONTH_COUNT+1)
 #define ACR_MONTHS_PER_YEAR ACR_MONTH_COUNT
 
+#define ACR_YEAR_IS_LEAP_YEAR(fourDigitYear) ((fourDigitYear % 400 == 0) || ((fourDigitYear % 100 != 0) && (fourDigitYear % 4 == 0)))
+
 /** days of the week
 */
 typedef enum ACR_DayOfWeek_e
@@ -116,6 +118,7 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_DAYS_PER_WEEK ACR_DAY_COUNT
 #define ACR_DAYS_PER_STANDARD_YEAR 365
 #define ACR_DAYS_PER_LEAP_YEAR 366
+#define ACR_DAYS_PER_YEAR(fourDigitYear) (ACR_YEAR_IS_LEAP_YEAR(fourDigitYear)?ACR_DAYS_PER_LEAP_YEAR:ACR_DAYS_PER_STANDARD_YEAR)
 
 // HOURS
 #define ACR_HOUR_PER_DAY 24
