@@ -89,6 +89,9 @@ int ACR_TestCommon(void)
     ACR_String_t stringForInfoUp = ACR_StringFromMemory((ACR_Byte_t*)"up", ACR_MAX_LENGTH, ACR_MAX_COUNT);
     ACR_Info_t infoFromUp = ACR_InfoFromString(stringForInfoUp);
     ACR_String_t stringForEmojiSmile;
+    // TIMER
+    ACR_TIMER(timer);
+    ACR_TimerStart(&timer);
 
     // other
     #if ACR_IS_DEBUG == ACR_BOOL_TRUE
@@ -392,6 +395,7 @@ int ACR_TestCommon(void)
     #if ACR_IS_DEBUG == ACR_BOOL_TRUE
     messageNumber = 900;
     #endif
-    ACR_DEBUG_PRINT(messageNumber+1, "OK: All tests complete");
+    long elapse = ACR_TimerElapse(&timer);
+    ACR_DEBUG_PRINT(messageNumber+1, "OK: All tests complete in %d microseconds", (int)elapse);
     return ACR_SUCCESS;
 }

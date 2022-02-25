@@ -105,6 +105,26 @@ ACR_Info_t ACR_InfoFromString(
 
 ////////////////////////////////////////////////////////////
 //
+// PUBLIC FUNCTIONS - TIMER
+//
+////////////////////////////////////////////////////////////
+
+/** start or restart a timer
+    \param me the timer
+    \returns ACR_BOOL_TRUE if successful
+*/
+ACR_Bool_t ACR_TimerStart(
+    ACR_Timer_t* me);
+
+/** get the time that has past since ACR_TimerStart() was called
+    \param me the timer
+    \returns the number of microseconds that have past
+*/
+long ACR_TimerElapse(
+    ACR_Timer_t* me);
+
+////////////////////////////////////////////////////////////
+//
 // PUBLIC FUNCTIONS - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////

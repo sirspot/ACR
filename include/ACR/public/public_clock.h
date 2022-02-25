@@ -62,6 +62,9 @@
 // included for ACR_COMPILER_CLANG, ACR_COMPILER_GCC, ACR_COMPILER_VS2017
 #include "ACR/public/public_config.h"
 
+// included for ACR_MICRO_PER_SEC
+#include "ACR/public/public_dates_and_times.h"
+
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
 #ifndef ACR_CONFIG_NO_RTC
@@ -72,6 +75,9 @@
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
+            // included for gettimeofday()
+            #include <sys/time.h>
+            #define ACR_TIMER_START(timer) gettimeofday(&timer,ACR_NULL)
         #endif
         #ifdef ACR_COMPILER_GCC
             // included for time(), gmtime_r()
@@ -79,6 +85,9 @@
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
+            // included for gettimeofday()
+            #include <sys/time.h>
+            #define ACR_TIMER_START(timer) gettimeofday(&timer,ACR_NULL)
         #endif
         #ifdef ACR_COMPILER_VS2017
             // Note: disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
@@ -87,6 +96,9 @@
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)
+            // included for gettimeofday()
+            #include <sys/time.h>
+            #define ACR_TIMER_START(timer) gettimeofday(&timer,ACR_NULL)
         #endif
     #else
         // without libc there is no interface to a standard
@@ -110,6 +122,10 @@
     */
     typedef struct tm ACR_DateTime_t;
 
+    /** struct to store seconds and microseconds
+    */
+    typedef struct timeval ACR_Timer_t;
+
 #else
 
     /** time value (seconds since unix epoch Jan 1, 1970)
@@ -121,8 +137,6 @@
         // 32bit
         typedef unsigned long ACR_Time_t;
     #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-    /// \todo support struct for time with seconds and microseconds
 
     /** standard date time structure
     */
@@ -141,14 +155,34 @@
         const char *tm_zone; /* Timezone abbreviation.           */
     } ACR_DateTime_t;
 
+    /** struct to store seconds and microseconds
+    */
+    typedef struct ACR_Timer_t
+    {
+        long tv_sec;
+        long tv_usec;
+    };
+
     // Note: src/ACR/common.c must be added to any project
     //       that wishes to use ACR/common.h
     #include "ACR/common.h"
 
     #define ACR_TIME_NOW(name) ACR_TimeNow(&name)
     #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&name,&time)
+    #define ACR_TIMER_START(timer) ACR_TimerStart(&timer);
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+/** define an empty timer on the stack
+*/
+#define ACR_TIMER(name) ACR_Timer_t name = {0,0};
+
+/** get the number of microseconds difference between two timers
+    \param timerA the start time
+    \param timerB the end time
+    \returns the number of microseconds as timerB minus timerA
+*/
+#define ACR_TIMER_DIFF_MICRO(timerA, timerB) (((timerB.tv_sec - timerA.tv_sec) * ACR_MICRO_PER_SEC) + (timerB.tv_usec - timerA.tv_usec))
 
 /** get the current date and time
     \param name any ACR_DateTime_t variable

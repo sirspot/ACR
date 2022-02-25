@@ -48,6 +48,9 @@
 // included for ACR_PLATFORM_MAC, ACR_PLATFORM_WIN, ACR_PLATFORM_GITPOD
 #include "ACR/public/public_config.h"
 
+// included for ACR_MICRO_PER_MILLI
+#include "ACR/public/public_dates_and_times.h"
+
 //#define ACR_USE_UTF8_LOCALE
 
 #ifdef ACR_USE_UTF8_LOCALE
@@ -209,6 +212,68 @@ ACR_Info_t ACR_InfoFromString(
     }
     while(i < ACR_INFO_COUNT);
     return ACR_INFO_UNKNOWN;
+}
+
+////////////////////////////////////////////////////////////
+//
+// PUBLIC FUNCTIONS - TIMER
+//
+////////////////////////////////////////////////////////////
+
+ACR_Bool_t ACR_TimerStart(
+    ACR_Timer_t* me)
+{
+    if(me)
+    {
+        #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+            ACR_TIMER_START((*me));
+            return ACR_BOOL_TRUE;
+
+        #else
+
+            if(g_ACRSimRtcTimeIsSet)
+            {
+                me->tv_sec = g_ACRSimRtcTime;
+                if(g_ACRSimRtcTimeMilliIsSet)
+                {
+                    me->tv_usec = g_ACRSimRtcTimeMilli * ACR_MICRO_PER_MILLI;
+                }
+                else
+                {
+                    me->tv_usec = 0;
+                }
+                return ACR_BOOL_TRUE;
+            }
+
+        #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
+
+        #if ACR_HAS_RTC == ACR_BOOL_FALSE
+        // time has never been set and a RTC is not available.
+        // set timer to zero.
+        me->tv_sec = 0;
+        me->tv_usec = 0;
+        #endif // #if ACR_HAS_RTC == ACR_BOOL_FALSE
+    }
+
+    return ACR_BOOL_FALSE;
+}
+
+long ACR_TimerElapse(
+    ACR_Timer_t* me)
+{
+    long elapseMicro = 0;
+
+    if(me)
+    {
+        ACR_TIMER(newTimer);
+        if(ACR_TimerStart(&newTimer))
+        {
+            elapseMicro = (long)ACR_TIMER_DIFF_MICRO((*me), newTimer);
+        }
+    }
+
+    return elapseMicro;
 }
 
 ////////////////////////////////////////////////////////////
