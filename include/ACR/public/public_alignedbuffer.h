@@ -96,7 +96,7 @@ typedef struct ACR_AlignedBuffer_s
 	      use ACR_ALIGNED_BUFFER_GET_LENGTH to get the actual length available and
           use ACR_ALIGNED_BUFFER_GET_MEMORY to get the actual memory address
 */
-#define ACR_ALIGNED_BUFFER_SET_DATA(name, memory, length) \
+#define ACR_ALIGNED_BUFFER_SET_MEMORY(name, memory, length) \
         { \
 			ACR_BUFFER_SET_DATA(name.m_UnalignedBuffer, memory, length); \
 			if((name.m_UnalignedBuffer.m_Pointer != ACR_NULL) && (name.m_UnalignedBuffer.m_Length > ACR_BYTES_PER_BLOCK)) \

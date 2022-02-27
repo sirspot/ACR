@@ -209,7 +209,7 @@ enum ACR_BufferFlags_e
 
 /** mark the buffer read only
 */
-#define ACR_BUFFER_SET_READ_ONLY(name, readOnly) (b ? ACR_ADD_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY) : ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY))
+#define ACR_BUFFER_SET_READ_ONLY(name, readOnly) (readOnly ? (ACR_ADD_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY)) : (ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY)))
 
 /** check if the buffer is marked read only
 */

@@ -55,7 +55,7 @@
 // included for ACR_ZERO_LENGTH and ACR_NULL
 #include "ACR/public/public_memory.h"
 
-// included for ACR_Buffer_t, ACR_BUFFER_SET_DATA, and ACR_BUFFER_FLAGS_NONE
+// included for ACR_Buffer_t, ACR_BUFFER_SET_DATA(), ACR_BUFFER_SET_READ_ONLY(), and ACR_BUFFER_FLAGS_NONE
 #include "ACR/public/public_buffer.h"
 
 // included for ACR_Count_t and ACR_ZERO_COUNT
