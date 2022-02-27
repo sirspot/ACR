@@ -125,7 +125,7 @@ typedef struct ACR_VarBuffer_s
 
 /** assign memory to the buffer
 */
-#define ACR_VAR_BUFFER_REFERENCE(name, memory, length)\
+#define ACR_VAR_BUFFER_SET_MEMORY(name, memory, length)\
         if(name.m_Buffer.m_Pointer != ACR_NULL)\
         {\
             if(ACR_HAS_FLAG(name.m_Buffer.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)\
@@ -194,7 +194,8 @@ typedef struct ACR_VarBuffer_s
 		name.m_Buffer.m_Length = ACR_ZERO_LENGTH
 
 /** allocate memory for the buffer and change the max length
- *  while maintaining all data that is currently in the buffer
+    while maintaining all data that is currently in the buffer
+    \todo make this work for memory references (right now it only works with buffers that allocated memory on the heap)
 */
 #define ACR_VAR_BUFFER_CHANGE_MAX_LENGTH(name, length)\
         if(name.m_MaxLength != length)\

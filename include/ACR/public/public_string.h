@@ -62,7 +62,6 @@
 #include "ACR/public/public_count.h"
 
 /** type for string data
-    /// \todo use buffer flags to optionally mark the string data const
 
     Note: disable warning C4820: padding added after data member
 */
@@ -88,5 +87,13 @@ typedef unsigned long ACR_Unicode_t;
     bytes uses to encode the character
 */
 #define ACR_UTF8_BYTE_COUNT(c) (((c & 0x80) != 0)?((c & 0x40) != 0)?((c & 0x20) != 0)?((c & 0x10) != 0)?4:3:2:1:1)
+
+/** mark the string as read only
+*/
+#define ACR_STRING_SET_READ_ONLY(name, readOnly) ACR_BUFFER_SET_READ_ONLY(name.m_Buffer, readOnly)
+
+/** check if the string is marked read only
+*/
+#define ACR_STRING_IS_READ_ONLY(name) ACR_BUFFER_IS_READ_ONLY(name.m_Buffer)
 
 #endif

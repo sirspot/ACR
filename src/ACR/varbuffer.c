@@ -150,7 +150,7 @@ ACR_Info_t ACR_VarBufferAllocate(
 }
 
 /**********************************************************/
-ACR_Info_t ACR_VarBufferRef(
+ACR_Info_t ACR_VarBufferSetMemory(
 	ACR_VarBuffer_t* me,
 	void* ptr,
 	ACR_Length_t length)
@@ -166,7 +166,7 @@ ACR_Info_t ACR_VarBufferRef(
 		return ACR_INFO_ERROR;
 	}
 
-	ACR_VAR_BUFFER_REFERENCE((*me), ptr, length);
+	ACR_VAR_BUFFER_SET_MEMORY((*me), ptr, length);
 	if(ACR_VAR_BUFFER_IS_VALID((*me)))
 	{
 		return ACR_INFO_OK;

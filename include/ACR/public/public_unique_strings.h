@@ -62,6 +62,7 @@
 
 // *** A ***
 #define ACR_INFO_STR_ACCEPT "accept"
+#define ACR_INFO_STR_ALL "all"
 #define ACR_MONTH_STR_APRIL "april"
 #define ACR_MONTH_STR_AUGUST "august"
 
@@ -70,6 +71,7 @@
 #define ACR_INFO_STR_BOTTOM "bottom"
 
 // *** C ***
+#define ACR_INFO_STR_CLOSED "closed"
 #define ACR_INFO_STR_CURRENT "current"
 
 // *** D ***
@@ -120,6 +122,7 @@
 #define ACR_INFO_STR_NEW "new"
 #define ACR_INFO_STR_NEXT "next"
 #define ACR_INFO_STR_NO "no"
+#define ACR_INFO_STR_NONE "none"
 #define ACR_INFO_STR_NOT_EQUAL "not_equal"
 #define ACR_MONTH_STR_NOVEMBER "november"
 
@@ -128,6 +131,7 @@
 #define ACR_INFO_STR_OFF "off"
 #define ACR_INFO_STR_OK "ok"
 #define ACR_INFO_STR_OLD "old"
+#define ACR_INFO_STR_OPEN "open"
 #define ACR_INFO_STR_ON "on"
 
 // *** P ***

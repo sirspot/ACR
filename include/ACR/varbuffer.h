@@ -70,7 +70,7 @@ extern "C" {                                              //
 	Note: this creates the buffer object but the
 	      memory for the buffer must be allocated
 		  by calling ACR_VarBufferAllocate() or
-		  referenced by calling ACR_VarBufferRef()
+		  referenced by calling ACR_VarBufferSetMemory()
 		  before it can be used effectively.
 */
 ACR_Info_t ACR_VarBufferNew(
@@ -90,7 +90,7 @@ void ACR_VarBufferDelete(
 	
 	Note: memory for the buffer must be allocated
 	      by calling ACR_VarBufferAllocate() or
-		  referenced by calling ACR_VarBufferReference()
+		  referenced by calling ACR_VarBufferSetMemory()
 		  before it can be used effectively.
 */
 void ACR_VarBufferInit(
@@ -132,7 +132,7 @@ ACR_Info_t ACR_VarBufferAllocate(
 	Note: if the buffer already has memory allocated,
 	      the memory will be freed before the reference is set
 */
-ACR_Info_t ACR_VarBufferRef(
+ACR_Info_t ACR_VarBufferSetMemory(
 	ACR_VarBuffer_t* me,
 	void* ptr,
 	ACR_Length_t length);

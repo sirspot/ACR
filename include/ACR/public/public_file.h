@@ -117,6 +117,13 @@ ACR_TYPEDEF_CALLBACK(ACR_FileCallbackSeek_t, ACR_Info_t)(
     ACR_Info_t fromPos,
     void* userPtr);
 
+/** callback function type to get the current position within a file
+    \param userPtr optional user pointer
+    \returns the current position
+*/
+ACR_TYPEDEF_CALLBACK(ACR_FileCallbackPosition_t, ACR_Length_t)(
+    void* userPtr);
+
 /** callback function type for opening a file
     \param path path to the file
     \param mode ACR_INFO_READ, ACR_INFO_WRITE, or ACR_INFO_READ_WRITE
@@ -151,6 +158,7 @@ typedef struct ACR_InterfaceFile_s
     ACR_FileCallbackRead_t m_Read;
     ACR_FileCallbackWrite_t m_Write;
     ACR_FileCallbackSeek_t m_Seek;
+    ACR_FileCallbackPosition_t m_Position;
 } ACR_FileInterface_t;
 
 /** define a file interface on the stack with the specified name

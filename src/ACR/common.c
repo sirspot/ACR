@@ -60,7 +60,7 @@
 
 /** info string lookup table
 */
-static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
+static const char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
 {
     //
     // COMPARISON
@@ -90,6 +90,10 @@ static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
     ACR_INFO_STR_IGNORE,    // ACR_INFO_IGNORE
     ACR_INFO_STR_VALID,     // ACR_INFO_VALID
     ACR_INFO_STR_INVALID,   // ACR_INFO_INVALID
+    ACR_INFO_STR_ALL,       // ACR_INFO_ALL
+    ACR_INFO_STR_NONE,      // ACR_INFO_NONE
+    ACR_INFO_STR_OPEN,      // ACR_INFO_OPEN
+    ACR_INFO_STR_CLOSED,    // ACR_INFO_CLOSED
 
     //
     // POSITION
@@ -129,7 +133,7 @@ static char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
 
 /** day of week string lookup table
 */
-static char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
+static const char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
 {
     ACR_DAY_STR_SUNDAY,     // ACR_DAY_SUNDAY
     ACR_DAY_STR_MONDAY,     // ACR_DAY_MONDAY
@@ -143,7 +147,7 @@ static char* g_ACRDayOfWeekStringLookup[ACR_DAY_COUNT+1] =
 
 /** month string lookup table
 */
-static char* g_ACRMonthStringLookup[ACR_MONTH_COUNT+1] =
+static const char* g_ACRMonthStringLookup[ACR_MONTH_COUNT+1] =
 {
     ACR_MONTH_STR_JANUARY,  // ACR_MONTH_JANUARY
     ACR_MONTH_STR_FEBRUARY, // ACR_MONTH_FEBRUARY
@@ -193,7 +197,7 @@ ACR_Time_t g_ACRSimRtcTimeMilli = 0;
 ACR_String_t ACR_InfoToString(
     ACR_Info_t info)
 {
-    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRInfoStringLookup[info], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromReadOnlyMemory((const ACR_Byte_t*)g_ACRInfoStringLookup[info], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_Info_t ACR_InfoFromString(
@@ -300,7 +304,7 @@ int ACR_DaysPerMonth(
 ACR_String_t ACR_DayOfWeekToString(
     ACR_DayOfWeek_t dayOfWeek)
 {
-    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRDayOfWeekStringLookup[dayOfWeek], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromReadOnlyMemory((const ACR_Byte_t*)g_ACRDayOfWeekStringLookup[dayOfWeek], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_DayOfWeek_t ACR_DayOfWeekFromString(
@@ -324,7 +328,7 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
 ACR_String_t ACR_MonthToString(
     ACR_Month_t month)
 {
-    return ACR_StringFromMemory((ACR_Byte_t*)g_ACRMonthStringLookup[month], ACR_MAX_LENGTH, ACR_MAX_COUNT);
+    return ACR_StringFromReadOnlyMemory((const ACR_Byte_t*)g_ACRMonthStringLookup[month], ACR_MAX_LENGTH, ACR_MAX_COUNT);
 }
 
 ACR_Month_t ACR_MonthFromString(
@@ -704,6 +708,16 @@ ACR_String_t ACR_StringFromMemory(
         }
         ACR_BUFFER_SET_DATA(s.m_Buffer, src, (srcLength - remaining));
     }
+    return s;
+}
+
+ACR_String_t ACR_StringFromReadOnlyMemory(
+    const ACR_Byte_t* src,
+    ACR_Length_t srcLength,
+    ACR_Count_t maxCharacters)
+{
+    ACR_String_t s = ACR_StringFromMemory((ACR_Byte_t*)src, srcLength, maxCharacters);
+    ACR_STRING_SET_READ_ONLY(s, ACR_BOOL_TRUE);
     return s;
 }
 

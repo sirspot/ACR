@@ -70,7 +70,7 @@ extern "C" {                                              //
 	Note: this creates the buffer object but the
 	      memory for the buffer must be allocated
 		  by calling ACR_AlignedBufferAllocate() or
-		  referenced by calling ACR_AlignedBufferRef()
+		  referenced by calling ACR_AlignedBufferSetMemory()
 		  before it can be used effectively.
 */
 ACR_Info_t ACR_AlignedBufferNew(
@@ -90,7 +90,7 @@ void ACR_AlignedBufferDelete(
 	
 	Note: memory for the buffer must be allocated
 	      by calling ACR_AlignedBufferAllocate() or
-		  referenced by calling ACR_AlignedBufferReference()
+		  referenced by calling ACR_AlignedBufferSetMemory()
 		  before it can be used effectively.
 */
 void ACR_AlignedBufferInit(
@@ -111,7 +111,7 @@ void ACR_AlignedBufferDeInit(
 	Note: if the buffer already has memory allocated,
 	      the memory will be freed before the reference is set
 */
-ACR_Info_t ACR_AlignedBufferRef(
+ACR_Info_t ACR_AlignedBufferSetMemory(
 	ACR_AlignedBuffer_t* me,
 	void* ptr,
 	ACR_Length_t length);

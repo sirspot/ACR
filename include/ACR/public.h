@@ -409,6 +409,9 @@
     ACR_Count_t, ACR_ZERO_COUNT, ACR_MAX_COUNT, ACR_POINTER_AT(),
     ACR_VALUE_AT()
 
+    Use ACR_Count_t to track the position within an array
+    and ACR_VALUE_AT() or ACR_POINTER_AT() to access each member
+
     ### New to C? ###
 
     Q: What is an array?
@@ -473,7 +476,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-    Include the file ACR/public/public_dates_and_times.h to
+    Include the file "ACR/public/public_dates_and_times.h" to
     define months as an enum and type ACR_Month_t,
     day of the week as an enum and type ACR_DayOfWeek_t,
     ACR_HOUR_PER_DAY, ACR_MIN_PER_HOUR, ACR_SEC_PER_MIN,
@@ -499,15 +502,16 @@
 ////////////////////////////////////////////////////////////
 
 /**
-    Include the file ACR/public/public_clock.h to define
+    Include the file "ACR/public/public_clock.h" to define
     ACR_HAS_RTC, ACR_TIME_NOW(), ACR_DATETIME_FROM_TIME(),
-    ACR_Time_t, ACR_DateTime_t, ACR_DATETIME_NOW(), 
-    ACR_DATETIME_YEAR(), ACR_DATETIME_MONTH(), ACR_DATETIME_HOUR(),
-    and more
+    ACR_Time_t, ACR_DateTime_t, ACR_Timer_t, ACR_TIMER_START(),
+    ACR_DATETIME_NOW(), ACR_DATETIME_YEAR(), ACR_DATETIME_MONTH(),
+    ACR_DATETIME_HOUR(), and more
 
     If your platform doesn't have an RTC, define ACR_CONFIG_NO_RTC
-    in your project settings and see ACR_TimeProcessSecondTick() in
-    "ACR/common.h" for how to simulate a real-time clock
+    in your project settings and see ACR_TimeProcessSecondTick() and
+    ACR_TimeProcessMilliTick() in "ACR/common.h" for how to
+    simulate a real-time clock
 
     ### New to C? ###
 
@@ -530,6 +534,10 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file "ACR/public/public_buffer.h" to define
+    ACR_Buffer_t, ACR_BUFFER_IS_VALID(), ACR_BUFFER_SET_DATA(),
+    ACR_BUFFER_ALLOC(), ACR_BUFFER_FREE(), and more
+
     ### New to C? ###
 
     Q: What is a buffer?
@@ -548,6 +556,10 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file "ACR/public/public_varbuffer.h" to define
+    ACR_VarBuffer_t, ACR_VAR_BUFFER_APPEND(), ACR_VAR_BUFFER_IS_VALID(),
+    ACR_VAR_BUFFER_SET_MEMORY(), ACR_VAR_BUFFER_ALLOC(), and more
+
     ### New to C? ###
 
     Q: Why can't a simple memory buffer change size?
@@ -569,13 +581,16 @@
 ////////////////////////////////////////////////////////////
 
 /**
+    Include the file "ACR/public/public_alignedbuffer.h" to define
+    ACR_AlignedBuffer_t, ACR_ALIGNED_BUFFER_SET_MEMORY(), and more
+
     ### New to C? ###
 
     Q: What does it mean for memory to be aligned?
     A: Computers work with memory in blocks. There are some hardware components
        that require data to be stored at the start of one of these blocks in
        order to operate correctly. An aligned buffer makes it easy to
-       placing data in memory where it can be accessed by specialized hardware
+       place data in memory where it can be accessed by specialized hardware
        See the include file ACR/public/public_alignedbuffer.h for more details.
 */
 #include "ACR/public/public_alignedbuffer.h"
@@ -585,6 +600,41 @@
 // TYPES AND DEFINES - COMMON INFORMATIONAL VALUES
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_info.h" to define
+    ACR_Info_t, ACR_INFO_OK, ACR_INFO_ERROR, and more
+
+    These values are most useful as function parameters and
+    as return values. The include file "ACR/public/public_unique_strings.h"
+    defines unique strings to match each value. The include file "ACR/common.h"
+    has functions ACR_InfoToString() and ACR_InfoFromString() that use
+    a lookup table to make for fast and easy conversions between the
+    value and the string.
+
+    ### New to C? ###
+
+    Q: What are function parameters?
+    A: A function can accept zero or more variables as parameters.
+       While the theoretical limit on parameters is very high, it
+       is best to only include a few parameters for each function
+       to help make them more readable. When a lot of variables are
+       needed by the function, it is best to pass them in as a
+       pointer to an existing data structure.
+
+    Q: What is a return value?
+    A: When a function is complete, it can return zero or one value
+       to the caller. The value can indicate whether the
+       function succeeded, provide the results of a mathematical
+       operation, access to private data, or other value.
+
+    Q: What is a lookup table?
+    A: A lookup table is a like a spreadsheet where
+       one value can be used to find any number of
+       related values. For example, an enum value can
+       be used to find a string that describes the value,
+       making it easier for humans to read.
+*/
 #include "ACR/public/public_info.h"
 
 ////////////////////////////////////////////////////////////
@@ -592,6 +642,37 @@
 // TYPES AND DEFINES - DECIMAL VALUES
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_decimal.h" to define
+    ACR_Decimal_t, ACR_DECIMAL_COMPARE(), 
+    ACR_DECIMAL_TOLERANCE_COMPARE() and more
+
+    It is highly recommended that decimal values such as those
+    defined by the types: float, double, etc are not simply
+    compared using == or similar operators because rounding
+    errors can cause this to fail. Instead, store the decimal
+    values as ACR_Decimal_t and use the ACR_DECIMAL_COMPARE()
+    or ACR_DECIMAL_TOLERANCE_COMPARE() macros to perform the
+    comparison.
+
+    ### New to C? ###
+
+    Q: What is a decimal value?
+    A: A decimal value is any base-10 real number. Put another
+       way, a decimal value has a decimal point and is not limited
+       to just whole numbers. These values are typically stored in
+       floating-point data types.
+
+    Q: What is floating-point?
+    A: Floating-point data types allow the decimal to be placed
+       arbitrarily within the number. This has the advantage of
+       being able to represent very large and very small numbers
+       using the same data type. If interested in much greater
+       details, search online for "IEEE 754" to
+       learn about the standard way this is implemented.
+
+*/
 #include "ACR/public/public_decimal.h"
 
 ////////////////////////////////////////////////////////////

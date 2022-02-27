@@ -115,7 +115,7 @@ void ACR_AlignedBufferDeInit(
 }
 
 /**********************************************************/
-ACR_Info_t ACR_AlignedBufferRef(
+ACR_Info_t ACR_AlignedBufferSetMemory(
 	ACR_AlignedBuffer_t* me,
 	void* ptr,
 	ACR_Length_t length)
@@ -125,7 +125,7 @@ ACR_Info_t ACR_AlignedBufferRef(
 		return ACR_INFO_ERROR;
 	}
 
-	ACR_ALIGNED_BUFFER_SET_DATA((*me), ptr, length);
+	ACR_ALIGNED_BUFFER_SET_MEMORY((*me), ptr, length);
 	if(ACR_ALIGNED_BUFFER_IS_VALID((*me)))
 	{
 		return ACR_INFO_OK;

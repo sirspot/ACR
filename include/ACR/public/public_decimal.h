@@ -55,8 +55,10 @@ typedef float ACR_Decimal_t;
 
 /** default tolerance for comparison of decimal values
     \see ACR_DecimalCompare()
+
+    Note: the 'f' at the end indicates this is a float (not a double or long double)
 */
-#define ACR_DEFAULT_TOLERANCE 0.0001
+#define ACR_DEFAULT_TOLERANCE 0.0001f
 
 /** compare two decimal values
     \param a

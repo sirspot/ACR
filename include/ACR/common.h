@@ -290,6 +290,15 @@ ACR_String_t ACR_StringFromMemory(
     ACR_Length_t srcLength,
     ACR_Count_t maxCharacters);
 
+/** \see ACR_StringFromMemory()
+
+    the string returned will have the read only flag set
+*/
+ACR_String_t ACR_StringFromReadOnlyMemory(
+    const ACR_Byte_t* src,
+    ACR_Length_t srcLength,
+    ACR_Count_t maxCharacters);
+
 /** compare a string to a null-terminated string in memory
     with support for UTF8 encoding
     \param string the known string to compare to

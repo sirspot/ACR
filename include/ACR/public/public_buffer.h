@@ -58,13 +58,16 @@
 // included for ACR_BOOL_TRUE and ACR_BOOL_FALSE
 #include "ACR/public/public_bool.h"
 
-// included for ACR_Length_t, ACR_ZERO_LENGTH, ACR_CLEAR_MEMORY, and ACR_NULL
+// included for ACR_Length_t, ACR_ZERO_LENGTH,
+// ACR_CLEAR_MEMORY(), and ACR_NULL
 #include "ACR/public/public_memory.h"
 
-// included for ACR_Byte_t, ACR_Flags_t, ACR_HAS_FLAG, ACR_ADD_FLAGS, and ACR_REMOVE_FLAGS
+// included for ACR_Byte_t, ACR_Flags_t, ACR_FLAG_NONE,
+// ACR_FLAG_ONE, ACR_FLAG_TWO, ACR_HAS_FLAG(),
+// ACR_ADD_FLAGS(), and ACR_REMOVE_FLAGS()
 #include "ACR/public/public_bytes_and_flags.h"
 
-// included for ACR_HAS_MALLOC, ACR_MALLOC and ACR_FREE
+// included for ACR_HAS_MALLOC, ACR_MALLOC() and ACR_FREE()
 #include "ACR/public/public_heap.h"
 
 /** type for reference to a memory area.
@@ -97,8 +100,9 @@ typedef struct ACR_Buffer_s
 */
 enum ACR_BufferFlags_e
 {
-	ACR_BUFFER_FLAGS_NONE = 0x00,
-	ACR_BUFFER_IS_REF     = 0x01
+	ACR_BUFFER_FLAGS_NONE = ACR_FLAG_NONE,
+	ACR_BUFFER_IS_REF     = ACR_FLAG_ONE,
+	ACR_BUFFER_READ_ONLY  = ACR_FLAG_TWO
 };
 
 /** define a buffer on the stack with the specified name
@@ -202,5 +206,13 @@ enum ACR_BufferFlags_e
 #define ACR_BUFFER_FORCE_FREE(name)\
         ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF); \
         ACR_BUFFER_FREE(name)
+
+/** mark the buffer read only
+*/
+#define ACR_BUFFER_SET_READ_ONLY(name, readOnly) (b ? ACR_ADD_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY) : ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY))
+
+/** check if the buffer is marked read only
+*/
+#define ACR_BUFFER_IS_READ_ONLY(name) ACR_HAS_FLAG(ACR_BUFFER_READ_ONLY)
 
 #endif
