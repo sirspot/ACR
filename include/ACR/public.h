@@ -680,6 +680,30 @@
 // TYPES AND DEFINES - MATH
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_math.h" to define
+    ACR_PI, ACR_CIRCUMFERENCE(), ACR_RUNNING_MEAN() and more.
+    
+    Don't type a magic number like 3.14 when there is a predefined
+    value like ACR_PI that has 11 decimal places.
+
+    ### New to C? ###
+
+    Q: What is a magic number?
+    A: A magic number is any number that has meaning
+       but is typed out using the digits themselves
+       instead of a name. Using magic numbers is considered
+       to be bad practice and should be avoided.
+       Thus, it is very rare that any
+       number with more than 1 digit should be used
+       directly in code instead of a define, constant,
+       or variable.
+       See ACR_Month_t in the include file
+       "ACR/public/public_dates_and_times.h" for more details
+       on why magic numbers are bad.
+
+*/
 #include "ACR/public/public_math.h"
 
 ////////////////////////////////////////////////////////////
@@ -697,6 +721,28 @@
 //       chcp (again) should return 65001
 //
 ////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_string.h" to define
+    ACR_String_t, ACR_Unicode_t, ACR_UTF8_BYTE_COUNT(), and more
+
+    This provides very rudimentary storage and access to string data.
+    For easier methods to work with string data see "ACR/common.h"
+    and "ACR/string.h"
+
+    ### New to C? ###
+
+    Q: What is a string?
+    A: A string is any data that represents text by encoding
+       characters as numeric values. The encoding can be
+       different between platforms. The most simple encoding
+       is ASCII, which provides characters for most of the
+       english language. Another encoding, UTF8, is backwards
+       compatible with ASCII but can be used to represent
+       all Unicode characters for nearly all of the world's
+       languages.
+
+*/
 #include "ACR/public/public_string.h"
 
 /////////////////////////////////////////////////////////
@@ -704,6 +750,18 @@
 // TYPES AND DEFINES - UNITS OF MEASURE                //
 //                                                     //
 /////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_units.h" to define
+    ACR_TEMPERATURE_C_TO_F(), ACR_MEASURE_INCHES_TO_CM(), 
+    ACR_WEIGHT_KILOGRAMS_TO_POUNDS() and more
+
+    Math and Programming are hard enough without having to
+    remember how to convert between units. Just remember that
+    it is best to choose one unit and stick with it then
+    only convert to other units when it is time to display
+    the values to a user.
+*/
 #include "ACR/public/public_units.h"
 
 /////////////////////////////////////////////////////////
@@ -711,6 +769,15 @@
 // TYPES AND DEFINES - UNIQUE STRING VALUES            //
 //                                                     //
 /////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_unique_strings.h" to define
+    ACR_MONTH_STR_JANUARY, ACR_INFO_STR_TRUE, and more
+
+    These defines are used by lookup tables in "ACR/common.c"
+    to provide string representations of ACR_Info_t, ACR_Month_t,
+    and more enum data type values. See "ACR/common.h" for details.
+*/
 #include "ACR/public/public_unique_strings.h"
 
 /////////////////////////////////////////////////////////

@@ -52,8 +52,31 @@
 */
 #define ACR_PI 3.14159265359
 
+/** the value of e (Euler's number)
+*/
+#define ACR_E 2.71828
+
+/** the area of the rectangle with the specified length and width
+*/
+#define ACR_AREA_RECTANGLE(length,width) (length*width)
+
+/** the area of the circle with the specified radius
+*/
+#define ACR_AREA_CIRCLE(radius) (ACR_PI*(radius*radius))
+
 /** the circumference of a circle with the specified radius
 */
 #define ACR_CIRCUMFERENCE(radius) (2*ACR_PI*radius)
+
+/** update the running mean
+    \param runningMean the variable that stores the runningMean.
+                       It will be updated with the new runningMean.
+                       This can start at zero.
+    \param count the variable that stores the number of values that have been included in the runningMean.
+                 It will be updated with the new count.
+                 This value can start at zero.
+    \param newValue the value to include in the runningMean
+*/
+#define ACR_RUNNING_MEAN(runningMean, count, newValue) (runningMean += ((newValue - runningMean) / ((ACR_Decimal_t)(++count))))
 
 #endif

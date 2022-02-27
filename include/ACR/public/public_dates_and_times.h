@@ -51,7 +51,7 @@
 #define _ACR_PUBLIC_DATES_AND_TIMES_H_
 
 /** months of the year
- * 
+
     ### New to C? ###
 
     Q: Why not just use the number of the month?
