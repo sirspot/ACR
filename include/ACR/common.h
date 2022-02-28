@@ -62,6 +62,9 @@
 // included for ACR_Time_t and ACR_DateTime_t
 #include "ACR/public/public_clock.h"
 
+// included for ACR_Timer_t
+#include "ACR/public/public_timer.h"
+
 // included for ACR_Bool_t
 #include "ACR/public/public_bool.h"
 
@@ -120,7 +123,7 @@ ACR_Bool_t ACR_TimerStart(
     \param me the timer
     \returns the number of microseconds that have past
 */
-long ACR_TimerElapse(
+ACR_Time_t ACR_TimerElapse(
     ACR_Timer_t* me);
 
 ////////////////////////////////////////////////////////////
@@ -200,13 +203,13 @@ ACR_Bool_t ACR_TimeSet(
 void ACR_TimeProcessSecondTick(
     ACR_Time_t seconds);
 
-/** where there is no RTC, call this function
-    once per millisecond (or as close as possible)
-    to simulate the time
-    \param milliseconds the number of milliseconds since the last call to this function (typically 10 or less is desired)
+/** when there is no timer, call this function
+    to simulate the time that has passed
+    \param microseconds the number of microseconds since the last call to this function
+           (typically 1000 microseconds or less is desired)
 */
-void ACR_TimeProcessMilliTick(
-    ACR_Time_t milliseconds);
+void ACR_TimeProcessMicroTick(
+    ACR_Time_t microseconds);
 
 /** set the date time data from the specified time
     \param me the date time

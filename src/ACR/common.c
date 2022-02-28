@@ -185,8 +185,8 @@ unsigned char g_ACRMonthDaysLookup[ACR_MONTH_COUNT+1] =
 
 ACR_Bool_t g_ACRSimRtcTimeIsSet = ACR_BOOL_FALSE;
 ACR_Time_t g_ACRSimRtcTime = 0;
-ACR_Bool_t g_ACRSimRtcTimeMilliIsSet = ACR_BOOL_FALSE;
-ACR_Time_t g_ACRSimRtcTimeMilli = 0;
+ACR_Bool_t g_ACRSimRtcTimeMicroIsSet = ACR_BOOL_FALSE;
+ACR_Time_t g_ACRSimRtcTimeMicro = 0;
 
 ////////////////////////////////////////////////////////////
 //
@@ -229,51 +229,45 @@ ACR_Bool_t ACR_TimerStart(
 {
     if(me)
     {
-        #if ACR_HAS_RTC == ACR_BOOL_TRUE
+        #if ACR_HAS_TIMER == ACR_BOOL_TRUE
 
             ACR_TIMER_START((*me));
             return ACR_BOOL_TRUE;
 
         #else
 
-            if(g_ACRSimRtcTimeIsSet)
+            if(g_ACRSimRtcTimeIsSet || g_ACRSimRtcTimeMicroIsSet)
             {
                 me->tv_sec = g_ACRSimRtcTime;
-                if(g_ACRSimRtcTimeMilliIsSet)
-                {
-                    me->tv_usec = g_ACRSimRtcTimeMilli * ACR_MICRO_PER_MILLI;
-                }
-                else
-                {
-                    me->tv_usec = 0;
-                }
+                me->tv_usec = g_ACRSimRtcTimeMicro;
                 return ACR_BOOL_TRUE;
+            }
+            else
+            {
+                // time has never been set and a timer is not available.
+                // set timer to zero.
+                me->tv_sec = 0;
+                me->tv_usec = 0;
             }
 
         #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
-
-        #if ACR_HAS_RTC == ACR_BOOL_FALSE
-        // time has never been set and a RTC is not available.
-        // set timer to zero.
-        me->tv_sec = 0;
-        me->tv_usec = 0;
-        #endif // #if ACR_HAS_RTC == ACR_BOOL_FALSE
     }
 
     return ACR_BOOL_FALSE;
 }
 
-long ACR_TimerElapse(
+ACR_Time_t ACR_TimerElapse(
     ACR_Timer_t* me)
 {
-    long elapseMicro = 0;
+    ACR_Time_t elapseMicro = 0;
+    ACR_Info_t comp;
 
     if(me)
     {
-        ACR_TIMER(newTimer);
+        ACR_Timer_t newTimer;
         if(ACR_TimerStart(&newTimer))
         {
-            elapseMicro = (long)ACR_TIMER_DIFF_MICRO((*me), newTimer);
+            ACR_TIMER_DIFF_MICRO((*me), newTimer, elapseMicro, comp);
         }
     }
 
@@ -372,14 +366,14 @@ ACR_Bool_t ACR_TimeNow(
                 (*me) = g_ACRSimRtcTime;
                 return ACR_BOOL_TRUE;
             }
+            else
+            {
+                // time has never been set and a RTC is not available.
+                // set time to zero seconds.
+                (*me) = 0;
+            }
 
         #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
-
-        #if ACR_HAS_RTC == ACR_BOOL_FALSE
-        // time has never been set and a RTC is not available.
-        // set time to zero seconds.
-        (*me) = 0;
-        #endif // #if ACR_HAS_RTC == ACR_BOOL_FALSE
     }
 
     return ACR_BOOL_FALSE;
@@ -422,11 +416,11 @@ void ACR_TimeProcessSecondTick(
     g_ACRSimRtcTime += seconds;
 }
 
-void ACR_TimeProcessMilliTick(
-    ACR_Time_t milliseconds)
+void ACR_TimeProcessMicroTick(
+    ACR_Time_t microseconds)
 {
-    g_ACRSimRtcTimeMilliIsSet = ACR_BOOL_TRUE;
-    g_ACRSimRtcTimeMilli += milliseconds;
+    g_ACRSimRtcTimeMicroIsSet = ACR_BOOL_TRUE;
+    g_ACRSimRtcTimeMicro += microseconds;
 }
 
 ACR_Bool_t ACR_DateTimeFromTime(

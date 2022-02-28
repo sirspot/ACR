@@ -50,7 +50,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include;../../../ACR/test</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_CONFIG_DEBUG;ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_PLATFORM_WIN;ACR_CONFIG_WIN_NATIVE;ACR_COMPILER_VS2017;ACR_CONFIG_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711;5045;4820;4710;4127</DisableSpecificWarnings>
     </ClCompile>
@@ -64,7 +64,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../../ACR/include;../../../ACR/test</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ACR_CONFIG_LITTLE_ENDIAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ACR_PLATFORM_WIN;ACR_CONFIG_WIN_NATIVE;ACR_COMPILER_VS2017;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4906;4711;5045;4820;4710;4127</DisableSpecificWarnings>
