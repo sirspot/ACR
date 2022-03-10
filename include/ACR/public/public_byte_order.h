@@ -174,6 +174,12 @@ typedef unsigned long ACR_Unsigned_32bit_t;
     #endif // #ifdef ACR_CONFIG_LITTLE_ENDIAN
 #endif // #ifdef ACR_CONFIG_BIG_ENDIAN
 
+#ifdef ACR_PLATFORM_WIN
+    // most windows platforms are little endian so
+    // make this assumption now
+    #define ACR_IS_BIG_ENDIAN ACR_BOOL_FALSE
+#endif
+
 //
 // defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
 // ACR_BOOL_FALSE if not previously defined

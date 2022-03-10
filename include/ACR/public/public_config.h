@@ -111,6 +111,12 @@
                                        for times and dates but does limit it.
                                    see "TYPES AND DEFINES - REAL TIME CLOCK" for details.
 
+        ACR_CONFIG_NO_TIMER        do not include <sys/time.h> for struct timeval, and
+                                   gettimeofday()
+                                   Note: this does not completely disables support
+                                       for timers but does limit it.
+                                   see "TYPES AND DEFINES - TIMER" for details.
+
         ACR_CONFIG_NO_64BIT        do not use types of long long
                                    Note: only use this setting if you know that your
                                        compiler does not support 64bit values

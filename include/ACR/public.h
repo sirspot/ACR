@@ -509,9 +509,8 @@
     ACR_DATETIME_HOUR(), and more
 
     If your platform doesn't have an RTC, define ACR_CONFIG_NO_RTC
-    in your project settings and see ACR_TimeProcessSecondTick() and
-    ACR_TimeProcessMilliTick() in "ACR/common.h" for how to
-    simulate a real-time clock
+    in your project settings and see ACR_TimeProcessSecondTick()
+    in "ACR/common.h" for how to simulate a real-time clock
 
     ### New to C? ###
 
@@ -526,6 +525,28 @@
        more details.
 */
 #include "ACR/public/public_clock.h"
+
+////////////////////////////////////////////////////////////
+//
+// TYPES AND DEFINES - TIMER
+//
+////////////////////////////////////////////////////////////
+
+/**
+    Include the file "ACR/public/public_timer.h" to define
+    ACR_HAS_TIMER, ACR_TIMER_START(), ACR_Timer_t, and more
+
+    If your platform doesn't have a timer, define ACR_CONFIG_NO_TIMER
+    in your project settings and see ACR_TimeProcessMicroTick() in
+    "ACR/common.h" for how to simulate a timer
+
+    ### New to C? ###
+
+    Q: What is a timer?
+    A: A timer is similar to a real time clock except that
+       instead of counting in seconds, it counts in 
+*/
+#include "ACR/public/public_timer.h"
 
 ////////////////////////////////////////////////////////////
 //
