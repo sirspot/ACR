@@ -77,7 +77,7 @@
     \param userPtr optional user pointer
     \returns ACR_INFO_OK if 0 or more bytes are read
              Note: check src->m_Buffer.m_Length for
-                   the exact number of bytes.
+                   the exact number of bytes read.
             ACR_INFO_ERROR if any error occurs.
 */
 ACR_TYPEDEF_CALLBACK(ACR_FileCallbackRead_t, ACR_Info_t)(
@@ -97,7 +97,7 @@ ACR_TYPEDEF_CALLBACK(ACR_FileCallbackRead_t, ACR_Info_t)(
     \param userPtr optional user pointer
     \returns ACR_INFO_OK if 0 or more bytes are written
              Note: check src->m_Buffer.m_Length for
-                   the exact number of bytes.
+                   the exact number of bytes written.
              ACR_INFO_ERROR if any error occurs.
 */
 ACR_TYPEDEF_CALLBACK(ACR_FileCallbackWrite_t, ACR_Info_t)(
@@ -127,26 +127,19 @@ ACR_TYPEDEF_CALLBACK(ACR_FileCallbackPosition_t, ACR_Length_t)(
 /** callback function type for opening a file
     \param path path to the file
     \param mode ACR_INFO_READ, ACR_INFO_WRITE, or ACR_INFO_READ_WRITE
-    \param fileHandle optional location for the callback to store
-                      a file handle for the open file 
-                      if ACR_INFO_OK is returned
     \param userPtr optional user pointer
     \returns ACR_INFO_OK or ACR_INFO_ERROR
 */
 ACR_TYPEDEF_CALLBACK(ACR_FileCallbackOpen_t, ACR_Info_t)(
     ACR_String_t path,
     ACR_Info_t mode,
-    void** fileHandle,
     void* userPtr);
 
 /** callback function type for closing a file
-    \param fileHandle optional location of the file handle for
-                      the open file to be closed
     \param userPtr optional user pointer
     \returns ACR_INFO_OK or ACR_INFO_ERROR
 */
 ACR_TYPEDEF_CALLBACK(ACR_FileCallbackClose_t, ACR_Info_t)(
-    void** fileHandle,
     void* userPtr);
 
 /** type for a complete interface to a file
@@ -159,10 +152,11 @@ typedef struct ACR_InterfaceFile_s
     ACR_FileCallbackWrite_t m_Write;
     ACR_FileCallbackSeek_t m_Seek;
     ACR_FileCallbackPosition_t m_Position;
+    void* m_User;
 } ACR_FileInterface_t;
 
 /** define a file interface on the stack with the specified name
 */
-#define ACR_FILE_INTERFACE(name) ACR_FileInterface_t name = {ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL}
+#define ACR_FILE_INTERFACE(name) ACR_FileInterface_t name = {ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL,ACR_NULL}
 
 #endif

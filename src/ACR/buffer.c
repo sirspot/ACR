@@ -52,6 +52,48 @@
 
 ////////////////////////////////////////////////////////////
 //
+// FILE INTERFACE FUNCTIONS
+//
+////////////////////////////////////////////////////////////
+
+/** \see ACR_FileCallbackRead_t
+*/
+ACR_Info_t _ACR_BufferFileCallbackRead(
+    ACR_VarBuffer_t* dest,
+    void* userPtr);
+
+/** \see ACR_FileCallbackWrite_t
+*/
+ACR_Info_t _ACR_BufferFileCallbackWrite(
+    ACR_VarBuffer_t* src,
+    void* userPtr);
+
+/** \see ACR_FileCallbackSeek_t
+*/
+ACR_Info_t _ACR_BufferFileCallbackSeek(
+    ACR_Length_t moveBy,
+    ACR_Info_t fromPos,
+    void* userPtr);
+
+/** \see ACR_FileCallbackPosition_t
+*/
+ACR_Length_t _ACR_BufferFileCallbackPosition(
+    void* userPtr);
+
+/** \see ACR_FileCallbackOpen_t
+*/
+ACR_Info_t _ACR_BufferFileCallbackOpen(
+    ACR_String_t path,
+    ACR_Info_t mode,
+    void* userPtr);
+
+/** \see ACR_FileCallbackClose_t
+*/
+ACR_Info_t _ACR_BufferFileCallbackClose(
+    void* userPtr);
+
+////////////////////////////////////////////////////////////
+//
 // HELPER FUNCTIONS
 //
 ////////////////////////////////////////////////////////////
@@ -386,6 +428,424 @@ void ACR_BufferShift(
             // invalid direction
         }
     }
+}
+
+/**********************************************************/
+ACR_Info_t ACR_BufferNewFileInterface(
+	ACR_BufferObj_t* me,
+	ACR_FileInterface_t** fileInterfacePtr)
+{
+    if (me == ACR_NULL)
+    {
+        return ACR_INFO_ERROR;
+    }
+
+    if (fileInterfacePtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    ACR_Info_t result = ACR_INFO_OK;
+    ACR_NEW_BY_TYPE(newFileInterface, ACR_FileInterface_t);
+    if (newFileInterface)
+    {
+        ACR_NEW_BY_TYPE(newBufferObjForFileInterface, struct ACR_BufferObjForFileInterface_s);
+        if(newBufferObjForFileInterface)
+        {
+            // setup file interface user data
+            newBufferObjForFileInterface->m_BufferObj = me;
+            newBufferObjForFileInterface->m_Position = 0;
+            newBufferObjForFileInterface->m_Mode = ACR_INFO_CLOSED;
+            newFileInterface->m_User = newBufferObjForFileInterface;
+
+            // assign file interface callback functions
+            newFileInterface->m_Open = _ACR_BufferFileCallbackOpen;
+            newFileInterface->m_Close = _ACR_BufferFileCallbackClose;
+            newFileInterface->m_Read = _ACR_BufferFileCallbackRead;
+            newFileInterface->m_Write = _ACR_BufferFileCallbackWrite;
+            newFileInterface->m_Seek = _ACR_BufferFileCallbackSeek;
+            newFileInterface->m_Position = _ACR_BufferFileCallbackPosition;
+        }
+        else
+        {
+            // failed to create buffer object for file interface
+            // delete the file interface that was already created
+            ACR_DELETE(newFileInterface);
+            result = ACR_INFO_ERROR;
+        }
+    }
+    else
+    {
+        // failed to create newFileInterface
+        result = ACR_INFO_ERROR;
+    }
+    (*fileInterfacePtr) = newFileInterface;
+
+    return result;
+
+}
+
+/**********************************************************/
+ACR_Info_t ACR_BufferDeleteFileInterface(
+	ACR_BufferObj_t* me,
+	ACR_FileInterface_t** fileInterfacePtr)
+{
+    if (fileInterfacePtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    if((*fileInterfacePtr) == ACR_NULL)
+    {
+        // nothing to delete
+        return ACR_INFO_OK;
+    }
+
+    ACR_Info_t result = ACR_INFO_OK;
+    // the user data should be a pointer to ACR_BufferObjForFileInterface_s
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)(*fileInterfacePtr)->m_User;
+    if(bufferObjForFileInterface)
+    {
+        if(bufferObjForFileInterface->m_BufferObj == me)
+        {
+            // done with user data
+            bufferObjForFileInterface = ACR_NULL;
+            ACR_FREE((*fileInterfacePtr)->m_User);
+            (*fileInterfacePtr)->m_User = ACR_NULL;
+
+            // free the interface itself
+            ACR_FREE((*fileInterfacePtr));
+            (*fileInterfacePtr) = ACR_NULL;
+        }
+        else
+        {
+            // a buffer object is trying to delete a file interface that doesn't belong to it.
+            // this function will protect the caller by not deleting it.
+            
+            // is it better to have a small memory leak than crash the
+            // program somewhere else? hard to say, but
+            // hopefully the caller is checking the return
+            // value and pointer to make sure the function succeeded
+            result = ACR_INFO_ERROR;
+        }
+    }
+    else
+    {
+        // this should not be possible
+        // because the user data is always
+        // set by ACR_BufferNewFileInterface()
+
+        // just free the interface and hope for the best
+        ACR_FREE((*fileInterfacePtr));
+        (*fileInterfacePtr) = ACR_NULL;
+
+        // this is not an error because the file interface
+        // has been deleted as requested
+    }
+
+    return result;
+}
+
+////////////////////////////////////////////////////////////
+//
+// FILE INTERFACE FUNCTIONS
+//
+////////////////////////////////////////////////////////////
+
+/**********************************************************/
+ACR_Info_t _ACR_BufferFileCallbackRead(
+    ACR_VarBuffer_t* dest,
+    void* userPtr)
+{
+    if (dest == ACR_NULL || userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return ACR_INFO_ERROR;
+    }
+
+    if((bufferObjForFileInterface->m_Mode != ACR_INFO_READ) &&
+        (bufferObjForFileInterface->m_Mode != ACR_INFO_READ_WRITE))
+    {
+        // cannot read from this buffer
+        return ACR_INFO_ERROR;
+    }
+
+    if ((bufferObjForFileInterface->m_BufferObj->m_Base.m_Pointer == ACR_NULL) ||
+        (dest->m_Buffer.m_Pointer == ACR_NULL))
+    {
+        // invalid memory
+        return ACR_INFO_ERROR;
+    }
+
+    if(bufferObjForFileInterface->m_Position < bufferObjForFileInterface->m_BufferObj->m_Base.m_Length)
+    {
+        // limit the number of bytes to read to just
+        // those that are requested
+        dest->m_Buffer.m_Length = bufferObjForFileInterface->m_BufferObj->m_Base.m_Length - bufferObjForFileInterface->m_Position;
+        if(dest->m_Buffer.m_Length > dest->m_MaxLength)
+        {
+            dest->m_Buffer.m_Length = dest->m_MaxLength;
+        }
+
+        // copy from the current position within the buffer
+        ACR_Byte_t* srcPtr = ((ACR_Byte_t*)bufferObjForFileInterface->m_BufferObj->m_Base.m_Pointer) + bufferObjForFileInterface->m_Position;
+        ACR_MEMCPY(dest->m_Buffer.m_Pointer, srcPtr, dest->m_Buffer.m_Length);
+
+        // update the position within the buffer so
+        // that the next read will continue from
+        // where this read finished
+        bufferObjForFileInterface->m_Position += dest->m_Buffer.m_Length;
+    }
+    else
+    {
+        // no bytes available
+        dest->m_Buffer.m_Length = 0;
+    }
+
+    return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t _ACR_BufferFileCallbackWrite(
+    ACR_VarBuffer_t* src,
+    void* userPtr)
+{
+    if (src == ACR_NULL || userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return ACR_INFO_ERROR;
+    }
+
+    if((bufferObjForFileInterface->m_Mode != ACR_INFO_WRITE) &&
+        (bufferObjForFileInterface->m_Mode != ACR_INFO_READ_WRITE))
+    {
+        // cannot write to this buffer
+        return ACR_INFO_ERROR;
+    }
+
+    if ((bufferObjForFileInterface->m_BufferObj->m_Base.m_Pointer == ACR_NULL) ||
+        (src->m_Buffer.m_Pointer == ACR_NULL))
+    {
+        // invalid memory
+        return ACR_INFO_ERROR;
+    }
+
+    if(bufferObjForFileInterface->m_Position < bufferObjForFileInterface->m_BufferObj->m_Base.m_Length)
+    {
+        // limit the number of bytes to written to just
+        // those that are requested
+        src->m_Buffer.m_Length = bufferObjForFileInterface->m_BufferObj->m_Base.m_Length - bufferObjForFileInterface->m_Position;
+        if(src->m_Buffer.m_Length > src->m_MaxLength)
+        {
+            src->m_Buffer.m_Length = src->m_MaxLength;
+        }
+
+        // copy to the current position within the buffer
+        ACR_Byte_t* destPtr = ((ACR_Byte_t*)bufferObjForFileInterface->m_BufferObj->m_Base.m_Pointer) + bufferObjForFileInterface->m_Position;
+        ACR_MEMCPY(destPtr, src->m_Buffer.m_Pointer, src->m_Buffer.m_Length);
+
+        // update the position within the buffer so
+        // that the next write will continue from
+        // where this write finished
+        bufferObjForFileInterface->m_Position += src->m_Buffer.m_Length;
+    }
+    else
+    {
+        // no space available
+        src->m_Buffer.m_Length = 0;
+    }
+
+    return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t _ACR_BufferFileCallbackSeek(
+    ACR_Length_t moveBy,
+    ACR_Info_t fromPos,
+    void* userPtr)
+{
+    if (userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return ACR_INFO_ERROR;
+    }
+
+    if(bufferObjForFileInterface->m_Mode == ACR_INFO_CLOSED)
+    {
+        // cannot seek in this buffer
+        return ACR_INFO_ERROR;
+    }
+
+    ACR_Info_t result = ACR_INFO_OK;
+    if(fromPos == ACR_INFO_FIRST)
+    {
+        if(moveBy <= bufferObjForFileInterface->m_BufferObj->m_Base.m_Length)
+        {
+            // set the position
+            bufferObjForFileInterface->m_Position = moveBy;
+        }
+        else
+        {
+            // invalid moveBy
+            result = ACR_INFO_ERROR;
+        }
+    }
+    else if(fromPos == ACR_INFO_CURRENT)
+    {
+        // calculate the number of bytes remaining till the end of the buffer
+        ACR_Length_t remaining = 0;
+        if(bufferObjForFileInterface->m_Position < bufferObjForFileInterface->m_BufferObj->m_Base.m_Length)
+        {
+            remaining = bufferObjForFileInterface->m_BufferObj->m_Base.m_Length - bufferObjForFileInterface->m_Position;
+        }
+
+        if(moveBy <= remaining)
+        {
+            // move the position by the requested number of bytes
+            bufferObjForFileInterface->m_Position += moveBy;
+        }
+        else
+        {
+            // invalid moveBy
+            result = ACR_INFO_ERROR;
+        }
+
+    }
+    else if(fromPos == ACR_INFO_LAST)
+    {
+        if(moveBy <= bufferObjForFileInterface->m_BufferObj->m_Base.m_Length)
+        {
+            // set the position to the requested number of bytes from the end of the buffer
+            bufferObjForFileInterface->m_Position = bufferObjForFileInterface->m_BufferObj->m_Base.m_Length - moveBy;
+        }
+        else
+        {
+            // invalid moveBy
+            result = ACR_INFO_ERROR;
+        }
+    }
+    else
+    {
+        // invalid fromPos
+        result = ACR_INFO_ERROR;
+    }
+
+    return result;
+}
+
+/**********************************************************/
+ACR_Length_t _ACR_BufferFileCallbackPosition(
+    void* userPtr)
+{
+    if (userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return 0;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return 0;
+    }
+
+    if(bufferObjForFileInterface->m_Mode == ACR_INFO_CLOSED)
+    {
+        // not open is always position 0
+        return 0;
+    }
+
+    return bufferObjForFileInterface->m_Position;
+}
+
+/**********************************************************/
+ACR_Info_t _ACR_BufferFileCallbackOpen(
+    ACR_String_t path,
+    ACR_Info_t mode,
+    void* userPtr)
+{
+    ACR_UNUSED(path);
+    
+    if (userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return ACR_INFO_ERROR;
+    }
+
+    if((mode != ACR_INFO_READ) &&
+      (mode != ACR_INFO_WRITE) &&
+      (mode != ACR_INFO_READ_WRITE))
+    {
+        // invalid mode
+        return ACR_INFO_ERROR;
+    }
+
+    // update the mode
+    bufferObjForFileInterface->m_Mode = mode;
+
+    return ACR_INFO_OK;
+}
+
+/**********************************************************/
+ACR_Info_t _ACR_BufferFileCallbackClose(
+    void* userPtr)
+{
+    if (userPtr == ACR_NULL)
+    {
+        // invalid pointer
+        return ACR_INFO_ERROR;
+    }
+
+    struct ACR_BufferObjForFileInterface_s* bufferObjForFileInterface = (struct ACR_BufferObjForFileInterface_s*)userPtr;
+    if(bufferObjForFileInterface->m_BufferObj == ACR_NULL)
+    {
+        // invalid buffer in file interface
+        return ACR_INFO_ERROR;
+    }
+
+    if(bufferObjForFileInterface->m_Mode != ACR_INFO_CLOSED)
+    {
+        // closing
+        bufferObjForFileInterface->m_Mode = ACR_INFO_CLOSED;
+        bufferObjForFileInterface->m_Position = 0;
+    }
+    else
+    {
+        // already closed
+    }
+
+    return ACR_INFO_OK;
 }
 
 ////////////////////////////////////////////////////////////

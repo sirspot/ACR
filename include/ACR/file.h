@@ -37,45 +37,28 @@
     ******************************************************
 
 */
-/** \file buffer_private.h
+/** \file file.h
 
-    private functions for access to the ACR_BufferObj_t type
+    public functions that perform common operations on ACR_FileInterface_t
 
 */
-#ifndef _ACR_PRIVATE_BUFFER_H_
-#define _ACR_PRIVATE_BUFFER_H_
+#ifndef _ACR_FILE_H_
+#define _ACR_FILE_H_
 
-#include "ACR/buffer.h"
+// included for ACR_String_t
+#include "ACR/public/public_string.h"
 
-// included for ACR_Buffer_t
-#include "ACR/public/public_buffer.h"
+// included for ACR_Info_t
+#include "ACR/public/public_info.h"
 
-#ifndef ACR_BUFFER_BYTE_COUNT_PER_SHIFT
-/** this is used by ACR_BufferShift() to determine the
-    amount of stack memory used for a temporary location
-    to store data during the shift operation. the actual
-    shift can be larger than this number but will occur
-    in a tight loop instead of a single copy operation
-*/
-#define ACR_BUFFER_BYTE_COUNT_PER_SHIFT 64
-#endif
+// included for ACR_FileInterface_t
+#include "ACR/public/public_file.h"
 
-/** private buffer type
-*/
-struct ACR_BufferObj_s
-{
-    ACR_Buffer_t m_Base;
-};
+// included for ACR_VarBuffer_t
+#include "ACR/public/public_varbuffer.h"
 
-/** private type to store pointer to the buffer object
-    and current position for use with ACR_FileInterface_t
-*/
-struct ACR_BufferObjForFileInterface_s
-{
-    struct ACR_BufferObj_s* m_BufferObj;
-    ACR_Length_t m_Position;
-    ACR_Info_t m_Mode;
-};
+// included for ACR_Length_t
+#include "ACR/public/public_memory.h"
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
@@ -87,24 +70,38 @@ extern "C" {                                              //
 
 ////////////////////////////////////////////////////////////
 //
-// PRIVATE FUNCTIONS
+// PUBLIC FUNCTIONS
 //
 ////////////////////////////////////////////////////////////
 
-/** prepare a buffer
-
-	Note: memory for the buffer must be allocated
-		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferSetData()
-		  before the buffer can be used effectively.
+/** get the file length.
+    requires me->m_Position and me->m_Seek callbacks
+    \param me the file interface, which must not be closed
+    \returns the file length in bytes
+    Note: 0 length can indicate the file has no bytes but
+          may also indicate missing or failure of
+          me->m_Position or me->m_Seek callbacks
 */
-void ACR_BufferInit(
-	ACR_BufferObj_t* me);
+ACR_Length_t ACR_FileGetLength(
+	ACR_FileInterface_t* me);
 
-/** free buffer memory
+/** read the entire file into a buffer.
+    requires me->m_Read callback and those required by ACR_FileGetLength()
+    \param me the file interface, which must be ready to read
+    \param buffer the buffer to read into. 
+    \returns ACR_INFO_OK if buffer was allocated to the exact
+             file size reported by ACR_FileGetLength() and
+             the m_Read callback was able to read the reported
+             number of bytes (other than 0).
+             otherwise ACR_INFO_ERROR is returned.
+
+             Note: if ACR_INFO_OK is returned the caller must
+                   call ACR_BUFFER_FREE() or similar when done
+                   with the data to release the allocated memory
 */
-void ACR_BufferDeInit(
-	ACR_BufferObj_t* me);
+ACR_Info_t ACR_FileReadAll(
+	ACR_FileInterface_t* me,
+    ACR_Buffer_t* buffer);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

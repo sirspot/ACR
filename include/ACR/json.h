@@ -37,45 +37,20 @@
     ******************************************************
 
 */
-/** \file buffer_private.h
+/** \file json.h
 
-    private functions for access to the ACR_BufferObj_t type
+    public functions for access to the ACR_JsonObj_t type
 
 */
-#ifndef _ACR_PRIVATE_BUFFER_H_
-#define _ACR_PRIVATE_BUFFER_H_
+#ifndef _ACR_JSON_H_
+#define _ACR_JSON_H_
 
-#include "ACR/buffer.h"
+// included for ACR_String_t
+#include "ACR/public/public_string.h"
 
-// included for ACR_Buffer_t
-#include "ACR/public/public_buffer.h"
-
-#ifndef ACR_BUFFER_BYTE_COUNT_PER_SHIFT
-/** this is used by ACR_BufferShift() to determine the
-    amount of stack memory used for a temporary location
-    to store data during the shift operation. the actual
-    shift can be larger than this number but will occur
-    in a tight loop instead of a single copy operation
+/** predefined object type
 */
-#define ACR_BUFFER_BYTE_COUNT_PER_SHIFT 64
-#endif
-
-/** private buffer type
-*/
-struct ACR_BufferObj_s
-{
-    ACR_Buffer_t m_Base;
-};
-
-/** private type to store pointer to the buffer object
-    and current position for use with ACR_FileInterface_t
-*/
-struct ACR_BufferObjForFileInterface_s
-{
-    struct ACR_BufferObj_s* m_BufferObj;
-    ACR_Length_t m_Position;
-    ACR_Info_t m_Mode;
-};
+typedef struct ACR_JsonObj_s ACR_JsonObj_t;
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
@@ -87,24 +62,23 @@ extern "C" {                                              //
 
 ////////////////////////////////////////////////////////////
 //
-// PRIVATE FUNCTIONS
+// PUBLIC FUNCTIONS
 //
 ////////////////////////////////////////////////////////////
 
-/** prepare a buffer
-
-	Note: memory for the buffer must be allocated
-		  by calling ACR_BufferAllocate() or
-		  referenced by calling ACR_BufferSetData()
-		  before the buffer can be used effectively.
+/** allocate json data
+	\param mePtr location to store the pointer
+	\returns ACR_INFO_OK or ACR_INFO_ERROR
 */
-void ACR_BufferInit(
-	ACR_BufferObj_t* me);
+ACR_Info_t ACR_JsonNew(
+	ACR_JsonObj_t** mePtr);
 
-/** free buffer memory
+/** free a json data
+	\param mePtr location of the pointer, which will
+	       be set to ACR_NULL after the memory is freed
 */
-void ACR_BufferDeInit(
-	ACR_BufferObj_t* me);
+void ACR_JsonDelete(
+	ACR_JsonObj_t** mePtr);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

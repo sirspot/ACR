@@ -159,7 +159,7 @@ ACR_Info_t ACR_FilesystemFileRemove(
 */
 ACR_Info_t ACR_FilesystemFileRename(
     ACR_FilesystemFileObj_t* me,
-    AMI_String_t path);
+    ACR_String_t path);
     
 /** check if the file is open
     \param me the file
@@ -234,7 +234,7 @@ ACR_Info_t ACR_FilesystemFileClose(
 */
 ACR_FilesystemFolderObj_t* ACR_FilesystemGetFolder(
     ACR_FilesystemObj_t* me,
-    AMIString_t* path);
+    ACRString_t* path);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

@@ -54,6 +54,9 @@
 // included for ACR_Byte_t
 #include "ACR/public/public_bytes_and_flags.h"
 
+// included for ACR_FileInterface_t
+#include "ACR/public/public_file.h"
+
 /** predefined object type
 */
 typedef struct ACR_BufferObj_s ACR_BufferObj_t;
@@ -223,6 +226,27 @@ void ACR_BufferShift(
 	ACR_Length_t shiftBytes,
 	ACR_Info_t direction,
 	ACR_Bool_t wrap);
+
+/** create a file interface for this buffer. multiple file interfaces
+    can be created for the same buffer.
+	\param me the buffer
+	\param fileInterfacePtr location to store a pointer to the new file interface.
+	                        call ACR_BufferDeleteFileInterface() when done.
+	\returns ACR_INFO_OK or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_BufferNewFileInterface(
+	ACR_BufferObj_t* me,
+	ACR_FileInterface_t** fileInterfacePtr);
+
+/** delete a file interface from this buffer.
+	\param me the buffer
+	\param fileInterfacePtr location of the pointer for the file interface, which will
+	       be set to ACR_NULL after the memory is freed.
+	\returns ACR_INFO_OK or ACR_INFO_ERROR
+*/
+ACR_Info_t ACR_BufferDeleteFileInterface(
+	ACR_BufferObj_t* me,
+	ACR_FileInterface_t** fileInterfacePtr);
 
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //

@@ -62,15 +62,19 @@
 // PROTOTYPES
 //
 
-/** simple example to use a buffer on the heap
+/** use a buffer on the heap
 */
 int HeapTest(void);
 
-/** simple example to use a buffer on the stack
+/** use a buffer on the heap with a file interface
+*/
+int FileInterfaceTest(void);
+
+/** use a buffer on the stack
 */
 int StackTest(void);
 
-/** simple example to use a buffer at a low level
+/** use a buffer at a low level
 */
 int LowLevelTest(void);
 
@@ -90,16 +94,18 @@ int main(int argc, char** argv)
 	ACR_UNUSED(argc);
 	ACR_UNUSED(argv);
 
-	result |= HeapTest();
+	result |= LowLevelTest();
+	result |= VerboseTest();
 
 #ifdef ACR_TEST_INCLUDE_PRIVATE
 	result |= StackTest();
-	result |= LowLevelTest();
-	result |= VerboseTest();
 #else
 	// OK - skip private tests
 	ACR_DEBUG_PRINT(1, "TEST skipped private tests");
 #endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
+
+	result |= HeapTest();
+	result |= FileInterfaceTest();
 
 	return result;
 }
@@ -200,6 +206,45 @@ int HeapTest(void)
 }
 
 /**********************************************************/
+int FileInterfaceTest(void)
+{
+	int result = ACR_SUCCESS;
+	ACR_BufferObj_t* bufferPtr;
+
+	ACR_BufferNew(&bufferPtr);
+	if(ACR_BufferAllocate(bufferPtr, 1024) == ACR_INFO_OK)
+	{
+		ACR_FileInterface_t* bufferAsFile;
+		if(ACR_BufferNewFileInterface(bufferPtr, &bufferAsFile) == ACR_INFO_OK)
+		{
+			
+
+			if(ACR_BufferDeleteFileInterface(bufferPtr, &bufferAsFile) != ACR_INFO_OK)
+			{
+				// failed to delete file interface.
+				// Note: this should only happen if the interface
+				//       being deleted does not belong to the buffer
+				//       that is trying to perform the deletion
+				result = ACR_FAILURE;
+			}
+		}
+		else
+		{
+			// failed to create file interface
+			result = ACR_FAILURE;
+		}
+	}
+	else
+	{
+		// failed to allocate 1024 bytes
+		result = ACR_FAILURE;
+	}
+	ACR_BufferDelete(&bufferPtr);
+
+	return result;
+}
+
+/**********************************************************/
 int StackTest(void)
 {
 #ifdef ACR_TEST_INCLUDE_PRIVATE
@@ -237,7 +282,6 @@ int StackTest(void)
 /**********************************************************/
 int LowLevelTest(void)
 {
-#ifdef ACR_TEST_INCLUDE_PRIVATE
 	ACR_BUFFER(buffer);
 
 	ACR_BUFFER_ALLOC(buffer, 5000);
@@ -260,16 +304,11 @@ int LowLevelTest(void)
 	}
 
 	return ACR_SUCCESS;
-#else
-    // OK - skip private tests
-    return ACR_SUCCESS;
-#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 }
 
 /**********************************************************/
 int VerboseTest(void)
 {
-#ifdef ACR_TEST_INCLUDE_PRIVATE
 	ACR_BUFFER(buffer);
 	ACR_Length_t testAllocateBytes = 5000;
 
@@ -310,8 +349,4 @@ int VerboseTest(void)
 	}
 
 	return ACR_SUCCESS;
-#else
-    // OK - skip private tests
-    return ACR_SUCCESS;
-#endif // #ifdef ACR_TEST_INCLUDE_PRIVATE
 }

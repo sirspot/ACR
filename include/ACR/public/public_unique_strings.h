@@ -80,6 +80,7 @@
 #define ACR_INFO_STR_DOWN "down"
 
 // *** E ***
+#define ACR_INFO_STR_EMPTY "empty"
 #define ACR_INFO_STR_ENABLED "enabled"
 #define ACR_INFO_STR_END "end"
 #define ACR_INFO_STR_EQUAL "equal"
@@ -90,6 +91,7 @@
 #define ACR_MONTH_STR_FEBRUARY "february"
 #define ACR_INFO_STR_FIRST "first"
 #define ACR_DAY_STR_FRIDAY "friday"
+#define ACR_INFO_STR_FULL "full"
 
 // *** G ***
 #define ACR_INFO_STR_GO "go"

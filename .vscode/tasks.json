@@ -23,6 +23,7 @@
                 "${workspaceFolder}/src/ACR/alignedbuffer.c",
                 "${workspaceFolder}/src/ACR/buffer.c",
                 "${workspaceFolder}/src/ACR/common.c",
+                "${workspaceFolder}/src/ACR/file.c",
                 "${workspaceFolder}/src/ACR/heap.c",
                 "${workspaceFolder}/src/ACR/string.c",
                 "${workspaceFolder}/src/ACR/varbuffer.c",
