@@ -269,7 +269,16 @@ ACR_Time_t ACR_TimerElapse(
         ACR_Timer_t newTimer;
         if(ACR_TimerStart(&newTimer))
         {
+            // (*me)    = timerA (in the past)
+            // newTimer = timerB (current time)
             ACR_TIMER_DIFF_MICRO((*me), newTimer, elapseMicro, comp);
+            if(comp == ACR_INFO_GREATER)
+            {
+                // the timer in the past should not be greater
+                // than the current time. return 0 to indicate
+                // that effectively no time has elapsed.
+                elapseMicro = 0;
+            }
         }
     }
 
