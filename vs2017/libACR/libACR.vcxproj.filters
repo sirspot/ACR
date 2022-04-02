@@ -117,6 +117,27 @@
     <ClInclude Include="..\..\include\ACR\private\private_heap.h">
       <Filter>Header Files\ACR\private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_file.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_filesystem.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\public\public_timer.h">
+      <Filter>Header Files\ACR\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\csv.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\file.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\filesystem.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ACR\json.h">
+      <Filter>Header Files\ACR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ACR\buffer.c">
@@ -135,6 +156,9 @@
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ACR\heap.c">
+      <Filter>Source Files\ACR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ACR\file.c">
       <Filter>Source Files\ACR</Filter>
     </ClCompile>
   </ItemGroup>

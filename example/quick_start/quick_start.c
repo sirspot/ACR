@@ -49,9 +49,6 @@
 // included for ACR_UNUSED
 #include "ACR/public/public_functions.h"
 
-// included for ACR_ENDIAN_DYNAMIC
-#include "ACR/public/public_byte_order.h"
-
 int main(int argc, char** argv)
 {
 	int result = ACR_TestCommon();

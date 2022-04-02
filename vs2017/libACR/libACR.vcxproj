@@ -78,7 +78,11 @@
     <ClInclude Include="..\..\include\ACR\alignedbuffer.h" />
     <ClInclude Include="..\..\include\ACR\buffer.h" />
     <ClInclude Include="..\..\include\ACR\common.h" />
+    <ClInclude Include="..\..\include\ACR\csv.h" />
+    <ClInclude Include="..\..\include\ACR\file.h" />
+    <ClInclude Include="..\..\include\ACR\filesystem.h" />
     <ClInclude Include="..\..\include\ACR\heap.h" />
+    <ClInclude Include="..\..\include\ACR\json.h" />
     <ClInclude Include="..\..\include\ACR\private\private_buffer.h" />
     <ClInclude Include="..\..\include\ACR\private\private_heap.h" />
     <ClInclude Include="..\..\include\ACR\public.h" />
@@ -94,12 +98,15 @@
     <ClInclude Include="..\..\include\ACR\public\public_dates_and_times.h" />
     <ClInclude Include="..\..\include\ACR\public\public_debug.h" />
     <ClInclude Include="..\..\include\ACR\public\public_decimal.h" />
+    <ClInclude Include="..\..\include\ACR\public\public_file.h" />
+    <ClInclude Include="..\..\include\ACR\public\public_filesystem.h" />
     <ClInclude Include="..\..\include\ACR\public\public_functions.h" />
     <ClInclude Include="..\..\include\ACR\public\public_heap.h" />
     <ClInclude Include="..\..\include\ACR\public\public_info.h" />
     <ClInclude Include="..\..\include\ACR\public\public_math.h" />
     <ClInclude Include="..\..\include\ACR\public\public_memory.h" />
     <ClInclude Include="..\..\include\ACR\public\public_string.h" />
+    <ClInclude Include="..\..\include\ACR\public\public_timer.h" />
     <ClInclude Include="..\..\include\ACR\public\public_unique_strings.h" />
     <ClInclude Include="..\..\include\ACR\public\public_units.h" />
     <ClInclude Include="..\..\include\ACR\public\public_varbuffer.h" />
@@ -110,6 +117,7 @@
     <ClCompile Include="..\..\src\ACR\alignedbuffer.c" />
     <ClCompile Include="..\..\src\ACR\buffer.c" />
     <ClCompile Include="..\..\src\ACR\common.c" />
+    <ClCompile Include="..\..\src\ACR\file.c" />
     <ClCompile Include="..\..\src\ACR\heap.c" />
     <ClCompile Include="..\..\src\ACR\string.c" />
     <ClCompile Include="..\..\src\ACR\varbuffer.c" />
