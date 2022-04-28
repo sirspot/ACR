@@ -326,7 +326,7 @@
 ////////////////////////////////////////////////////////////
 
 /**
-    Include the file "ACR/public/public_byte_order.h" to
+    Include the file "ACR/public/public_bytes_and_flags.h" to
     define ACR_Byte_t, ACR_Flags_t, ACR_HAS_FLAG(),
     ACR_ADD_FLAGS(), and ACR_REMOVE_FLAGS()
 
