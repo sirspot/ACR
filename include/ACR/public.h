@@ -407,7 +407,10 @@
 
     Include the file "ACR/public/public_count.h" to define
     ACR_Count_t, ACR_ZERO_COUNT, ACR_MAX_COUNT, ACR_POINTER_AT(),
-    ACR_VALUE_AT()
+    ACR_VALUE_AT(), ACR_Counter_t, ACR_COUNTER_NEXT()
+
+    Use ACR_Counter_t with ACR_COUNTER_NEXT() to safely
+    count from a starting value to an ending value
 
     Use ACR_Count_t to track the position within an array
     and ACR_VALUE_AT() or ACR_POINTER_AT() to access each member

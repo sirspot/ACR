@@ -234,6 +234,22 @@ int _ACR_TestCommonCount(int testNumber)
         return ACR_FAILURE;
     }
 
+    ACR_COUNTER(counter, 10, 15);
+    ACR_DEBUG_PRINT(3 + testNumber, "OK: test counter values %lu to %lu", counter.m_Start, counter.m_End);
+    if(ACR_CounterFirst(&counter, &count))
+    {
+        do
+        {
+            ACR_DEBUG_PRINT(4 + testNumber, "OK:     counter value is %lu", count);
+        }
+        while(ACR_CounterNext(&counter, &count));
+        ACR_DEBUG_PRINT(5 + testNumber, "OK: counter finished and reset to %lu", count);
+    }
+    else
+    {
+        ACR_DEBUG_PRINT(6 + testNumber, "ERROR: counter is invalid");
+    }
+
     return ACR_SUCCESS;
 }
 

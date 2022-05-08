@@ -80,5 +80,57 @@ typedef unsigned long ACR_Count_t;
 */
 #define ACR_POINTER_AT(t,p,i) (&ACR_VALUE_AT(t,p,i))
 
+/** data used for counting from a start value to an end value
+*/
+typedef struct ACR_Counter_s
+{
+    ACR_Count_t m_Start;
+    ACR_Count_t m_End;
+    ACR_Count_t m_Current;
+} ACR_Counter_t;
+
+/** setup an existing counter
+*/
+#define ACR_COUNTER_SETUP(c, s, e) c = {s,e,s}
+
+/** reset an existing counter
+*/
+#define ACR_COUNTER_RESET(c) c.m_Current = c.m_Start
+
+/** check if a counter is valid
+*/
+#define ACR_COUNTER_IS_VALID(c) (c.m_Start <= c.m_End)
+
+/** define a new counter
+*/
+#define ACR_COUNTER(c, s, e) ACR_Counter_t ACR_COUNTER_SETUP(c,s,e)
+
+/** get the current counter value
+    \param c the counter
+    \param v the ACR_Count_t to store the value
+*/
+#define ACR_COUNTER_CURRENT(c, v) v = c.m_Current
+
+/** increment the counter and get the value 
+    \param c the counter
+    \param v the ACR_Count_t to store the next value
+    \param k ACR_Bool_t value will be set to ACR_BOOL_FALSE if there is no next value
+             in which case the counter is reset so that this macro will return the
+             start value again
+*/
+#define ACR_COUNTER_NEXT(c, v, k)\
+{\
+    if(c.m_Current < c.m_End)\
+    {\
+        c.m_Current += 1;\
+        k = ACR_BOOL_TRUE;\
+    }\
+    else\
+    {\
+        c.m_Current = c.m_Start;\
+        k = ACR_BOOL_FALSE;\
+    }\
+    v = c.m_Current;\
+}
 
 #endif

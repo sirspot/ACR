@@ -128,6 +128,47 @@ ACR_Time_t ACR_TimerElapse(
 
 ////////////////////////////////////////////////////////////
 //
+// PUBLIC FUNCTIONS - COUNTER
+//
+////////////////////////////////////////////////////////////
+
+/** get the current global counter
+    \returns a value ACR_ZERO_COUNT to (ACR_MAX_COUNT-1)
+*/
+ACR_Count_t ACR_GlobalCounter(void);
+
+/** get the next global counter value
+    \param value location to store the value
+    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
+             no more values exist, which means value has been set
+             back to the first value
+*/
+ACR_Bool_t ACR_GlobalCounterNext(
+    ACR_Count_t* value);
+
+/** get the first counter value
+    \param me the counter
+    \param value location to store the value
+    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
+             no values exist which means the counter is invalid
+*/
+ACR_Bool_t ACR_CounterFirst(
+    ACR_Counter_t* me,
+    ACR_Count_t* value);
+
+/** get the next counter value
+    \param me the counter
+    \param value location to store the value
+    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
+             no more values exist, which means value has been set
+             back to the first value
+*/
+ACR_Bool_t ACR_CounterNext(
+    ACR_Counter_t* me,
+    ACR_Count_t* value);
+
+////////////////////////////////////////////////////////////
+//
 // PUBLIC FUNCTIONS - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
