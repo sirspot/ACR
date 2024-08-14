@@ -507,8 +507,8 @@
 /**
     Include the file "ACR/public/public_clock.h" to define
     ACR_HAS_RTC, ACR_TIME_NOW(), ACR_DATETIME_FROM_TIME(),
-    ACR_Time_t, ACR_DateTime_t, ACR_Timer_t, ACR_TIMER_START(),
-    ACR_DATETIME_NOW(), ACR_DATETIME_YEAR(), ACR_DATETIME_MONTH(),
+    ACR_Time_t, ACR_DateTime_t, ACR_DATETIME_NOW(),
+    ACR_DATETIME_YEAR(), ACR_DATETIME_MONTH(),
     ACR_DATETIME_HOUR(), and more
 
     If your platform doesn't have an RTC, define ACR_CONFIG_NO_RTC
@@ -547,7 +547,7 @@
 
     Q: What is a timer?
     A: A timer is similar to a real time clock except that
-       instead of counting in seconds, it counts in 
+       instead of counting in seconds, it counts in microseconds
 */
 #include "ACR/public/public_timer.h"
 
@@ -723,7 +723,7 @@
        number with more than 1 digit should be used
        directly in code instead of a define, constant,
        or variable.
-       See ACR_Month_t in the include file
+       For an example, see ACR_Month_t in the include file
        "ACR/public/public_dates_and_times.h" for more details
        on why magic numbers are bad.
 
@@ -811,6 +811,14 @@
 /////////////////////////////////////////////////////////
 
 /**
+    Include the file "ACR/public/public_file.h" to define
+    ACR_FileInterface_t, which is used to store callback
+    functions to access and modify files
+
+    Include the file "ACR/public/public_filesystem.h" to define
+    ACR_HAS_FILESYSTEM, ACR_FILESYSTEM_FILE_LENGTH(),
+    ACR_FILESYSTEM_FILE_READ(), and ACR_FILESYSTEM_FILE_WRITE()
+
     ### New to C? ###
 
     Q: What is a file?
@@ -827,6 +835,5 @@
 */
 #include "ACR/public/public_file.h"
 #include "ACR/public/public_filesystem.h"
-
 
 #endif

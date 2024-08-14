@@ -80,11 +80,29 @@
 #define ACR_EMPTY_VALUE 0
 
 #ifdef ACR_CONFIG_NO_64BIT
-#define ACR_USE_64BIT ACR_BOOL_FALSE
+    // config without support for 64bit
+    #define ACR_USE_64BIT ACR_BOOL_FALSE
 #else
-/// \todo is there a way to determine, at compile time, whether or not the platform uses 64bit addresses?
-#define ACR_USE_64BIT ACR_BOOL_TRUE
-#endif // #ifndef ACR_CONFIG_NO_64BIT
+    #ifdef ACR_CONFIG_NO_LIBC
+        // cannot use libc. assume config with support for 64bit
+        #define ACR_USE_64BIT ACR_BOOL_TRUE
+    #else
+
+        // determine, at compile time, whether or not the platform uses 64bit addresses
+        // Requires C11 using modified solution found here:
+        //     https://stackoverflow.com/questions/51616057/how-to-determine-pointer-size-preprocessor-c
+        //     Sep 22, 2023 at 16:21 by pjincz
+        // included for UINTPTR_MAX
+        #include <stdint.h>
+        #if (UINTPTR_MAX / 255 % 255) == 8
+            // on 64 bit system
+            #define ACR_USE_64BIT ACR_BOOL_TRUE
+        #else
+            #define ACR_USE_64BIT ACR_BOOL_FALSE
+        #endif
+
+    #endif // #ifdef ACR_CONFIG_NO_LIBC
+#endif // #ifdef ACR_CONFIG_NO_64BIT
 
 /** type for a typical length such as the size of a file or
     the size of an area of memory
@@ -92,11 +110,11 @@
 	stored by this data type
 */
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-typedef unsigned long long ACR_Length_t;
+    // 64bit
+    typedef unsigned long long ACR_Length_t;
 #else
-// 32bit
-typedef unsigned long ACR_Length_t;
+    // 32bit
+    typedef unsigned long ACR_Length_t;
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 /** represents zero length.
@@ -120,11 +138,11 @@ typedef unsigned long ACR_Length_t;
 /** max value that can be stored by the ACR_Length_t type
 */
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-#define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
+    // 64bit
+    #define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
 #else
-// 32bit
-#define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
+    // 32bit
+    #define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 /*

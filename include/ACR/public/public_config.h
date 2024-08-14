@@ -107,35 +107,36 @@
 
         ACR_CONFIG_NO_RTC          do not include <time.h> for time_t, struct tm,
                                    time(), and gmtime_s() or gmtime_r()
-                                   Note: this does not completely disables support
-                                       for times and dates but does limit it.
+                                   Note: this does not completely disable support
+                                         for times and dates but does limit it.
                                    see "TYPES AND DEFINES - REAL TIME CLOCK" for details.
 
         ACR_CONFIG_NO_TIMER        do not include <sys/time.h> for struct timeval, and
                                    gettimeofday()
-                                   Note: this does not completely disables support
-                                       for timers but does limit it.
+                                   Note: this does not completely disable support
+                                         for timers but does limit it.
                                    see "TYPES AND DEFINES - TIMER" for details.
 
         ACR_CONFIG_NO_64BIT        do not use types of long long
                                    Note: only use this setting if you know that your
-                                       compiler does not support 64bit values
-                                       so that 32bit values will be used as the
-                                       largest integer and pointer size instead.
+                                         compiler does not support 64bit values
+                                         so that 32bit values will be used as the
+                                         largest integer and pointer size instead.
                                    see "TYPES AND DEFINES - MEMORY LENGTHS" for details.
 
         ACR_CONFIG_NO_LIBC         do not include any headers from the system
                                    including but not limited to <stdlib.h>,
-                                   <string.h>, and <time.h>. when ACR_CONFIG_DEBUG is
-                                   defined there may be some system headers
-                                   included only to allow the debug featues.
+                                   <string.h>, and <time.h>.
+                                   Note: when ACR_CONFIG_DEBUG is
+                                         defined there may be some system headers
+                                         included only to allow the debug featues.
                                    Note: features provided by these headers will
-                                       attempt to be made available but may
-                                       be limited or require additional user
-                                       setup to be functional.
-                                       each section may use this define to prevent
-                                       system headers from being included and will
-                                       provide additional details upon use.
+                                         attempt to be made available but may
+                                         be limited or require additional user
+                                         setup to be functional.
+                                         each section may use this define to prevent
+                                         system headers from being included and will
+                                         provide additional details upon use.
 
         ACR_CONFIG_HEAP_SIZE       specified in bytes, this configures the heap
                                    size for ACR/heap.h when ACR_CONFIG_NO_LIBC
@@ -215,6 +216,25 @@
     #define ACR_COMPILER_NAME "gcc"
 
 #endif // ACR_PLATFORM_GITPOD
+
+/** LINUX
+*/
+#ifdef ACR_PLATFORM_LINUX
+
+    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
+    #define ACR_PLATFORM_NAME "linux"
+    #ifdef ACR_IDE_QTCREATOR
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "qt_creator"
+        #ifdef ACR_COMPILER_GCC
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "gcc"
+        #endif // ACR_COMPILER_GCC
+    #endif // ACR_IDE_QTCREATOR
+
+#endif // ACR_PLATFORM_LINUX
+
+
 
 #ifndef ACR_HAS_PLATFORM
 
