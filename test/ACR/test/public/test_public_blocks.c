@@ -87,7 +87,7 @@ int main(int argc, char** argv)
         ACR_DEBUG_PRINT(5, "ERROR blocks needed is off by %d", (75-(int)blockCount));
     }
 
-    // calculate the exact number of full blocks needed to store 1600 bytes when
+    // calculate the exact number of full blocks needed to store 1800 bytes when
     // each block is only 32 bytes and the number of bytes that will remain not
     // within a full block.
     ACR_Blocks_t blocks;

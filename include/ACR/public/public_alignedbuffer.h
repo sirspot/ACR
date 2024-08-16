@@ -55,7 +55,7 @@
 // included for ACR_Length_t, ACR_PointerValue_t, ACR_ZERO_LENGTH, and ACR_NULL
 #include "ACR/public/public_memory.h"
 
-// included for ACR_ADD_FLAGS, and ACR_REMOVE_FLAGS
+// included for ACR_BITS_PER_BYTE, ACR_ADD_FLAGS, and ACR_REMOVE_FLAGS
 #include "ACR/public/public_bytes_and_flags.h"
 
 // included for ACR_Buffer_t, ACR_BUFFER_IS_REF, and ACR_BUFFER_FLAGS_NONE
@@ -90,23 +90,23 @@ typedef struct ACR_AlignedBuffer_s
 */
 #define ACR_ALIGNED_BUFFER_IS_VALID(name) ACR_BUFFER_IS_VALID(name.m_AlignedBuffer)
 
-/** allocate memory to the buffer aligned on a block boundary
+/** assign exsiting memory to the buffer aligned on a boundary determined by the specified number of bits
 
     Note: the buffer length available may be up to 1 full block less than the length specified.
 	      use ACR_ALIGNED_BUFFER_GET_LENGTH to get the actual length available and
           use ACR_ALIGNED_BUFFER_GET_MEMORY to get the actual memory address
 */
-#define ACR_ALIGNED_BUFFER_SET_MEMORY(name, memory, length) \
+#define ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(name, memory, length, bits) \
         { \
-			ACR_BUFFER_SET_DATA(name.m_UnalignedBuffer, memory, length); \
-			if((name.m_UnalignedBuffer.m_Pointer != ACR_NULL) && (name.m_UnalignedBuffer.m_Length > ACR_BYTES_PER_BLOCK)) \
+			ACR_BUFFER_SET_DATA(name.m_UnalignedBuffer, (memory), (length)); \
+			if((name.m_UnalignedBuffer.m_Pointer != ACR_NULL) && (name.m_UnalignedBuffer.m_Length > ACR_MIN_BLOCKS_NEEDED_BY_SIZE(bits,ACR_BITS_PER_BYTE))) \
 			{ \
-				ACR_PointerValue_t alignMask = (~(ACR_BITS_PER_BLOCK-1)); \
-				ACR_PointerValue_t memValue = (ACR_PointerValue_t)memory; \
-				memValue += (ACR_BITS_PER_BLOCK-1); \
+				ACR_PointerValue_t alignMask = (~(bits-1)); \
+				ACR_PointerValue_t memValue = (ACR_PointerValue_t)(memory); \
+				memValue += (bits-1); \
 				memValue &= alignMask; \
 				name.m_AlignedBuffer.m_Pointer = (void*)memValue; \
-				name.m_AlignedBuffer.m_Length = (length - (ACR_Length_t)((ACR_PointerValue_t)name.m_AlignedBuffer.m_Pointer - (ACR_PointerValue_t)memory)); \
+				name.m_AlignedBuffer.m_Length = (length - (ACR_Length_t)((ACR_PointerValue_t)name.m_AlignedBuffer.m_Pointer - (ACR_PointerValue_t)(memory))); \
 				ACR_ADD_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF); \
 			} \
 			else \
@@ -116,6 +116,10 @@ typedef struct ACR_AlignedBuffer_s
 				ACR_REMOVE_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF); \
 			} \
         }
+
+/** assign exsiting memory to the buffer aligned on a ACR_Block_t boundary
+*/
+#define ACR_ALIGNED_BUFFER_SET_MEMORY(name, memory, length) ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(name, memory, length, ACR_BITS_PER_BLOCK)
 
 /** get the number of bytes of memory available to the aligned buffer
 */

@@ -66,7 +66,7 @@
 #ifdef ACR_COMPILER_CLANG
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
-#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", number, ##__VA_ARGS__)
+#define ACR_DEBUG_PRINT(number, format, ...) printf("%4d "format"\n", (int)number, ##__VA_ARGS__)
 #else
 #define ACR_IS_DEBUG ACR_BOOL_FALSE
 #define ACR_DEBUG_PRINT(number, format, ...)
