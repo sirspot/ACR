@@ -55,7 +55,7 @@
 // included for ACR_ZERO_LENGTH and ACR_NULL
 #include "ACR/public/public_memory.h"
 
-// included for ACR_Buffer_t, ACR_BUFFER_SET_DATA(), ACR_BUFFER_SET_READ_ONLY(), and ACR_BUFFER_FLAGS_NONE
+// included for ACR_Buffer_t, ACR_BUFFER_SET_DATA(), ACR_BUFFER_SET_READ_ONLY(), and ACR_BUFFER_NO_FLAGS
 #include "ACR/public/public_buffer.h"
 
 // included for ACR_Count_t and ACR_ZERO_COUNT
@@ -73,7 +73,7 @@ typedef struct ACR_String_s
 
 /** define a string on the stack with the specified name
 */
-#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_ZERO_COUNT};
+#define ACR_STRING(name) ACR_String_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_NO_FLAGS},ACR_ZERO_COUNT};
 
 /** assign memory to the string
 */

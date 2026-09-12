@@ -96,10 +96,10 @@ void ACR_AlignedBufferInit(
 
 	me->m_UnalignedBuffer.m_Length = ACR_ZERO_LENGTH;
 	me->m_UnalignedBuffer.m_Pointer = ACR_NULL;
-	me->m_UnalignedBuffer.m_Flags = ACR_BUFFER_FLAGS_NONE;
+	me->m_UnalignedBuffer.m_Flags = ACR_BUFFER_NO_FLAGS;
 	me->m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH;
 	me->m_AlignedBuffer.m_Pointer = ACR_NULL;
-	me->m_AlignedBuffer.m_Flags = ACR_BUFFER_FLAGS_NONE;
+	me->m_AlignedBuffer.m_Flags = ACR_BUFFER_NO_FLAGS;
 }
 
 /**********************************************************/

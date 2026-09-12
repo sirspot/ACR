@@ -64,7 +64,7 @@
 // included for ACR_HAS_MALLOC, ACR_MALLOC, ACR_REALLOC, and ACR_FREE
 #include "ACR/public/public_heap.h"
 
-// included for ACR_Buffer_t, ACR_BUFFER_IS_REF, and ACR_BUFFER_FLAGS_NONE
+// included for ACR_Buffer_t, ACR_BUFFER_IS_REF, and ACR_BUFFER_NO_FLAGS
 #include "ACR/public/public_buffer.h"
 
 /** type for reference to a memory area with variable length
@@ -81,7 +81,7 @@ typedef struct ACR_VarBuffer_s
 
 /** define a variable sized buffer on the stack with the specified name
 */
-#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},ACR_ZERO_LENGTH}
+#define ACR_VAR_BUFFER(name) ACR_VarBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_NO_FLAGS},ACR_ZERO_LENGTH}
 
 /** get the max length of the buffer
 */

@@ -58,7 +58,7 @@
 // included for ACR_BITS_PER_BYTE, ACR_ADD_FLAGS, and ACR_REMOVE_FLAGS
 #include "ACR/public/public_bytes_and_flags.h"
 
-// included for ACR_Buffer_t, ACR_BUFFER_IS_REF, and ACR_BUFFER_FLAGS_NONE
+// included for ACR_Buffer_t, ACR_BUFFER_IS_REF, and ACR_BUFFER_NO_FLAGS
 #include "ACR/public/public_buffer.h"
 
 // included for ACR_BYTES_PER_BLOCK and ACR_BITS_PER_BLOCK
@@ -84,7 +84,7 @@ typedef struct ACR_AlignedBuffer_s
 
 /** define an empty aligned buffer on the stack with the specified name
 */
-#define ACR_ALIGNED_BUFFER(name) ACR_AlignedBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE},{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE}}
+#define ACR_ALIGNED_BUFFER(name) ACR_AlignedBuffer_t name = {{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_NO_FLAGS},{ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_NO_FLAGS}}
 
 /** check if the aligned buffer is valid
 */

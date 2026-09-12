@@ -103,9 +103,10 @@ typedef unsigned char ACR_Byte_t;
 */
 typedef ACR_Byte_t ACR_Flags_t;
 
+#define ACR_NO_FLAGS   0x00
+
 /* Hex values for each flag
 */
-#define ACR_FLAG_NONE  0x00
 #define ACR_FLAG_ONE   0x01
 #define ACR_FLAG_TWO   0x02
 #define ACR_FLAG_THREE 0x04
@@ -132,6 +133,19 @@ typedef ACR_Byte_t ACR_Flags_t;
 */
 #define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) != 0)
 
+/** checks if the flags are an exact match
+ 
+    example:
+
+    ACR_Flags_t flags = ACR_FLAG_ONE;
+    if(ACR_HAS_EXACT_FLAGS(flags, ACR_NO_FLAGS))
+    {
+        // one or more flags are set
+    }
+
+*/
+#define ACR_HAS_EXACT_FLAGS(checkFlags, forFlags) (checkFlags == forFlags)
+
 /** checks if all of the flags are present
  
     example:
@@ -143,7 +157,7 @@ typedef ACR_Byte_t ACR_Flags_t;
     }
 
 */
-#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) == forFlags)
+#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) == (forFlags))
 
 /** use this when checking for just one flag
 */
@@ -156,15 +170,15 @@ typedef ACR_Byte_t ACR_Flags_t;
     ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
     if(ACR_HAS_ONLY_FLAGS(flags, ACR_FLAG_ONE | ACR_FLAG_FOUR))
     {
-        // flags has ONE and/or FOUR and no other flags
+        // flags has NONE, ONE, and/or FOUR and no other flags
     }
     else
     {
-        // there are flags other than ONE and FOUR present
+        // there are flags other than ONE and/or FOUR present
     }
 
 */
-#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) (((checkFlags) & (~(forFlags)) == 0)
+#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) (((checkFlags) & (~(forFlags))) == 0)
 
 /** adds one or more flags to the existing flags
 */

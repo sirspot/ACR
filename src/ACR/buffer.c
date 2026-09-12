@@ -1219,7 +1219,7 @@ void ACR_BufferInit(
 
     me->m_Base.m_Length = ACR_ZERO_LENGTH;
     me->m_Base.m_Pointer = ACR_NULL;
-    me->m_Base.m_Flags = ACR_BUFFER_FLAGS_NONE;
+    me->m_Base.m_Flags = ACR_BUFFER_NO_FLAGS;
 }
 
 /**********************************************************/
