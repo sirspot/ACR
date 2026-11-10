@@ -1,40 +1,23 @@
 name: MSBuild
 
-on: [push]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
-env:
-  # Path to the solution file relative to the root of the project.
-  SOLUTION_FILE_PATH: ./vs2017/ACR.sln
-
-  # Configuration type to build.
-  # You can convert this to a build matrix if you need coverage of multiple configuration types.
-  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-  BUILD_CONFIGURATION: GitHub
+permissions:
+  contents: read
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v7
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v3
 
-    - name: Select installed Windows SDK
-      shell: pwsh
-      run: |
-        $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" -Directory |
-          Where-Object { $_.Name -match '^10\.\d+\.\d+\.\d+$' } |
-          Sort-Object { [version]$_.Name } -Descending |
-          Select-Object -First 1
-        if (-not $sdk) {
-          throw "No installed Windows 10 SDK was found."
-        }
-        "WINDOWS_SDK_VERSION=$($sdk.Name)" >> $env:GITHUB_ENV
-
-    - name: Build
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      # Add additional options to the MSBuild command line here (like platform or verbosity level).
-      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:WindowsTargetPlatformVersion=${{env.WINDOWS_SDK_VERSION}} ${{env.SOLUTION_FILE_PATH}}
+      - name: Build solution
+        run: msbuild .\vs2017\ACR.sln -m -v:minimal /p:Configuration=GitHub /p:Platform=x64
