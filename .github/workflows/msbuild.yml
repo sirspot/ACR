@@ -21,8 +21,20 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
+    - name: Select installed Windows SDK
+      shell: pwsh
+      run: |
+        $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" -Directory |
+          Where-Object { $_.Name -match '^10\.\d+\.\d+\.\d+$' } |
+          Sort-Object { [version]$_.Name } -Descending |
+          Select-Object -First 1
+        if (-not $sdk) {
+          throw "No installed Windows 10 SDK was found."
+        }
+        "WINDOWS_SDK_VERSION=$($sdk.Name)" >> $env:GITHUB_ENV
+
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:WindowsTargetPlatformVersion=${{env.WINDOWS_SDK_VERSION}} ${{env.SOLUTION_FILE_PATH}}
