@@ -76,6 +76,20 @@
         #ifdef ACR_COMPILER_GCC
             // included for time(), gmtime_r()
             #include <time.h>
+            #ifdef _WIN32
+                // gmtime_r is not available on most windows platforms.
+                // use an inline function to simulate it instead
+                static inline struct tm* gmtime_r(const time_t* t, struct tm* name)
+                {
+                    struct tm* tm = gmtime(t);
+                    if (tm && name)
+                    {
+                        (*name) = (*tm);
+                        return name;
+                    }
+                    return NULL;
+                }
+            #endif
             #define ACR_HAS_RTC ACR_BOOL_TRUE
             #define ACR_TIME_NOW(name) time(&name)
             #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
