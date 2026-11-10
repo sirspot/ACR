@@ -62,7 +62,7 @@
 // ACR_CLEAR_MEMORY(), and ACR_NULL
 #include "ACR/public/public_memory.h"
 
-// included for ACR_Byte_t, ACR_Flags_t, ACR_FLAG_NONE,
+// included for ACR_Byte_t, ACR_Flags_t, ACR_NO_FLAGS,
 // ACR_FLAG_ONE, ACR_FLAG_TWO, ACR_HAS_FLAG(),
 // ACR_ADD_FLAGS(), and ACR_REMOVE_FLAGS()
 #include "ACR/public/public_bytes_and_flags.h"
@@ -100,14 +100,14 @@ typedef struct ACR_Buffer_s
 */
 enum ACR_BufferFlags_e
 {
-	ACR_BUFFER_FLAGS_NONE = ACR_FLAG_NONE,
+	ACR_BUFFER_NO_FLAGS   = ACR_NO_FLAGS,
 	ACR_BUFFER_IS_REF     = ACR_FLAG_ONE,
 	ACR_BUFFER_READ_ONLY  = ACR_FLAG_TWO
 };
 
 /** define a buffer on the stack with the specified name
 */
-#define ACR_BUFFER(name) ACR_Buffer_t name = {ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_FLAGS_NONE}
+#define ACR_BUFFER(name) ACR_Buffer_t name = {ACR_NULL,ACR_ZERO_LENGTH,ACR_BUFFER_NO_FLAGS}
 
 /** define a buffer on the stack and with the specified name using the data of the specified size 
 */

@@ -114,7 +114,7 @@
     typedef unsigned long long ACR_Length_t;
 #else
     // 32bit
-    typedef unsigned long ACR_Length_t;
+    typedef unsigned int ACR_Length_t;
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 /** represents zero length.

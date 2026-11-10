@@ -96,18 +96,18 @@
 //                decimal little endian = 1
 //                decimal big endian = 256
 //
-//   long/4       memory = [ 0x00 0x01 0x00 0x00 ]
+//   int/4        memory = [ 0x00 0x01 0x00 0x00 ]
 //                binary little endian = 
 //                    MSB 00000000 00000001 00000000 00000000 LSB
 //                decimal little endian = 65536
 //                decimal big endian = 256
 //
-// "long" Example:
+// "int" Example:
 //
 //      // given a local variable with value 1
-//      long valueInSystemEndian = 1;
+//      int valueInSystemEndian = 1;
 //      // convert the value to big endian 
-//      long valueInBigEndian = ACR_BYTE_ORDER_32(valueInSystemEndian);
+//      int valueInBigEndian = ACR_BYTE_ORDER_32(valueInSystemEndian);
 //      // and use the same macro to convert
 //      // a big endian value back to system endianness
 //      valueInSystemEndian = ACR_BYTE_ORDER_32(valueInBigEndian);
@@ -169,6 +169,33 @@ static inline ACR_Bool_t ACR_InlineIsBigEndian(void)
 // this was written
 //
 #ifndef ACR_IS_BIG_ENDIAN
+
+    #ifdef  __BYTE_ORDER__
+        // the compiler has already specified byte order
+        #ifdef __ORDER_LITTLE_ENDIAN__
+            // the compiler as also specified a known value for __BYTE_ORDER__
+            #undef BYTE_ORDER
+            #undef LITTLE_ENDIAN
+            #undef BIG_ENDIAN
+            #define LITTLE_ENDIAN 1234
+            #define BIG_ENDIAN 4321
+            #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+                #define BYTE_ORDER LITTLE_ENDIAN
+            #else
+                #define BYTE_ORDER BIG_ENDIAN
+            #endif
+        #endif
+    #else
+        #if defined(_WIN32) || defined(_WIN64)
+            // Windows is (historically) always little endian
+            #undef BYTE_ORDER
+            #undef LITTLE_ENDIAN
+            #undef BIG_ENDIAN
+            #define LITTLE_ENDIAN 1234
+            #define BIG_ENDIAN 4321
+            #define BYTE_ORDER LITTLE_ENDIAN
+        #endif
+    #endif
 
     // check for compiler defined values such as those normally provided by clang
     #if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
