@@ -161,6 +161,7 @@
 #define ACR_DAY_STR_TUESDAY "tuesday"
 
 // *** U ***
+#define ACR_INFO_STR_UNDEFINED "undefined"
 #define ACR_INFO_STR_UNKNOWN "unknown"
 #define ACR_INFO_STR_UP "up"
 

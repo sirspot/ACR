@@ -43,6 +43,9 @@
 
 #include "ACR/common.h"
 
+// included for NAN to test undefined decimal comparisons
+#include <math.h>
+
 // included for ACR_BYTE_ORDER_16, ACR_BYTE_ORDER_32, ACR_BYTE_ORDER_64
 #include "ACR/public/public_byte_order.h"
 
@@ -164,8 +167,8 @@ int _ACR_TestCommonEndian(int testNumber)
     }
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-    systemEndianValue64 = ACR_BYTE_ORDER_32(bigEndian64);
-    if (systemEndianValue32 != 0x0000000000000001ULL)
+    systemEndianValue64 = ACR_BYTE_ORDER_64(bigEndian64);
+    if (systemEndianValue64 != 0x0000000000000001ULL)
     {
         // ACR_BYTE_ORDER_64 is not working properly
         ACR_DEBUG_PRINT(9 + testNumber, "ERROR: ACR_IS_BIG_ENDIAN is %s but ACR_BYTE_ORDER_64 did not work", (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE) ? ACR_INFO_STR_FALSE : ACR_INFO_STR_TRUE);
@@ -234,7 +237,7 @@ int _ACR_TestCommonCount(int testNumber)
         return ACR_FAILURE;
     }
 
-    ACR_COUNTER(counter, 10, 15);
+    ACR_COUNTER(counter, 10, 15, 10);
     ACR_DEBUG_PRINT(3 + testNumber, "OK: test counter values %lu to %lu", counter.m_Start, counter.m_End);
     if(ACR_CounterFirst(&counter, &count))
     {
@@ -382,13 +385,41 @@ int _ACR_TestCommonDecimal(int testNumber)
     if (ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, (ACR_Decimal_t)5.2, (ACR_Decimal_t)0.0001) != ACR_INFO_EQUAL)
     {
         // 5.1999 and 5.2 should have been equal using the tolerance
-        ACR_DEBUG_PRINT(1 + testNumber, "ERROR: ACR_DECIMAL_COMPARE should have found %0.4f to be equal to %0.4f", realNumber, 5.2);
+        ACR_DEBUG_PRINT(1 + testNumber, "ERROR: decimal values within tolerance were not reported equal");
         return ACR_FAILURE;
     }
     else
     {
-        ACR_DEBUG_PRINT(2 + testNumber, "OK: ACR_DECIMAL_COMPARE found %0.4f is within %0.4f of %0.4f", realNumber, 0.0001, 5.2);
+        ACR_DEBUG_PRINT(2 + testNumber, "OK: decimal values within tolerance were reported equal");
     }
+
+    if (ACR_DECIMAL_TOLERANCE_COMPARE(NAN, realNumber, ACR_DEFAULT_TOLERANCE) != ACR_INFO_UNDEFINED)
+    {
+        ACR_DEBUG_PRINT(3 + testNumber, "ERROR: NaN first operand was not reported undefined");
+        return ACR_FAILURE;
+    }
+    ACR_DEBUG_PRINT(4 + testNumber, "OK: NaN first operand was reported undefined");
+
+    if (ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, NAN, ACR_DEFAULT_TOLERANCE) != ACR_INFO_UNDEFINED)
+    {
+        ACR_DEBUG_PRINT(5 + testNumber, "ERROR: NaN second operand was not reported undefined");
+        return ACR_FAILURE;
+    }
+    ACR_DEBUG_PRINT(6 + testNumber, "OK: NaN second operand was reported undefined");
+
+    if (ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, (ACR_Decimal_t)5.3, NAN) != ACR_INFO_UNDEFINED)
+    {
+        ACR_DEBUG_PRINT(7 + testNumber, "ERROR: NaN tolerance was not reported undefined");
+        return ACR_FAILURE;
+    }
+    ACR_DEBUG_PRINT(8 + testNumber, "OK: NaN tolerance was reported undefined");
+
+    if (ACR_DECIMAL_TOLERANCE_COMPARE(realNumber, (ACR_Decimal_t)5.3, -ACR_DEFAULT_TOLERANCE) != ACR_INFO_UNKNOWN)
+    {
+        ACR_DEBUG_PRINT(9 + testNumber, "ERROR: negative tolerance was not reported unknown");
+        return ACR_FAILURE;
+    }
+    ACR_DEBUG_PRINT(10 + testNumber, "OK: negative tolerance was reported unknown");
 
     return ACR_SUCCESS;
 }
@@ -414,12 +445,12 @@ int _ACR_TestCommonUtf8(int testNumber)
     if (stringForEmojiSmile.m_Count != 7)
     {
         // incorrect character count for string with emoji smile
-        ACR_DEBUG_PRINT(3 + testNumber, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
+        ACR_DEBUG_PRINT(5 + testNumber, "ERROR: ACR_StringFromMemory() says the smile emoji is %lu characters", stringForEmojiSmile.m_Count);
         return ACR_FAILURE;
     }
     else
     {
-        ACR_DEBUG_PRINT(4 + testNumber, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, (const char*)stringForEmojiSmile.m_Buffer.m_Pointer);
+        ACR_DEBUG_PRINT(6 + testNumber, "OK: %.*s with a single character smile emoji", (int)stringForEmojiSmile.m_Buffer.m_Length, (const char*)stringForEmojiSmile.m_Buffer.m_Pointer);
     }
 
     return ACR_SUCCESS;

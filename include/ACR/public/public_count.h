@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -48,9 +48,12 @@
 #ifndef _ACR_PUBLIC_COUNT_H_
 #define _ACR_PUBLIC_COUNT_H_
 
+// included for ACR_BOOL_TRUE, ACR_BOOL_FALSE
+#include "ACR/public/public_bool.h"
+
 /** type for a typical count such as the number of items in an array
     \see ACR_MAX_COUNT for the maximum value that can be
-    stored by this data type
+         stored by this data type
 */
 typedef unsigned long ACR_Count_t;
 
@@ -64,15 +67,31 @@ typedef unsigned long ACR_Count_t;
 */
 #define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
 
-/** get a pointer to a data item in an array
+/** get the value of a data item in an array
+
+    example to a get the value of the 10th number in an array
+    
+    void* numbers = malloc(sizeof(int)*100);
+    memset(numbers, 0, sizeof(int)*100);
+    int value = ACR_VALUE_AT(int, numbers, 10);
+    // value is 0
+
     \param t the data type
     \param p the pointer
     \param i the position 0 to length-1 where
              length is the number of data items in the array
 */
-#define ACR_VALUE_AT(t,p,i) ((t*)p)[i]
+#define ACR_VALUE_AT(t,p,i) ((t*)(p))[(i)]
 
 /** get a pointer to a data item in an array
+
+    example to a get a pointer to the 10th number in an array
+    
+    void* numbers = malloc(sizeof(int)*100);
+    int* valuePtr = ACR_VALUE_AT(int, numbers, 10);
+    (*valuePtr) = 0;
+    // value is set to 0 in the array
+
     \param t the data type
     \param p the pointer
     \param i the position 0 to length-1 where
@@ -89,48 +108,65 @@ typedef struct ACR_Counter_s
     ACR_Count_t m_Current;
 } ACR_Counter_t;
 
-/** setup an existing counter
+/** define a new counter
+    \param c name for the new counter object
+    \param s the start value
+    \param e the end value
+    \param v the current value
 */
-#define ACR_COUNTER_SETUP(c, s, e) c = {s,e,s}
+#define ACR_COUNTER(c, s, e, v) ACR_Counter_t c = {(s),(e),(v)}
+
+/** setup an existing counter
+    \param c the existing counter object
+    \param s the start value
+    \param e the end value
+    \param v the current value
+*/
+#define ACR_COUNTER_SETUP(c, s, e, v)\
+do\
+{\
+    (c).m_Start = (s);\
+    (c).m_Current = (v);\
+    (c).m_End = (e);\
+}\
+while (0)\
 
 /** reset an existing counter
+    \param c the existing counter object
 */
-#define ACR_COUNTER_RESET(c) c.m_Current = c.m_Start
+#define ACR_COUNTER_RESET(c) (c).m_Current = (c).m_Start
 
 /** check if a counter is valid
+    \param c the existing counter object
 */
-#define ACR_COUNTER_IS_VALID(c) (c.m_Start <= c.m_End)
-
-/** define a new counter
-*/
-#define ACR_COUNTER(c, s, e) ACR_Counter_t ACR_COUNTER_SETUP(c,s,e)
+#define ACR_COUNTER_IS_VALID(c) (((c).m_Start) <= ((c).m_End)) && (((c).m_Current) <= ((c).m_End)) && (((c).m_Current) >= ((c).m_Start))
 
 /** get the current counter value
-    \param c the counter
+    \param c the existing counter object
     \param v the ACR_Count_t to store the value
 */
-#define ACR_COUNTER_CURRENT(c, v) v = c.m_Current
+#define ACR_COUNTER_CURRENT(c, v) (v) = (c).m_Current
 
 /** increment the counter and get the value 
-    \param c the counter
+    \param c the existing counter object
     \param v the ACR_Count_t to store the next value
     \param k ACR_Bool_t value will be set to ACR_BOOL_FALSE if there is no next value
              in which case the counter is reset so that this macro will return the
              start value again
 */
 #define ACR_COUNTER_NEXT(c, v, k)\
-{\
-    if(c.m_Current < c.m_End)\
+do {\
+    if(((c).m_Current) < ((c).m_End))\
     {\
-        c.m_Current += 1;\
-        k = ACR_BOOL_TRUE;\
+        (c).m_Current += 1;\
+        (k) = ACR_BOOL_TRUE;\
     }\
     else\
     {\
-        c.m_Current = c.m_Start;\
-        k = ACR_BOOL_FALSE;\
+        (c).m_Current = (c).m_Start;\
+        (k) = ACR_BOOL_FALSE;\
     }\
-    v = c.m_Current;\
-}
+    (v) = (c).m_Current;\
+} while (0)
 
 #endif

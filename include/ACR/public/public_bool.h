@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -49,6 +49,19 @@
 #ifndef _ACR_PUBLIC_BOOL_H_
 #define _ACR_PUBLIC_BOOL_H_
 
+#include "ACR/public/public_version.h"
+
+#if ACR_C_VERSION < ACR_C_VERSION_23
+    // only C23 has the bool datatype built-in.
+    // earlier versions such as C99 use an additional header.
+    #ifndef ACR_CONFIG_NO_LIBC
+        #include <stdbool.h>
+        #define ACR_CONFIG_INTERNAL_BOOL_BUILTIN
+    #endif
+#else
+    #define ACR_CONFIG_INTERNAL_BOOL_BUILTIN
+#endif
+
 /** represents a false boolean result
 
     example:
@@ -63,7 +76,11 @@
         }
 
 */
-#define ACR_BOOL_FALSE 0
+#ifdef ACR_CONFIG_INTERNAL_BOOL_BUILTIN
+    #define ACR_BOOL_FALSE false
+#else
+    #define ACR_BOOL_FALSE 0
+#endif
 
 /** represents a true boolean result
 
@@ -79,10 +96,18 @@
         }
 
 */
-#define ACR_BOOL_TRUE 1
+#ifdef ACR_CONFIG_INTERNAL_BOOL_BUILTIN
+    #define ACR_BOOL_TRUE true
+#else
+    #define ACR_BOOL_TRUE 1
+#endif
 
 /** use this type only for ACR_BOOL_FALSE or ACR_BOOL_TRUE
 */
-typedef char ACR_Bool_t;
+#ifdef ACR_CONFIG_INTERNAL_BOOL_BUILTIN
+    typedef bool ACR_Bool_t;
+#else
+    typedef char ACR_Bool_t;
+#endif
 
 #endif

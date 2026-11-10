@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -69,7 +69,12 @@
                 unexpected type changes so this must be done carefully to support all platforms.
 
 */
-typedef unsigned char ACR_Byte_t;
+#ifndef ACR_CONFIG_NO_LIBC
+    #include <stdint.h>
+    typedef uint8_t ACR_Byte_t;
+#else
+    typedef unsigned char ACR_Byte_t;
+#endif
 
 /** number of bits in ACR_Byte_t
 */
@@ -79,7 +84,6 @@ typedef unsigned char ACR_Byte_t;
 */
 #define ACR_MAX_BYTE 255 // hex value 0xFF
 
-
 ////////////////////////////////////////////////////////////
 //
 // TYPES AND DEFINES - FLAGS
@@ -87,7 +91,7 @@ typedef unsigned char ACR_Byte_t;
 ////////////////////////////////////////////////////////////
 
 /** flags are always a single byte to keep options organized.
-    if necessary, use more than one set of flags.
+    if necessary, use more than one set of flags (or an array).
 
     ### New to C? ###
 
@@ -117,7 +121,7 @@ typedef ACR_Byte_t ACR_Flags_t;
 
 /** Converts a number between 1 and 8 to the cooresponding flag
 */
-#define ACR_FLAG(n) (0x01 << (n-1))
+#define ACR_FLAG(n) (0x01 << ((n)-1))
 
 /** checks if any of the flags are present
  
@@ -132,8 +136,8 @@ typedef ACR_Byte_t ACR_Flags_t;
 */
 #define ACR_HAS_ANY_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) != 0)
 
-/** checks if all of the flags are present
- 
+/** checks if all flags are present.
+
     example:
 
     ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR | ACR_FLAG_SEVEN;
@@ -142,12 +146,18 @@ typedef ACR_Byte_t ACR_Flags_t;
         // flags has ONE, FOUR, and SEVEN
     }
 
+    \param check_flags The flags to inspect.
+    \param required_flags The flags that must all be present.
+    \return 1 if all required flags are present; otherwise 0.
 */
-#define ACR_HAS_ALL_FLAGS(checkFlags, forFlags) (((checkFlags) & (forFlags)) == forFlags)
+static inline int ACR_HAS_ALL_FLAGS(ACR_Flags_t check_flags, ACR_Flags_t required_flags)
+{
+    return (check_flags & required_flags) == required_flags;
+}
 
 /** use this when checking for just one flag
 */
-#define ACR_HAS_FLAG(checkFlags, forFlag) ACR_HAS_ALL_FLAGS(checkFlags, forFlag)
+#define ACR_HAS_FLAG(checkFlags, forFlag) (((checkFlags) & (forFlag)) != 0)
 
 /** checks if any flags exist that are not specified
  
@@ -164,14 +174,14 @@ typedef ACR_Byte_t ACR_Flags_t;
     }
 
 */
-#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) (((checkFlags) & (~(forFlags)) == 0)
+#define ACR_HAS_ONLY_FLAGS(checkFlags, forFlags) (((checkFlags) & (~(forFlags))) == 0)
 
 /** adds one or more flags to the existing flags
 */
-#define ACR_ADD_FLAGS(flags, flagsToAdd) flags |= (flagsToAdd)
+#define ACR_ADD_FLAGS(flags, flagsToAdd) (flags) |= (flagsToAdd)
 
 /** removes one or more flags from the existing flags
 */
-#define ACR_REMOVE_FLAGS(flags, flagsToRemove) flags &= (~(flagsToRemove))
+#define ACR_REMOVE_FLAGS(flags, flagsToRemove) (flags) &= (~(flagsToRemove))
 
 #endif

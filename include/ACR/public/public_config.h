@@ -66,6 +66,7 @@
 
             ACR_IDE_XCODE           using XCode
             ACR_IDE_QTCREATOR       using Qt Creator
+            ACR_IDE_VSCODE          using Visual Studio Code
 
             ACR_COMPILER_CLANG      compiling with clang
 
@@ -166,6 +167,14 @@
             #define ACR_COMPILER_NAME "clang"
         #endif // ACR_COMPILER_CLANG
     #endif // ACR_IDE_XCODE
+    #ifdef ACR_IDE_VSCODE
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "vscode"
+        #ifdef ACR_COMPILER_CLANG
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "clang"
+        #endif // ACR_COMPILER_CLANG
+    #endif // ACR_IDE_VSCODE
 
 #endif // ACR_PLATFORM_MAC
 

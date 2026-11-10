@@ -73,6 +73,7 @@ static const char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
     ACR_INFO_STR_LESS,      // ACR_INFO_LESS
     ACR_INFO_STR_GREATER,   // ACR_INFO_GREATER
     ACR_INFO_STR_UNKNOWN,   // ACR_INFO_UNKNOWN
+    ACR_INFO_STR_UNDEFINED, // ACR_INFO_UNDEFINED
 
     //
     // POSITIVE, NEGATIVE
@@ -193,7 +194,7 @@ ACR_Time_t g_ACRSimRtcTime = 0;
 ACR_Bool_t g_ACRSimRtcTimeMicroIsSet = ACR_BOOL_FALSE;
 ACR_Time_t g_ACRSimRtcTimeMicro = 0;
 
-ACR_COUNTER(g_ACRGlobalCounter, ACR_ZERO_COUNT, (ACR_MAX_COUNT-1));
+ACR_COUNTER(g_ACRGlobalCounter, ACR_ZERO_COUNT, (ACR_MAX_COUNT-1), ACR_ZERO_COUNT);
 
 ////////////////////////////////////////////////////////////
 //

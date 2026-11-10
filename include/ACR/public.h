@@ -3,7 +3,7 @@
    ********** DO NOT REMOVE THIS INFORMATION ************
 
    ACR - A set of C functions in a git Repository
-   Copyright (C) 2018 - 2022 Adam C. Rosenberg
+   Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
    Please read LICENSE before using this code
 
@@ -669,15 +669,15 @@
 
 /**
     Include the file "ACR/public/public_decimal.h" to define
-    ACR_Decimal_t, ACR_DECIMAL_COMPARE(), 
-    ACR_DECIMAL_TOLERANCE_COMPARE() and more
+   ACR_Decimal_t, ACR_DECIMAL_COMPARE(),
+   ACR_DECIMAL_TOLERANCE_COMPARE(), and more
 
     It is highly recommended that decimal values such as those
     defined by the types: float, double, etc are not simply
     compared using == or similar operators because rounding
     errors can cause this to fail. Instead, store the decimal
     values as ACR_Decimal_t and use the ACR_DECIMAL_COMPARE()
-    or ACR_DECIMAL_TOLERANCE_COMPARE() macros to perform the
+    or ACR_DECIMAL_TOLERANCE_COMPARE() to perform the
     comparison.
 
     ### New to C? ###

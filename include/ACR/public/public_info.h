@@ -146,6 +146,7 @@ typedef enum ACR_Info_e
     ACR_INFO_LESS,
     ACR_INFO_GREATER,
     ACR_INFO_UNKNOWN,
+    ACR_INFO_UNDEFINED,
 
     //
     // POSITIVE,       NEGATIVE
