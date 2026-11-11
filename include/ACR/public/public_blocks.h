@@ -44,7 +44,7 @@
     work with blocks of data.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_Block_t           for block data count
     ACR_Blocks_t          for exact block and byte count
     ACR_MIN_BLOCKS_NEEDED as a macro to convert bytes to blocks needed

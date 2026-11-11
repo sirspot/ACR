@@ -59,8 +59,8 @@ ACR_Info_t ACR_VarBufferNew(
 	{
 		ACR_BUFFER(buffer);
 
-		ACR_BUFFER_ALLOC(buffer, sizeof(ACR_VarBuffer_t));
-		if(ACR_BUFFER_IS_VALID(buffer))
+		ACR_BUFFER_ALLOC(&buffer, sizeof(ACR_VarBuffer_t));
+		if(ACR_BUFFER_IS_VALID(&buffer))
 		{
 			ACR_VarBufferInit((ACR_VarBuffer_t*)buffer.m_Pointer);
 			result = ACR_INFO_OK;
@@ -79,8 +79,8 @@ void ACR_VarBufferDelete(
 		ACR_BUFFER(buffer);
 
 		ACR_VarBufferDeInit((*mePtr));
-		ACR_BUFFER_SET_DATA(buffer, (*mePtr), sizeof(ACR_VarBuffer_t));
-		ACR_BUFFER_FORCE_FREE(buffer);
+		ACR_BUFFER_SET_DATA(&buffer, (*mePtr), sizeof(ACR_VarBuffer_t));
+		ACR_BUFFER_FORCE_FREE(&buffer);
 		(*mePtr) = ACR_NULL;
 	}
 }
@@ -259,5 +259,5 @@ void ACR_VarBufferClear(
 		return;
 	}
 
-	ACR_BUFFER_CLEAR(me->m_Buffer);
+	ACR_BUFFER_CLEAR(&me->m_Buffer);
 }

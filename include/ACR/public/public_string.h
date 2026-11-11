@@ -44,7 +44,7 @@
     work with variable length data buffers.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_String_t          for string data
     ACR_Unicode_t         for unicode characters
 
@@ -77,7 +77,7 @@ typedef struct ACR_String_s
 
 /** assign memory to the string
 */
-#define ACR_STRING_SET_DATA(name, memory, length, count) ACR_BUFFER_SET_DATA(name.m_Buffer, memory, length); name.m_Count = count;
+#define ACR_STRING_SET_DATA(name, memory, length, count) ACR_BUFFER_SET_DATA(&name.m_Buffer, memory, length); name.m_Count = count;
 
 /** type for unicode characters
 */
@@ -90,10 +90,10 @@ typedef unsigned long ACR_Unicode_t;
 
 /** mark the string as read only
 */
-#define ACR_STRING_SET_READ_ONLY(name, readOnly) ACR_BUFFER_SET_READ_ONLY(name.m_Buffer, readOnly)
+#define ACR_STRING_SET_READ_ONLY(name, readOnly) ACR_BUFFER_SET_READ_ONLY(&name.m_Buffer, readOnly)
 
 /** check if the string is marked read only
 */
-#define ACR_STRING_IS_READ_ONLY(name) ACR_BUFFER_IS_READ_ONLY(name.m_Buffer)
+#define ACR_STRING_IS_READ_ONLY(name) ACR_BUFFER_IS_READ_ONLY(&name.m_Buffer)
 
 #endif

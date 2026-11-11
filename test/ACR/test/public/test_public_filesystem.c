@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     ACR_Length_t startPos;
 
     append = ACR_BOOL_FALSE;
-    ACR_BUFFER_SET_DATA(buffer, path, sizeof(path)-1);
+    ACR_BUFFER_SET_DATA(&buffer, path, sizeof(path)-1);
     ACR_FILESYSTEM_FILE_WRITE(path,length,buffer,append);
 	ACR_DEBUG_PRINT(1,"OK %d bytes written to %s", (int)length, path);
 
@@ -79,11 +79,11 @@ int main(int argc, char** argv)
 	ACR_DEBUG_PRINT(1,"OK %s length is %d", path, (int)length);
 
     startPos = 0;
-    ACR_BUFFER_ALLOC(buffer,length);
+    ACR_BUFFER_ALLOC(&buffer,length);
     ACR_FILESYSTEM_FILE_READ(path,length,buffer,startPos);
 	ACR_DEBUG_PRINT(1,"OK %d bytes read from %s", (int)length, path);
 	ACR_DEBUG_PRINT(1,"OK read: \"%.*s\"", (int)buffer.m_Length, (const char*)buffer.m_Pointer);
-    ACR_BUFFER_FREE(buffer);
+    ACR_BUFFER_FREE(&buffer);
   
 	return result;
 }

@@ -43,7 +43,7 @@
     This header provides debug printing.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_IS_DEBUG    as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
     ACR_DEBUG_PRINT as a macro
 

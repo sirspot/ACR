@@ -43,7 +43,7 @@
     This header provides access to the file system when available.
     It is included automatically with public.h
     
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_HAS_FILESYSTEM     as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
     ACR_File_t             for file data
 

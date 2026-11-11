@@ -331,7 +331,7 @@ int _ACR_TestCommonDateTime(int testNumber)
 int _ACR_TestCommonBuffer(int testNumber)
 {
     ACR_BUFFER(buffer);
-    if (ACR_BUFFER_GET_LENGTH(buffer) != 0)
+    if (ACR_BUFFER_GET_LENGTH(&buffer) != 0)
     {
         // buffer length should have initialized to zero
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
@@ -341,8 +341,8 @@ int _ACR_TestCommonBuffer(int testNumber)
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
         return ACR_FAILURE;
     }
-    ACR_BUFFER_ALLOC(buffer, 1000);
-    if (ACR_BUFFER_GET_LENGTH(buffer) == 0)
+    ACR_BUFFER_ALLOC(&buffer, 1000);
+    if (ACR_BUFFER_GET_LENGTH(&buffer) == 0)
     {
         // failed to allocate the buffer
 #if ACR_HAS_MALLOC != ACR_BOOL_FALSE
@@ -364,8 +364,8 @@ int _ACR_TestCommonBuffer(int testNumber)
         ACR_DEBUG_PRINT(6 + testNumber, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", buffer.m_Length);
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
     }
-    ACR_BUFFER_FREE(buffer);
-    if (ACR_BUFFER_GET_LENGTH(buffer) != 0)
+    ACR_BUFFER_FREE(&buffer);
+    if (ACR_BUFFER_GET_LENGTH(&buffer) != 0)
     {
         ACR_DEBUG_PRINT(7 + testNumber, "ERROR: ACR_BUFFER_FREE failed to free buffer memory");
         return ACR_FAILURE;

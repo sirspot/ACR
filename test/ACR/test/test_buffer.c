@@ -284,18 +284,18 @@ int LowLevelTest(void)
 {
 	ACR_BUFFER(buffer);
 
-	ACR_BUFFER_ALLOC(buffer, 5000);
-	if(ACR_BUFFER_IS_VALID(buffer))
+	ACR_BUFFER_ALLOC(&buffer, 5000);
+	if(ACR_BUFFER_IS_VALID(&buffer))
 	{
 		//
 		// OK - 5000 byte buffer ready for use
 		//
 
 		// optional step to clear the buffer
-		ACR_BUFFER_CLEAR(buffer);
+		ACR_BUFFER_CLEAR(&buffer);
 
 		// done with the buffer
-		ACR_BUFFER_FREE(buffer);
+		ACR_BUFFER_FREE(&buffer);
 	}
 	else
 	{
@@ -313,9 +313,9 @@ int VerboseTest(void)
 	ACR_Length_t testAllocateBytes = 5000;
 
 	ACR_DEBUG_PRINT(1, "TEST allocate %d bytes", (int)testAllocateBytes);
-	ACR_BUFFER_ALLOC(buffer, testAllocateBytes);
+	ACR_BUFFER_ALLOC(&buffer, testAllocateBytes);
 	#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
-		if(ACR_BUFFER_GET_LENGTH(buffer) != testAllocateBytes)
+		if(ACR_BUFFER_GET_LENGTH(&buffer) != testAllocateBytes)
 		{
 			ACR_DEBUG_PRINT(2, "FAIL buffer length is %d", (int)buffer.m_Length);
 			return ACR_FAILURE;
@@ -325,7 +325,7 @@ int VerboseTest(void)
 			ACR_DEBUG_PRINT(3, "PASS allocated %d bytes", (int)buffer.m_Length);
 		}
 	#else
-		if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+		if(ACR_BUFFER_GET_LENGTH(&buffer) != 0)
 		{
 			ACR_DEBUG_PRINT(4, "FAIL buffer length is %d", (int)buffer.m_Length);
 			return ACR_FAILURE;
@@ -336,9 +336,9 @@ int VerboseTest(void)
 		}
 	#endif
 	ACR_DEBUG_PRINT(6, "TEST free %d bytes", (int)buffer.m_Length);
-	ACR_BUFFER_FREE(buffer);
+	ACR_BUFFER_FREE(&buffer);
 
-	if(ACR_BUFFER_GET_LENGTH(buffer) != 0)
+	if(ACR_BUFFER_GET_LENGTH(&buffer) != 0)
 	{
 		ACR_DEBUG_PRINT(7, "FAIL buffer length is %d", (int)buffer.m_Length);
 		return ACR_FAILURE;

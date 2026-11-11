@@ -168,7 +168,7 @@ int LowLevelTest(void)
 
 		// set the length and clear the buffer
 		ACR_VAR_BUFFER_SET_LENGTH(varbuffer, 1000);
-		ACR_BUFFER_CLEAR(varbuffer.m_Buffer);
+		ACR_BUFFER_CLEAR(&varbuffer.m_Buffer);
 
 		// reset the length and append some data
 		ACR_VAR_BUFFER_RESET(varbuffer);

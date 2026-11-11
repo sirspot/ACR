@@ -44,7 +44,7 @@
     configure the ACR library. 
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_HAS_PLATFORM   as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
     ACR_PLATFORM_NAME  as a quoted string
     ACR_HAS_IDE        as either ACR_BOOL_TRUE or ACR_BOOL_FALSE

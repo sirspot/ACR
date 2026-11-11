@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -83,39 +83,61 @@
     // config without support for 64bit
     #define ACR_USE_64BIT ACR_BOOL_FALSE
 #else
-    #ifdef ACR_CONFIG_NO_LIBC
-        // cannot use libc. assume config with support for 64bit
+    #if defined (_WIN64) || defined (_LP64)
+        // definitely a 64bit platform
         #define ACR_USE_64BIT ACR_BOOL_TRUE
-    #else
-
-        // determine, at compile time, whether or not the platform uses 64bit addresses
-        // Requires C11 using modified solution found here:
-        //     https://stackoverflow.com/questions/51616057/how-to-determine-pointer-size-preprocessor-c
-        //     Sep 22, 2023 at 16:21 by pjincz
-        // included for UINTPTR_MAX
-        #include <stdint.h>
-        #if (UINTPTR_MAX / 255 % 255) == 8
-            // on 64 bit system
+    #elif defined (__SIZEOF_POINTER__)
+        #if __SIZEOF_POINTER__ >= 8
+            // at least 64bit
             #define ACR_USE_64BIT ACR_BOOL_TRUE
         #else
+            // 64bit memory is not supported
             #define ACR_USE_64BIT ACR_BOOL_FALSE
         #endif
-
+    #elif defined (ACR_CONFIG_NO_LIBC)
+        // cannot use libc.
+        // assume config uses 64bit
+        #define ACR_USE_64BIT ACR_BOOL_TRUE
+        // IMPORTANT: The ACR library could not determine if this is a 64bit platform. Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
+    #else
+        // included for UINTPTR_MAX
+        #include <stdint.h>
+        #ifdef UINTPTR_MAX
+            // determine, at compile time, whether or not the platform uses 64bit addresses
+            // Requires C11 using modified solution found here:
+            //     https://stackoverflow.com/questions/51616057/how-to-determine-pointer-size-preprocessor-c
+            //     Sep 22, 2023 at 16:21 by pjincz
+            #if (UINTPTR_MAX / 255 % 255) == 8
+                // on 64 bit system
+                #define ACR_USE_64BIT ACR_BOOL_TRUE
+            #else
+                #define ACR_USE_64BIT ACR_BOOL_FALSE
+            #endif
+        #else
+            // UINTPTR_MAX is missing.
+            // assume 64bit platform
+            #define ACR_USE_64BIT ACR_BOOL_TRUE
+            // IMPORTANT: The ACR library could not determine if this is a 64bit platform. Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
+        #endif
     #endif // #ifdef ACR_CONFIG_NO_LIBC
 #endif // #ifdef ACR_CONFIG_NO_64BIT
 
 /** type for a typical length such as the size of a file or
     the size of an area of memory
 	\see ACR_MAX_LENGTH for the maximum value that can be
-	stored by this data type
+         stored by this data type
 */
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
+#if ACR_USE_64BIT == ACR_BOOL_FALSE
+    // 32bit
+    typedef unsigned int ACR_Length_t;
+#elif defined(ACR_CONFIG_NO_LIBC)
     // 64bit
     typedef unsigned long long ACR_Length_t;
 #else
-    // 32bit
-    typedef unsigned int ACR_Length_t;
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
+    // included for size_t
+    #include <stddef.h>
+    typedef size_t ACR_Length_t;
+#endif
 
 /** represents zero length.
 	use this instead of 0 to clearly indicate the value
@@ -137,13 +159,16 @@
 
 /** max value that can be stored by the ACR_Length_t type
 */
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
+#if ACR_USE_64BIT == ACR_BOOL_FALSE
+    // 32bit
+    #define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
+#elif defined(ACR_CONFIG_NO_LIBC)
     // 64bit
     #define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
 #else
-    // 32bit
-    #define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
+    #include <stdint.h>
+    #define ACR_MAX_LENGTH SIZE_MAX
+#endif
 
 /*
     ### New to C? ###
@@ -271,7 +296,7 @@
 #endif
 
 #ifndef ACR_NULL
-#define ACR_NULL 0
+#define ACR_NULL ((void*)0)
 #endif
 
 /** the value of a pointer (used for pointer math)

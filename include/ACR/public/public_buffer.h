@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -44,7 +44,7 @@
     work with simple data buffers.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_Buffer_t           for buffer data
     ACR_BUFFER_IS_VALID    as a macro to check for valid buffer data
     ACR_BUFFER_SET_DATA    as a macro to reference an area of memory
@@ -61,6 +61,9 @@
 // included for ACR_Length_t, ACR_ZERO_LENGTH,
 // ACR_CLEAR_MEMORY(), and ACR_NULL
 #include "ACR/public/public_memory.h"
+
+// included for ACR_MAX_COUNT
+#include "ACR/public/public_count.h"
 
 // included for ACR_Byte_t, ACR_Flags_t, ACR_NO_FLAGS,
 // ACR_FLAG_ONE, ACR_FLAG_TWO, ACR_HAS_FLAG(),
@@ -115,104 +118,149 @@ enum ACR_BufferFlags_e
 
 /** determine if the buffer is valid
 */
-#define ACR_BUFFER_IS_VALID(name) ((name.m_Pointer != ACR_NULL) && (name.m_Length > 0))
+static inline ACR_Bool_t ACR_BUFFER_IS_VALID(const ACR_Buffer_t* name)
+{
+	return (name->m_Pointer != ACR_NULL) && (name->m_Length > 0);
+}
 
 /** get the length of the buffer
 */
-#define ACR_BUFFER_GET_LENGTH(name) name.m_Length
+static inline ACR_Length_t ACR_BUFFER_GET_LENGTH(const ACR_Buffer_t* name)
+{
+	return name->m_Length;
+}
 
 /** clear the buffer
 */
-#define ACR_BUFFER_CLEAR(name) ACR_CLEAR_MEMORY(name.m_Pointer, name.m_Length)
+static inline void ACR_BUFFER_CLEAR(ACR_Buffer_t* name)
+{
+	ACR_CLEAR_MEMORY(name->m_Pointer, name->m_Length);
+}
 
 /** assign memory to the existing buffer
 */
-#define ACR_BUFFER_SET_DATA(name, data, length)\
-        if(name.m_Pointer != ACR_NULL)\
-		{\
-			if(ACR_HAS_FLAG(name.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)\
-			{\
-				ACR_FREE(name.m_Pointer);\
-			}\
-		}\
-		name.m_Pointer = (void*)data;\
-		if(name.m_Pointer != ACR_NULL)\
-		{\
-			name.m_Length = length;\
-			ACR_ADD_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF);\
-		}\
-		else\
-		{\
-			name.m_Length = ACR_ZERO_LENGTH;\
-			ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF);\
+static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR_Length_t length)
+{
+	if(name->m_Pointer != ACR_NULL)
+	{
+		if(ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)
+		{
+			ACR_FREE(name->m_Pointer);
 		}
+	}
+	name->m_Pointer = (void*)data;
+	if(name->m_Pointer != ACR_NULL)
+	{
+		name->m_Length = length;
+		ACR_ADD_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
+	else
+	{
+		name->m_Length = ACR_ZERO_LENGTH;
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
+}
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
-/** free memory used by the buffer
-*/
-#define ACR_BUFFER_FREE(name) \
-        if(name.m_Pointer != ACR_NULL) \
-		{ \
-			if(ACR_HAS_FLAG(name.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE) \
-			{ \
-				ACR_FREE(name.m_Pointer); \
-			} \
-			name.m_Pointer = ACR_NULL; \
-		} \
-		name.m_Length = ACR_ZERO_LENGTH; \
-		ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF)
+	/** free memory used by the buffer
+	*/
+	static inline void ACR_BUFFER_FREE(ACR_Buffer_t* name)
+	{
+		if(name->m_Pointer != ACR_NULL)
+		{
+			if(ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)
+			{
+				ACR_FREE(name->m_Pointer);
+			}
+			name->m_Pointer = ACR_NULL;
+		}
+		name->m_Length = ACR_ZERO_LENGTH;
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
 
-/** allocate memory for the buffer
+	/** allocate memory for the buffer
 
-    Note that 1 extra byte will be allocated as a safety
-    precaution to ensure the buffer will always be null-terminated
-    regardless of the data stored up to the size of the buffer.
-*/
-#define ACR_BUFFER_ALLOC(name, length) \
-        if(name.m_Pointer != ACR_NULL) \
-		{ \
-			if(ACR_HAS_FLAG(name.m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE) \
-			{ \
-				ACR_FREE(name.m_Pointer); \
-			} \
-		} \
-		name.m_Pointer = ACR_MALLOC(length+1); \
-		if(name.m_Pointer != ACR_NULL) \
-		{ \
-            ((ACR_Byte_t*)name.m_Pointer)[length] = 0; \
-			name.m_Length = length; \
-		} \
-		else \
-		{ \
-			name.m_Length = ACR_ZERO_LENGTH; \
-		} \
-		ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF)
+		Note that 1 extra byte will be allocated as a safety
+		precaution to ensure the buffer will always be null-terminated
+		regardless of the data stored up to the size of the buffer.
+	*/
+	static inline void ACR_BUFFER_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
+	{
+		if(length > ACR_MAX_COUNT)
+		{
+			return;
+		}
+		if(name->m_Pointer != ACR_NULL)
+		{
+			if(ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_IS_REF) == ACR_BOOL_FALSE)
+			{
+				ACR_FREE(name->m_Pointer);
+			}
+		}
+		name->m_Pointer = ACR_MALLOC(length + 1);
+		if(name->m_Pointer != ACR_NULL)
+		{
+			((ACR_Byte_t*)name->m_Pointer)[length] = 0;
+			name->m_Length = length;
+		}
+		else
+		{
+			name->m_Length = ACR_ZERO_LENGTH;
+		}
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
 
 #else
 
-/** free is not available
-*/
-#define ACR_BUFFER_FREE(name) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH; ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF)
+	/** free is not available
+	*/
+	static inline void ACR_BUFFER_FREE(ACR_Buffer_t* name)
+	{
+		name->m_Pointer = ACR_NULL;
+		name->m_Length = ACR_ZERO_LENGTH;
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
 
-/** malloc is not available
-*/
-#define ACR_BUFFER_ALLOC(name, length) name.m_Pointer = ACR_NULL; name.m_Length = ACR_ZERO_LENGTH; ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF)
+	/** malloc is not available
+	*/
+	static inline void ACR_BUFFER_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
+	{
+		(void)length;
+		name->m_Pointer = ACR_NULL;
+		name->m_Length = ACR_ZERO_LENGTH;
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	}
 
 #endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE        
 
 /** explicitly free the memory this buffer references
 */
-#define ACR_BUFFER_FORCE_FREE(name)\
-        ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_IS_REF); \
-        ACR_BUFFER_FREE(name)
+static inline void ACR_BUFFER_FORCE_FREE(ACR_Buffer_t* name)
+{
+	ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
+	ACR_BUFFER_FREE(name);
+}
 
 /** mark the buffer read only
 */
-#define ACR_BUFFER_SET_READ_ONLY(name, readOnly) (readOnly ? (ACR_ADD_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY)) : (ACR_REMOVE_FLAGS(name.m_Flags, ACR_BUFFER_READ_ONLY)))
+static inline void ACR_BUFFER_SET_READ_ONLY(ACR_Buffer_t* name, ACR_Bool_t readOnly)
+{
+	if(readOnly)
+	{
+		ACR_ADD_FLAGS(name->m_Flags, ACR_BUFFER_READ_ONLY);
+	}
+	else
+	{
+		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_READ_ONLY);
+	}
+}
 
 /** check if the buffer is marked read only
 */
-#define ACR_BUFFER_IS_READ_ONLY(name) ACR_HAS_FLAG(ACR_BUFFER_READ_ONLY)
+static inline ACR_Bool_t ACR_BUFFER_IS_READ_ONLY(const ACR_Buffer_t* name)
+{
+	return ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_READ_ONLY);
+}
 
 #endif

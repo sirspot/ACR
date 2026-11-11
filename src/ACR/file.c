@@ -93,7 +93,7 @@ ACR_Info_t ACR_FileReadAll(
         if(me->m_Read)
         {
             ACR_Length_t length = ACR_FileGetLength(me);
-            ACR_BUFFER_ALLOC((*buffer), length);
+            ACR_BUFFER_ALLOC(buffer, length);
             if (buffer->m_Pointer)
             {
                 if(length > 0)
@@ -108,7 +108,7 @@ ACR_Info_t ACR_FileReadAll(
                         if(varBuffer.m_Buffer.m_Length != buffer->m_Length)
                         {
                             // failed to read all bytes
-                            ACR_BUFFER_FREE((*buffer));
+                            ACR_BUFFER_FREE(buffer);
                             result = ACR_INFO_ERROR;
                         }
                         else
@@ -119,7 +119,7 @@ ACR_Info_t ACR_FileReadAll(
                     else
                     {
                         // read failed
-                        ACR_BUFFER_FREE((*buffer));
+                        ACR_BUFFER_FREE(buffer);
                         result = ACR_INFO_ERROR;
                     }
                 }

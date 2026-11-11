@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -43,7 +43,7 @@
     This header provides access to a memory heap.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_HAS_MALLOC     as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
     ACR_MALLOC         as a macro to allocate memory or return ACR_NULL if memory cannot be allocated
     ACR_FREE           as a macro to free previously allocated memory
@@ -67,7 +67,7 @@
     #ifndef ACR_CONFIG_NO_LIBC
         /** defined when malloc is available
             Note: to remove malloc from this library define
-                  ACR_CONFIG_NO_LIBC in your preprocessor
+                  ACR_CONFIG_NO_MALLOC in your preprocessor
         */
         #define ACR_HAS_MALLOC ACR_BOOL_TRUE
         #define ACR_HEAP_IS_GLOBAL ACR_BOOL_FALSE
@@ -110,22 +110,7 @@
 
         int main()
         {
-            ACR_NEW_BY_TYPE(oneDateTime, ACR_DateTime_t);
-
-            oneDateTime->tm_sec = 30;
-            oneDateTime->tm_min = 1;
-            // etc
-        }
-*/
-#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_SIZE(n,t,(sizeof(t)))
-
-/** similar to malloc but automatically defines the variable and clears the memory
- 
-    example:
-
-        int main()
-        {
-            ACR_NEW_BY_TYPE(twoDateTime, ACR_DateTime_t, 2);
+            ACR_NEW_BY_COUNT(twoDateTime, ACR_DateTime_t, 2);
 
             twoDateTime[1].tm_sec = 30;
             twoDateTime[1].tm_min = 1;
@@ -134,15 +119,30 @@
 */
 #define ACR_NEW_BY_COUNT(n, t, c) ACR_NEW_BY_SIZE(n,t,(sizeof(t)*c))
 
+/** similar to malloc but automatically defines the variable and clears the memory
+ 
+    example:
+
+        int main()
+        {
+            ACR_NEW_BY_TYPE(oneDateTime, ACR_DateTime_t);
+
+            oneDateTime->tm_sec = 30;
+            oneDateTime->tm_min = 1;
+            // etc
+        }
+*/
+#define ACR_NEW_BY_TYPE(n, t) ACR_NEW_BY_COUNT(n,t,1);
+
 /** similar to free but checks the pointer for null and sets it to null when freed
 */
 #define ACR_DELETE(n) \
-{\
+do{\
     if(n)\
     {\
         ACR_FREE(n);\
         n = ACR_NULL;\
     }\
-}
+}while(0)
 
 #endif

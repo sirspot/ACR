@@ -44,7 +44,7 @@
     work with variable length data buffers.
     It is included automatically with public.h
 
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_VarBuffer_t          for variable length buffer data
     ACR_VAR_BUFFER_IS_VALID  as a macro to check for valid buffer data
 

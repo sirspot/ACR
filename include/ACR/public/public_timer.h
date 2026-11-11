@@ -43,7 +43,7 @@
     This header provides access to a high precision clock when available.
     It is included automatically with public.h
     
-    This header gaurantees the following will be defined:
+    This header guarantees the following will be defined:
     ACR_HAS_TIMER          as either ACR_BOOL_TRUE or ACR_BOOL_FALSE
     ACR_Timer_t            for timer data
     ACR_TIME_START         as a macro that accepts a ACR_Timer_t variable
