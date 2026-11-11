@@ -122,6 +122,7 @@ static inline ACR_Bool_t ACR_BUFFER_PTR_IS_VALID(const ACR_Buffer_t* name)
 {
 	return (name->m_Pointer != ACR_NULL) && (name->m_Length > 0);
 }
+#define ACR_BUFFER_IS_VALID(name) ACR_BUFFER_PTR_IS_VALID(&name)
 
 /** get the length of the buffer
 */
@@ -129,6 +130,7 @@ static inline ACR_Length_t ACR_BUFFER_PTR_GET_LENGTH(const ACR_Buffer_t* name)
 {
 	return name->m_Length;
 }
+#define ACR_BUFFER_GET_LENGTH(name) ACR_BUFFER_PTR_GET_LENGTH(&name)
 
 /** clear the buffer
 */
@@ -136,6 +138,7 @@ static inline void ACR_BUFFER_PTR_CLEAR(ACR_Buffer_t* name)
 {
 	ACR_CLEAR_MEMORY(name->m_Pointer, name->m_Length);
 }
+#define ACR_BUFFER_CLEAR(name) ACR_BUFFER_PTR_CLEAR(&name)
 
 /** assign memory to the existing buffer
 */
@@ -160,6 +163,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
 }
+#define ACR_BUFFER_CLEAR(name, data, length) ACR_BUFFER_PTR_SET_DATA(&name, data, length)
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 
@@ -178,6 +182,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		name->m_Length = ACR_ZERO_LENGTH;
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
+	#define ACR_BUFFER_FREE(name) ACR_BUFFER_PTR_FREE(&name)
 
 	/** allocate memory for the buffer
 
@@ -210,6 +215,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		}
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
+	#define ACR_BUFFER_ALLOC(name, length) ACR_BUFFER_PTR_ALLOC(&name, length)
 
 #else
 
@@ -221,6 +227,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		name->m_Length = ACR_ZERO_LENGTH;
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
+	#define ACR_BUFFER_FREE(name) ACR_BUFFER_PTR_FREE(&name)
 
 	/** malloc is not available
 	*/
@@ -231,6 +238,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		name->m_Length = ACR_ZERO_LENGTH;
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
+	#define ACR_BUFFER_ALLOC(name, length) ACR_BUFFER_PTR_ALLOC(&name, length)
 
 #endif // #if ACR_HAS_MALLOC == ACR_BOOL_TRUE        
 
@@ -241,6 +249,7 @@ static inline void ACR_BUFFER_PTR_FORCE_FREE(ACR_Buffer_t* name)
 	ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	ACR_BUFFER_FREE(name);
 }
+#define ACR_BUFFER_FORCE_FREE(name) ACR_BUFFER_PTR_FORCE_FREE(&name)
 
 /** mark the buffer read only
 */
@@ -255,6 +264,7 @@ static inline void ACR_BUFFER_PTR_SET_READ_ONLY(ACR_Buffer_t* name, ACR_Bool_t r
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_READ_ONLY);
 	}
 }
+#define ACR_BUFFER_SET_READ_ONLY(name, readOnly) ACR_BUFFER_PTR_SET_READ_ONLY(&name, readOnly)
 
 /** check if the buffer is marked read only
 */
@@ -262,5 +272,6 @@ static inline ACR_Bool_t ACR_BUFFER_PTR_IS_READ_ONLY(const ACR_Buffer_t* name)
 {
 	return ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_READ_ONLY);
 }
+#define ACR_BUFFER_IS_READ_ONLY(name) ACR_BUFFER_PTR_IS_READ_ONLY(&name)
 
 #endif
