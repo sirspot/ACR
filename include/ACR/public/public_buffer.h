@@ -247,7 +247,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 static inline void ACR_BUFFER_PTR_FORCE_FREE(ACR_Buffer_t* name)
 {
 	ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
-	ACR_BUFFER_FREE(name);
+	ACR_BUFFER_PTR_FREE(name);
 }
 #define ACR_BUFFER_FORCE_FREE(name) ACR_BUFFER_PTR_FORCE_FREE(&name)
 
