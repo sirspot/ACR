@@ -51,21 +51,30 @@
 // included for ACR_BOOL_TRUE, ACR_BOOL_FALSE
 #include "ACR/public/public_bool.h"
 
+// included for ACR_Unsigned_32bit_t
+#include "ACR/public/public_byte_order.h"
+
 /** type for a typical count such as the number of items in an array
     \see ACR_MAX_COUNT for the maximum value that can be
          stored by this data type
 */
-typedef unsigned long ACR_Count_t;
+typedef ACR_Unsigned_32bit_t ACR_Count_t;
 
 /** used for setting a count explicitly to zero
 */
 #define ACR_ZERO_COUNT 0
 
-/** max value that can be stored by the ACR_Count_t type such that
-    it will not overflow when added to 1
+/** max value that can be stored by the ACR_Count_t type and still
+    be incremented by 1 without wrapping
     (this allows ACR_MAX_COUNT+1 to be greater than ACR_ZERO_COUNT)
+    for example: the max unsigned 32bit value is 2^32 - 1 or 4,294,967,295.
+                 this means 4,294,967,295 + 1 = 0 because it will overflow.
+                 another way to reach the same value is to use a binary NOT
+                 operation '~' on 0 so that all bits flip from 0 to 1.
+                 once the max value is, found we subtract 1
+                 to get a safe maximum count value.
 */
-#define ACR_MAX_COUNT 4294967294UL // hex value 0xFFFFFFFE
+#define ACR_MAX_COUNT ((~((ACR_Count_t)0)) - 1)
 
 /** get the value of a data item in an array
 

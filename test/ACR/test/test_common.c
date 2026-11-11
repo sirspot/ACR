@@ -118,7 +118,7 @@ int _ACR_TestCommonEndian(int testNumber)
     // Note: disable warning C4127: conditional expression is constant
     //       for test purposes this cannot be a #if #endif because 
     //       when ACR_ENDIAN_DYNAMIC is ACR_BOOL_TRUE the ACR_IS_BIG_ENDIAN
-    //       value must be evaluated at runtime
+    //       value must be evaluated at runtime because it is actually a function called ACR_DYNAMIC_IS_BIG_ENDIAN()
     if (ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE)
     {
         // system is little endian

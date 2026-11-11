@@ -233,12 +233,13 @@
     /** Determine whether the current system stores the most significant byte first.
         \return ACR_BOOL_TRUE for big-endian systems; otherwise ACR_BOOL_FALSE.
     */
-    static inline ACR_Bool_t ACR_IS_BIG_ENDIAN(void)
+    static inline ACR_Bool_t ACR_DYNAMIC_IS_BIG_ENDIAN(void)
     {
         const unsigned short value = 1;
         const unsigned char *first_byte = (const unsigned char *)&value;
         return first_byte[0] == 0 ? ACR_BOOL_TRUE : ACR_BOOL_FALSE;
     }
+    #define ACR_IS_BIG_ENDIAN ACR_DYNAMIC_IS_BIG_ENDIAN()
 #else
     #define ACR_ENDIAN_DYNAMIC ACR_BOOL_FALSE
 #endif
@@ -306,8 +307,8 @@ static inline ACR_Unsigned_32bit_t ACR_BYTE_ORDER_SWAP_32(ACR_Unsigned_32bit_t v
 // to swap byte order to big endian when needed
 //
 #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
-    #define ACR_BYTE_ORDER_16(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_16(x):x)
-    #define ACR_BYTE_ORDER_32(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_32(x):x)
+    #define ACR_BYTE_ORDER_16(x) ((ACR_DYNAMIC_IS_BIG_ENDIAN() == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_16(x):x)
+    #define ACR_BYTE_ORDER_32(x) ((ACR_DYNAMIC_IS_BIG_ENDIAN() == ACR_BOOL_FALSE)?ACR_BYTE_ORDER_SWAP_32(x):x)
 #else
     #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
         #define ACR_BYTE_ORDER_16(x) (ACR_BYTE_ORDER_SWAP_16(x))
@@ -354,7 +355,7 @@ static inline ACR_Unsigned_32bit_t ACR_BYTE_ORDER_SWAP_32(ACR_Unsigned_32bit_t v
                ((value & 0xff00000000000000ULL) >> 56);
     }
     #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
-        #define ACR_BYTE_ORDER_64(x) ((ACR_IS_BIG_ENDIAN == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
+        #define ACR_BYTE_ORDER_64(x) ((ACR_DYNAMIC_IS_BIG_ENDIAN() == 0)?ACR_BYTE_ORDER_SWAP_64(x):x)
     #else
         #if ACR_IS_BIG_ENDIAN == ACR_BOOL_FALSE
             #define ACR_BYTE_ORDER_64(x) (ACR_BYTE_ORDER_SWAP_64(x))
