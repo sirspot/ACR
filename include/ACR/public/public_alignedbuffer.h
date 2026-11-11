@@ -88,7 +88,7 @@ typedef struct ACR_AlignedBuffer_s
 
 /** check if the aligned buffer is valid
 */
-#define ACR_ALIGNED_BUFFER_IS_VALID(name) ACR_BUFFER_IS_VALID(&name.m_AlignedBuffer)
+#define ACR_ALIGNED_BUFFER_IS_VALID(name) ACR_BUFFER_IS_VALID(name.m_AlignedBuffer)
 
 /** assign exsiting memory to the buffer aligned on a boundary determined by the specified number of bits
 
@@ -132,7 +132,7 @@ typedef struct ACR_AlignedBuffer_s
 /** free memory used by the buffer
 */
 #define ACR_ALIGNED_BUFFER_FREE(name) \
-        ACR_BUFFER_FREE(&name.m_UnalignedBuffer); \
+        ACR_BUFFER_FREE(name.m_UnalignedBuffer); \
 		name.m_AlignedBuffer.m_Pointer = ACR_NULL; \
 		name.m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH; \
         ACR_REMOVE_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF)

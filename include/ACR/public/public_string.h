@@ -90,10 +90,10 @@ typedef unsigned long ACR_Unicode_t;
 
 /** mark the string as read only
 */
-#define ACR_STRING_SET_READ_ONLY(name, readOnly) ACR_BUFFER_SET_READ_ONLY(&name.m_Buffer, readOnly)
+#define ACR_STRING_SET_READ_ONLY(name, readOnly) ACR_BUFFER_SET_READ_ONLY(name.m_Buffer, readOnly)
 
 /** check if the string is marked read only
 */
-#define ACR_STRING_IS_READ_ONLY(name) ACR_BUFFER_IS_READ_ONLY(&name.m_Buffer)
+#define ACR_STRING_IS_READ_ONLY(name) ACR_BUFFER_IS_READ_ONLY(name.m_Buffer)
 
 #endif
