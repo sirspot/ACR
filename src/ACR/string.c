@@ -59,8 +59,8 @@ ACR_Info_t ACR_StringNew(
 	{
 		ACR_BUFFER(buffer);
 
-		ACR_BUFFER_ALLOC(&buffer, sizeof(ACR_String_t));
-		if(ACR_BUFFER_IS_VALID(&buffer))
+		ACR_BUFFER_ALLOC(buffer, sizeof(ACR_String_t));
+		if(ACR_BUFFER_IS_VALID(buffer))
 		{
 			ACR_StringInit((ACR_String_t*)buffer.m_Pointer);
 			result = ACR_INFO_OK;

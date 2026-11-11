@@ -284,18 +284,18 @@ int LowLevelTest(void)
 {
 	ACR_BUFFER(buffer);
 
-	ACR_BUFFER_ALLOC(&buffer, 5000);
-	if(ACR_BUFFER_IS_VALID(&buffer))
+	ACR_BUFFER_ALLOC(buffer, 5000);
+	if(ACR_BUFFER_IS_VALID(buffer))
 	{
 		//
 		// OK - 5000 byte buffer ready for use
 		//
 
 		// optional step to clear the buffer
-		ACR_BUFFER_CLEAR(&buffer);
+		ACR_BUFFER_CLEAR(buffer);
 
 		// done with the buffer
-		ACR_BUFFER_FREE(&buffer);
+		ACR_BUFFER_FREE(buffer);
 	}
 	else
 	{
