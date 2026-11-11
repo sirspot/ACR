@@ -65,9 +65,9 @@ int main(int argc, char** argv)
     if ((maxBlockCount + 1) == 0)
     {
         #if ACR_USE_64BIT == ACR_BOOL_TRUE
-            ACR_DEBUG_PRINT(1, "OK max block count is %llu", (unsigned long long)maxBlockCount);
+            ACR_DEBUG_PRINT(1, "OK max block count is %llu", ((unsigned long long)maxBlockCount));
         #else
-            ACR_DEBUG_PRINT(2, "OK max block count is %lu", (unsigned long)maxBlockCount);
+            ACR_DEBUG_PRINT(2, "OK max block count is %lu", ((unsigned long)maxBlockCount));
         #endif
     }
     else

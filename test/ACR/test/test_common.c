@@ -335,9 +335,9 @@ int _ACR_TestCommonBuffer(int testNumber)
     {
         // buffer length should have initialized to zero
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        ACR_DEBUG_PRINT(1 + testNumber, "ERROR: buffer length is %llu when it should be 0", (unsigned long long)buffer.m_Length);
+        ACR_DEBUG_PRINT(1 + testNumber, "ERROR: buffer length is %llu when it should be 0", ((unsigned long long)buffer.m_Length));
 #else
-        ACR_DEBUG_PRINT(2 + testNumber, "ERROR: buffer length is %lu when it should be 0", (unsigned long)buffer.m_Length);
+        ACR_DEBUG_PRINT(2 + testNumber, "ERROR: buffer length is %lu when it should be 0", ((unsigned long)buffer.m_Length));
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
         return ACR_FAILURE;
     }
@@ -359,9 +359,9 @@ int _ACR_TestCommonBuffer(int testNumber)
     else
     {
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-        ACR_DEBUG_PRINT(5 + testNumber, "OK: ACR_BUFFER_ALLOC allocated %llu bytes", (unsigned long long)buffer.m_Length);
+        ACR_DEBUG_PRINT(5 + testNumber, "OK: ACR_BUFFER_ALLOC allocated %llu bytes", ((unsigned long long)buffer.m_Length));
 #else
-        ACR_DEBUG_PRINT(6 + testNumber, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", (unsigned long)buffer.m_Length);
+        ACR_DEBUG_PRINT(6 + testNumber, "OK: ACR_BUFFER_ALLOC allocated %lu bytes", ((unsigned long)buffer.m_Length));
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
     }
     ACR_BUFFER_FREE(buffer);
