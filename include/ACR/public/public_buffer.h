@@ -163,7 +163,7 @@ static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data,
 		ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	}
 }
-#define ACR_BUFFER_CLEAR(name, data, length) ACR_BUFFER_PTR_SET_DATA(&name, data, length)
+#define ACR_BUFFER_SET_DATA(name, data, length) ACR_BUFFER_PTR_SET_DATA(&name, data, length)
 
 #if ACR_HAS_MALLOC == ACR_BOOL_TRUE
 

@@ -259,5 +259,5 @@ void ACR_VarBufferClear(
 		return;
 	}
 
-	ACR_BUFFER_CLEAR(&me->m_Buffer);
+	ACR_BUFFER_CLEAR(me->m_Buffer);
 }

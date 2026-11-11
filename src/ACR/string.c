@@ -108,5 +108,5 @@ void ACR_StringDeInit(
 		return;
 	}
 
-	ACR_BUFFER_FREE(&me->m_Buffer);
+	ACR_BUFFER_FREE(me->m_Buffer);
 }
