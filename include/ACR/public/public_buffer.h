@@ -118,28 +118,28 @@ enum ACR_BufferFlags_e
 
 /** determine if the buffer is valid
 */
-static inline ACR_Bool_t ACR_BUFFER_IS_VALID(const ACR_Buffer_t* name)
+static inline ACR_Bool_t ACR_BUFFER_PTR_IS_VALID(const ACR_Buffer_t* name)
 {
 	return (name->m_Pointer != ACR_NULL) && (name->m_Length > 0);
 }
 
 /** get the length of the buffer
 */
-static inline ACR_Length_t ACR_BUFFER_GET_LENGTH(const ACR_Buffer_t* name)
+static inline ACR_Length_t ACR_BUFFER_PTR_GET_LENGTH(const ACR_Buffer_t* name)
 {
 	return name->m_Length;
 }
 
 /** clear the buffer
 */
-static inline void ACR_BUFFER_CLEAR(ACR_Buffer_t* name)
+static inline void ACR_BUFFER_PTR_CLEAR(ACR_Buffer_t* name)
 {
 	ACR_CLEAR_MEMORY(name->m_Pointer, name->m_Length);
 }
 
 /** assign memory to the existing buffer
 */
-static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR_Length_t length)
+static inline void ACR_BUFFER_PTR_SET_DATA(ACR_Buffer_t* name, const void* data, ACR_Length_t length)
 {
 	if(name->m_Pointer != ACR_NULL)
 	{
@@ -165,7 +165,7 @@ static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR
 
 	/** free memory used by the buffer
 	*/
-	static inline void ACR_BUFFER_FREE(ACR_Buffer_t* name)
+	static inline void ACR_BUFFER_PTR_FREE(ACR_Buffer_t* name)
 	{
 		if(name->m_Pointer != ACR_NULL)
 		{
@@ -185,7 +185,7 @@ static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR
 		precaution to ensure the buffer will always be null-terminated
 		regardless of the data stored up to the size of the buffer.
 	*/
-	static inline void ACR_BUFFER_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
+	static inline void ACR_BUFFER_PTR_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
 	{
 		if(length > ACR_MAX_COUNT)
 		{
@@ -215,7 +215,7 @@ static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR
 
 	/** free is not available
 	*/
-	static inline void ACR_BUFFER_FREE(ACR_Buffer_t* name)
+	static inline void ACR_BUFFER_PTR_FREE(ACR_Buffer_t* name)
 	{
 		name->m_Pointer = ACR_NULL;
 		name->m_Length = ACR_ZERO_LENGTH;
@@ -224,7 +224,7 @@ static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR
 
 	/** malloc is not available
 	*/
-	static inline void ACR_BUFFER_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
+	static inline void ACR_BUFFER_PTR_ALLOC(ACR_Buffer_t* name, ACR_Length_t length)
 	{
 		(void)length;
 		name->m_Pointer = ACR_NULL;
@@ -236,7 +236,7 @@ static inline void ACR_BUFFER_SET_DATA(ACR_Buffer_t* name, const void* data, ACR
 
 /** explicitly free the memory this buffer references
 */
-static inline void ACR_BUFFER_FORCE_FREE(ACR_Buffer_t* name)
+static inline void ACR_BUFFER_PTR_FORCE_FREE(ACR_Buffer_t* name)
 {
 	ACR_REMOVE_FLAGS(name->m_Flags, ACR_BUFFER_IS_REF);
 	ACR_BUFFER_FREE(name);
@@ -244,7 +244,7 @@ static inline void ACR_BUFFER_FORCE_FREE(ACR_Buffer_t* name)
 
 /** mark the buffer read only
 */
-static inline void ACR_BUFFER_SET_READ_ONLY(ACR_Buffer_t* name, ACR_Bool_t readOnly)
+static inline void ACR_BUFFER_PTR_SET_READ_ONLY(ACR_Buffer_t* name, ACR_Bool_t readOnly)
 {
 	if(readOnly)
 	{
@@ -258,7 +258,7 @@ static inline void ACR_BUFFER_SET_READ_ONLY(ACR_Buffer_t* name, ACR_Bool_t readO
 
 /** check if the buffer is marked read only
 */
-static inline ACR_Bool_t ACR_BUFFER_IS_READ_ONLY(const ACR_Buffer_t* name)
+static inline ACR_Bool_t ACR_BUFFER_PTR_IS_READ_ONLY(const ACR_Buffer_t* name)
 {
 	return ACR_HAS_FLAG(name->m_Flags, ACR_BUFFER_READ_ONLY);
 }

@@ -121,16 +121,6 @@
 //      
 ////////////////////////////////////////////////////////////
 
-/** Determine whether the current system stores the most significant byte first.
-    \return ACR_BOOL_TRUE for big-endian systems; otherwise ACR_BOOL_FALSE.
-*/
-static inline ACR_Bool_t ACR_InlineIsBigEndian(void)
-{
-    const unsigned short value = 1;
-    const unsigned char *first_byte = (const unsigned char *)&value;
-    return first_byte[0] == 0 ? ACR_BOOL_TRUE : ACR_BOOL_FALSE;
-}
-
 //
 // defines ACR_IS_BIG_ENDIAN
 //
@@ -240,7 +230,15 @@ static inline ACR_Bool_t ACR_InlineIsBigEndian(void)
 //
 #ifndef ACR_IS_BIG_ENDIAN
     #define ACR_ENDIAN_DYNAMIC ACR_BOOL_TRUE
-    #define ACR_IS_BIG_ENDIAN ACR_InlineIsBigEndian()
+    /** Determine whether the current system stores the most significant byte first.
+        \return ACR_BOOL_TRUE for big-endian systems; otherwise ACR_BOOL_FALSE.
+    */
+    static inline ACR_Bool_t ACR_IS_BIG_ENDIAN(void)
+    {
+        const unsigned short value = 1;
+        const unsigned char *first_byte = (const unsigned char *)&value;
+        return first_byte[0] == 0 ? ACR_BOOL_TRUE : ACR_BOOL_FALSE;
+    }
 #else
     #define ACR_ENDIAN_DYNAMIC ACR_BOOL_FALSE
 #endif
