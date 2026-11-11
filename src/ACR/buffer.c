@@ -204,12 +204,12 @@ ACR_Info_t ACR_BufferSetData(
 
     if (length == 0)
     {
-        ACR_BUFFER_FREE(&me->m_Base);
+        ACR_BUFFER_FREE(me->m_Base);
         return ACR_INFO_ERROR;
     }
 
-    ACR_BUFFER_SET_DATA(&me->m_Base, ptr, length);
-    if (ACR_BUFFER_IS_VALID(&me->m_Base))
+    ACR_BUFFER_SET_DATA(me->m_Base, ptr, length);
+    if (ACR_BUFFER_IS_VALID(me->m_Base))
     {
         return ACR_INFO_OK;
     }

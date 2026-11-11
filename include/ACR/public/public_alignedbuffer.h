@@ -98,7 +98,7 @@ typedef struct ACR_AlignedBuffer_s
 */
 #define ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(name, memory, length, bits) \
         { \
-            ACR_BUFFER_SET_DATA(&name.m_UnalignedBuffer, (memory), (length)); \
+            ACR_BUFFER_SET_DATA(name.m_UnalignedBuffer, (memory), (length)); \
 			if((name.m_UnalignedBuffer.m_Pointer != ACR_NULL) && (name.m_UnalignedBuffer.m_Length > ACR_MIN_BLOCKS_NEEDED_BY_SIZE(bits,ACR_BITS_PER_BYTE))) \
 			{ \
 				ACR_PointerValue_t alignMask = (~(bits-1)); \

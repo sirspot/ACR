@@ -77,7 +77,7 @@ typedef struct ACR_String_s
 
 /** assign memory to the string
 */
-#define ACR_STRING_SET_DATA(name, memory, length, count) ACR_BUFFER_SET_DATA(&name.m_Buffer, memory, length); name.m_Count = count;
+#define ACR_STRING_SET_DATA(name, memory, length, count) ACR_BUFFER_SET_DATA(name.m_Buffer, memory, length); name.m_Count = count;
 
 /** type for unicode characters
 */
