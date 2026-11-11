@@ -178,12 +178,12 @@ ACR_Info_t ACR_BufferAllocate(
 
     if (length == 0)
     {
-        ACR_BUFFER_FREE(&me->m_Base);
+        ACR_BUFFER_FREE(me->m_Base);
         return ACR_INFO_ERROR;
     }
 
-    ACR_BUFFER_ALLOC(&me->m_Base, length);
-    if (ACR_BUFFER_IS_VALID(&me->m_Base))
+    ACR_BUFFER_ALLOC(me->m_Base, length);
+    if (ACR_BUFFER_IS_VALID(me->m_Base))
     {
         return ACR_INFO_OK;
     }
@@ -238,7 +238,7 @@ void ACR_BufferClear(
         return;
     }
 
-    ACR_BUFFER_CLEAR(&me->m_Base);
+    ACR_BUFFER_CLEAR(me->m_Base);
 }
 
 /**********************************************************/
@@ -1231,5 +1231,5 @@ void ACR_BufferDeInit(
         return;
     }
 
-    ACR_BUFFER_FREE(&me->m_Base);
+    ACR_BUFFER_FREE(me->m_Base);
 }
