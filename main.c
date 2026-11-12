@@ -223,6 +223,39 @@ void ACR_HeaderTestPublicMemory()
 
 /////////////////////////////////////////////////////////////////////////////
 //                                                                         //
+// public/public_int.h                                                     //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
+#include "ACR/public/public_int.h"
+void ACR_HeaderTestPublicInt()
+{
+    printf(TEXT_START TEXT_TEST_FILE("public/public_int.h"));
+    if(ACR_INT_16_MASK(0) != 0)
+    {
+        printf(TEXT_ERROR "ACR_INT_16_MASK(0) should be 0\n");
+    }
+    else if(ACR_INT_16_MASK(1) != 1)
+    {
+        printf(TEXT_ERROR "ACR_INT_16_MASK(1) should be 1\n");
+    }
+    else if(ACR_INT_16_MASK(8) != 0x00FFU)
+    {
+        printf(TEXT_ERROR "ACR_INT_16_MASK(8) should be 0x00FF\n");
+    }
+    else if(ACR_INT_16_MASK(16) != 0xFFFFU)
+    {
+        printf(TEXT_ERROR "ACR_INT_16_MASK(16) should be 0xFFFF\n");
+    }
+    else
+    {
+        printf(TEXT_OK "ACR_INT_16_MASK works for 0, 1, 8, and 16-bit masks\n");
+    }
+    printf(TEXT_END TEXT_TEST_FILE("public/public_int.h"));
+    printf("\n");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                                                                         //
 // public/public_bytes_and_flags.h                                         //
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
@@ -392,6 +425,7 @@ int main(int argc, char** argv)
     ACR_HeaderTestPublicBool();
     ACR_HeaderTestPublicFunctions();
     ACR_HeaderTestPublicMemory();
+    ACR_HeaderTestPublicInt();
     ACR_HeaderTestPublicBytesAndFlags();
     ACR_HeaderTestPublicByteOrder();
 

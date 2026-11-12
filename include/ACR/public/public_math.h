@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -45,16 +45,57 @@
     included automatically with public.h
 
 */
-#ifndef _ACR_PUBLIC_DECIMAL_H_
-#define _ACR_PUBLIC_DECIMAL_H_
+#ifndef _ACR_PUBLIC_MATH_H_
+#define _ACR_PUBLIC_MATH_H_
 
-/** the value of pie
+// included for ACR_Length_t
+#include "ACR/public/public_memory.h"
+
+// included for ACR_Decimal_t
+#include "ACR/public/public_decimal.h"
+
+// included for ACR_Count_t recommended for use by ACR_RUNNING_MEAN()
+#include "ACR/public/public_count.h"
+
+/** the value of pi
 */
 #define ACR_PI 3.14159265359
 
 /** the value of e (Euler's number)
 */
 #define ACR_E 2.71828
+
+/** calculating power using exponents
+*/
+#ifdef ACR_CONFIG_NO_LIBC
+    /** take an unsigned integer to the power of another unsigned integer.
+        this uses ACR_Length_t because it is known to be the largest
+        unsigned integer type supported by the current platform.
+        \param b the base value
+        \param e the exponent
+        \returns the result or 0 if an overflow occurs
+    */
+    static inline ACR_Length_t ACR_POWER_OF_UNSIGNED_INT(ACR_Length_t b, ACR_Length_t e)
+    {
+        ACR_Length_t result = 1;
+        while(e > 0)
+        {
+            ACR_Length_t nextValue = (result * b);
+            if(nextValue < result)
+            {
+                // overflow
+                return 0;
+            }
+            result = nextValue;
+            e -= 1;
+        }
+        return result;
+    }
+#else
+    // included for powl()
+    #include <math.h>
+    #define ACR_POWER_OF_UNSIGNED_INT(b,e) (ACR_Length_t)powl((ACR_Length_t)(b),(ACR_Length_t)(e))
+#endif
 
 /** the area of the rectangle with the specified length and width
 */
@@ -69,6 +110,15 @@
 #define ACR_CIRCUMFERENCE(radius) (2*ACR_PI*radius)
 
 /** update the running mean
+    example:
+    ACR_Decimal_t value = 0;
+    ACR_Count_t count = 0;
+
+    ACR_RUNNING_MEAN(value, count, 5);    // value += ((5 - 0) / 1);    // value = 5
+    ACR_RUNNING_MEAN(value, count, 5.5);  // value += ((5.5 - 5) / 2)   // value = 5.25
+    ACR_RUNNING_MEAN(value, count, 6);    // value += ((6 - 5.25) / 3)  // value = 5.50
+    ACR_RUNNING_MEAN(value, count, 10);   // value += ((10 - 5.50) / 4) // value = 6.625
+
     \param runningMean the variable that stores the runningMean.
                        It will be updated with the new runningMean.
                        This can start at zero.
@@ -77,6 +127,6 @@
                  This value can start at zero.
     \param newValue the value to include in the runningMean
 */
-#define ACR_RUNNING_MEAN(runningMean, count, newValue) (runningMean += ((newValue - runningMean) / ((ACR_Decimal_t)(++count))))
+#define ACR_RUNNING_MEAN(runningMean, count, newValue) (runningMean += (((ACR_Decimal_t)(newValue) - (ACR_Decimal_t)runningMean) / ((ACR_Decimal_t)(++count))))
 
 #endif

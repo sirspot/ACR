@@ -71,14 +71,14 @@ typedef ACR_Unsigned_32bit_t ACR_Count_t;
                  this means 4,294,967,295 + 1 = 0 because it will overflow.
                  another way to reach the same value is to use a binary NOT
                  operation '~' on 0 so that all bits flip from 0 to 1.
-                 once the max value is, found we subtract 1
+                 once the max value is found we subtract 1
                  to get a safe maximum count value.
 */
 #define ACR_MAX_COUNT ((~((ACR_Count_t)0)) - 1)
 
 /** get the value of a data item in an array
 
-    example to a get the value of the 10th number in an array
+    example to get the value of the 10th number in an array
     
     void* numbers = malloc(sizeof(int)*100);
     memset(numbers, 0, sizeof(int)*100);
@@ -94,7 +94,7 @@ typedef ACR_Unsigned_32bit_t ACR_Count_t;
 
 /** get a pointer to a data item in an array
 
-    example to a get a pointer to the 10th number in an array
+    example to get a pointer to the 10th number in an array
     
     void* numbers = malloc(sizeof(int)*100);
     int* valuePtr = ACR_VALUE_AT(int, numbers, 10);

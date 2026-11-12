@@ -1,3 +1,11 @@
 {
-    "debug.allowBreakpointsEverywhere": true
+    "debug.allowBreakpointsEverywhere": true,
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/test"
+    ],
+    "C_Cpp.default.defines": [
+        "ACR_CONFIG_NO_LIBC"
+    ],
+    "C_Cpp.default.compilerPath": "c:\\Qt\\Tools\\mingw1310_64\\bin\\gcc.exe"
 }

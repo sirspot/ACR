@@ -62,8 +62,8 @@
 // ### New to C? ###
 //
 // Even experienced programmers sometimes forget about
-// endianess. Read the following details to help understand
-// what endianess means and how it changes the way data
+// endianness. Read the following details to help understand
+// what endianness means and how it changes the way data
 // is stored in memory
 //
 // Q: What is MSB and LSB?
@@ -127,7 +127,7 @@
 //
 // defines ACR_IS_BIG_ENDIAN
 //
-// Optional: If you already know the endianess of your
+// Optional: If you already know the endianness of your
 //           system then set the preprocessor define as
 //           follows to improve byte order handling
 //           performance.
@@ -158,7 +158,7 @@
 // defines ACR_IS_BIG_ENDIAN as ACR_BOOL_TRUE or
 // ACR_BOOL_FALSE using defines built into the compiler
 // or by including a platform-specific c header because
-// no C standard currently defines endianess at the time
+// no C standard currently defines endianness at the time
 // this was written
 //
 #ifndef ACR_IS_BIG_ENDIAN

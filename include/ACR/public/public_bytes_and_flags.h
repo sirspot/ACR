@@ -120,7 +120,7 @@ typedef ACR_Byte_t ACR_Flags_t;
 #define ACR_FLAG_SEVEN 0x40
 #define ACR_FLAG_EIGHT 0x80
 
-/** Converts a number between 1 and 8 to the cooresponding flag
+/** Converts a number between 1 and 8 to the corresponding flag
 */
 #define ACR_FLAG(n) (0x01 << ((n)-1))
 

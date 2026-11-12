@@ -66,7 +66,7 @@
 // included for ACR_BITS_PER_BYTE
 #include "ACR/public/public_bytes_and_flags.h"
 
-/** type for an effeciently sized memory block, which is
+/** type for an efficiently sized memory block, which is
     probably the largest integer value type
 	\see ACR_MAX_BLOCK for the maximum value that can be
 	stored by this data type
