@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -90,7 +90,7 @@ typedef struct ACR_AlignedBuffer_s
 */
 #define ACR_ALIGNED_BUFFER_IS_VALID(name) ACR_BUFFER_IS_VALID(name.m_AlignedBuffer)
 
-/** assign exsiting memory to the buffer aligned on a boundary determined by the specified number of bits
+/** assign existing memory to the buffer aligned on a boundary determined by the specified number of bits
 
     Note: the buffer length available may be up to 1 full block less than the length specified.
 	      use ACR_ALIGNED_BUFFER_GET_LENGTH to get the actual length available and

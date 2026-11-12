@@ -54,6 +54,9 @@
 // included for ACR_USE_64BIT
 #include "ACR/public/public_memory.h"
 
+// included for ACR_Unsigned_16bit_t, ACR_Unsigned_32bit_t, and ACR_Unsigned_64bit_t
+#include "ACR/public/public_int.h"
+
 ////////////////////////////////////////////////////////////
 //
 // ### New to C? ###
@@ -244,24 +247,6 @@
     #define ACR_ENDIAN_DYNAMIC ACR_BOOL_FALSE
 #endif
 
-/** 16 bit signed value
-*/
-#ifndef ACR_CONFIG_NO_LIBC
-    #include <stdint.h>
-    typedef int16_t ACR_16bit_t;
-#else
-    typedef short ACR_16bit_t;
-#endif
-
-/** 16 bit unsigned value
-*/
-#ifndef ACR_CONFIG_NO_LIBC
-    #include <stdint.h>
-    typedef uint16_t ACR_Unsigned_16bit_t;
-#else
-    typedef unsigned short ACR_Unsigned_16bit_t;
-#endif
-
 /** Swap the byte order of a 16-bit value.
     \param value The value whose bytes are to be swapped.
     \return The value with its two bytes reversed.
@@ -271,24 +256,6 @@ static inline ACR_Unsigned_16bit_t ACR_BYTE_ORDER_SWAP_16(ACR_Unsigned_16bit_t v
     return (ACR_Unsigned_16bit_t)(((value & 0x00ffU) << 8) |
                                   ((value & 0xff00U) >> 8));
 }
-
-/** 32 bit signed value
-*/
-#ifndef ACR_CONFIG_NO_LIBC
-    #include <stdint.h>
-    typedef int32_t ACR_32bit_t;
-#else
-    typedef long ACR_32bit_t;
-#endif
-
-/** 32 bit unsigned value
-*/
-#ifndef ACR_CONFIG_NO_LIBC
-    #include <stdint.h>
-    typedef uint32_t ACR_Unsigned_32bit_t;
-#else
-    typedef unsigned long ACR_Unsigned_32bit_t;
-#endif
 
 /** Swap the byte order of a 32-bit value.
     \param value The value whose bytes are to be swapped.
@@ -320,24 +287,6 @@ static inline ACR_Unsigned_32bit_t ACR_BYTE_ORDER_SWAP_32(ACR_Unsigned_32bit_t v
 #endif // #if ACR_ENDIAN_DYNAMIC == ACR_BOOL_TRUE
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-    /** 64 bit signed value
-    */
-    #ifndef ACR_CONFIG_NO_LIBC
-        #include <stdint.h>
-        typedef int64_t ACR_64bit_t;
-    #else
-        typedef long long ACR_64bit_t;
-    #endif
-
-    /** 64 bit unsigned value
-    */
-    #ifndef ACR_CONFIG_NO_LIBC
-        #include <stdint.h>
-        typedef uint64_t ACR_Unsigned_64bit_t;
-    #else
-        typedef unsigned long long ACR_Unsigned_64bit_t;
-    #endif
 
     /** swap the byte order of a 64-bit value.
         \param value the value

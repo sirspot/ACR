@@ -79,47 +79,61 @@
 */
 #define ACR_EMPTY_VALUE 0
 
+/** attempt to detect a 64bit platform and set one of the following:
+    ACR_CONFIG_INTERNAL_DETECTED_64BIT, ACR_CONFIG_INTERNAL_ASSUME_64BIT, or ACR_CONFIG_INTERNAL_ASSUME_32BIT
+*/
+#if defined (_WIN64) || defined (_LP64)
+    // definitely a 64bit platform
+    #define ACR_CONFIG_INTERNAL_DETECTED_64BIT
+#elif defined (__SIZEOF_POINTER__)
+    #if __SIZEOF_POINTER__ >= 8
+        // at least 64bit
+        #define ACR_CONFIG_INTERNAL_DETECTED_64BIT
+    #else
+        #define ACR_CONFIG_INTERNAL_ASSUME_32BIT
+    #endif
+#elif !defined (ACR_CONFIG_NO_LIBC)
+    // included for UINTPTR_MAX
+    #include <stdint.h>
+    #ifdef UINTPTR_MAX
+        // determine, at compile time, whether or not the platform uses 64bit addresses
+        // Requires C11 using modified solution found here:
+        //     https://stackoverflow.com/questions/51616057/how-to-determine-pointer-size-preprocessor-c
+        //     Sep 22, 2023 at 16:21 by pjincz
+        #if (UINTPTR_MAX / 255 % 255) == 8
+            #define ACR_CONFIG_INTERNAL_DETECTED_64BIT
+        #else
+            #define ACR_CONFIG_INTERNAL_ASSUME_32BIT
+        #endif
+    #else
+        // UINTPTR_MAX is missing
+        // IMPORTANT: The ACR library could not determine if this is a 64bit platform.
+        // Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
+        #define ACR_CONFIG_INTERNAL_ASSUME_64BIT
+    #endif
+#else
+    // IMPORTANT: The ACR library could not determine if this is a 64bit platform.
+    // Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
+    #define ACR_CONFIG_INTERNAL_ASSUME_64BIT
+#endif 
+
+/** determine if the library should not use any 64bit values
+    even if a 64bit platform was detected
+*/
 #ifdef ACR_CONFIG_NO_64BIT
     // config without support for 64bit
     #define ACR_USE_64BIT ACR_BOOL_FALSE
 #else
-    #if defined (_WIN64) || defined (_LP64)
+    #if defined (ACR_CONFIG_INTERNAL_DETECTED_64BIT)
         // definitely a 64bit platform
         #define ACR_USE_64BIT ACR_BOOL_TRUE
-    #elif defined (__SIZEOF_POINTER__)
-        #if __SIZEOF_POINTER__ >= 8
-            // at least 64bit
-            #define ACR_USE_64BIT ACR_BOOL_TRUE
-        #else
-            // 64bit memory is not supported
-            #define ACR_USE_64BIT ACR_BOOL_FALSE
-        #endif
-    #elif defined (ACR_CONFIG_NO_LIBC)
-        // cannot use libc.
-        // assume config uses 64bit
+    #elif defined (ACR_CONFIG_INTERNAL_ASSUME_64BIT)
+        // assume this is a 64bit platform
         #define ACR_USE_64BIT ACR_BOOL_TRUE
-        // IMPORTANT: The ACR library could not determine if this is a 64bit platform. Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
     #else
-        // included for UINTPTR_MAX
-        #include <stdint.h>
-        #ifdef UINTPTR_MAX
-            // determine, at compile time, whether or not the platform uses 64bit addresses
-            // Requires C11 using modified solution found here:
-            //     https://stackoverflow.com/questions/51616057/how-to-determine-pointer-size-preprocessor-c
-            //     Sep 22, 2023 at 16:21 by pjincz
-            #if (UINTPTR_MAX / 255 % 255) == 8
-                // on 64 bit system
-                #define ACR_USE_64BIT ACR_BOOL_TRUE
-            #else
-                #define ACR_USE_64BIT ACR_BOOL_FALSE
-            #endif
-        #else
-            // UINTPTR_MAX is missing.
-            // assume 64bit platform
-            #define ACR_USE_64BIT ACR_BOOL_TRUE
-            // IMPORTANT: The ACR library could not determine if this is a 64bit platform. Define ACR_CONFIG_NO_64BIT if it only supports 32bit memory addresses.
-        #endif
-    #endif // #ifdef ACR_CONFIG_NO_LIBC
+        // not a 64bit platform
+        #define ACR_USE_64BIT ACR_BOOL_FALSE
+    #endif
 #endif // #ifdef ACR_CONFIG_NO_64BIT
 
 /** type for a typical length such as the size of a file or
@@ -129,14 +143,21 @@
 */
 #if ACR_USE_64BIT == ACR_BOOL_FALSE
     // 32bit
-    typedef unsigned int ACR_Length_t;
-#elif defined(ACR_CONFIG_NO_LIBC)
-    // 64bit
-    typedef unsigned long long ACR_Length_t;
+    #if defined(ACR_CONFIG_NO_LIBC)
+        typedef unsigned int ACR_Length_t;
+    #else
+        #include <stdint.h>
+        typedef uint32_t ACR_Length_t;
+    #endif
 #else
-    // included for size_t
-    #include <stddef.h>
-    typedef size_t ACR_Length_t;
+    // 64bit
+    #if defined(ACR_CONFIG_NO_LIBC)
+        typedef unsigned long long ACR_Length_t;
+    #else
+        // included for size_t
+        #include <stddef.h>
+        typedef size_t ACR_Length_t;
+    #endif
 #endif
 
 /** represents zero length.

@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -60,32 +60,28 @@
 // included for ACR_USE_64BIT
 #include "ACR/public/public_memory.h"
 
+// included for ACR_Unsigned_64bit_t and ACR_Unsigned_32bit_t
+#include "ACR/public/public_int.h"
+
+// included for ACR_BITS_PER_BYTE
+#include "ACR/public/public_bytes_and_flags.h"
+
 /** type for an effeciently sized memory block, which is
     probably the largest integer value type
 	\see ACR_MAX_BLOCK for the maximum value that can be
 	stored by this data type
 */
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-typedef unsigned long long ACR_Block_t;
+    typedef ACR_Unsigned_64bit_t ACR_Block_t;
+    #define ACR_BYTES_PER_BLOCK 8
 #else
-// 32bit
-typedef unsigned long ACR_Block_t;
+    typedef ACR_Unsigned_32bit_t ACR_Block_t;
+    #define ACR_BYTES_PER_BLOCK 4
 #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
 /** max value that can be stored by the ACR_Block_t type
 */
-#if ACR_USE_64BIT == ACR_BOOL_TRUE
-// 64bit
-#define ACR_MAX_BLOCK 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
-#else
-// 32bit
-#define ACR_MAX_BLOCK 4294967295UL // hex value 0xFFFFFFFF
-#endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
-
-/** number of bytes in ACR_Block_t
-*/
-#define ACR_BYTES_PER_BLOCK sizeof(ACR_Block_t)
+#define ACR_MAX_BLOCK (~((ACR_Block_t)0))
 
 /** number of bits in ACR_Block_t
 */
@@ -97,7 +93,7 @@ typedef unsigned long ACR_Block_t;
     \param s number of bytes per block
     \returns the minimum number of blocks needed as ACR_Block_t
 */
-#define ACR_MIN_BLOCKS_NEEDED_BY_SIZE(l, s) ((ACR_Block_t)((l / s) + ((l % s) != 0)))
+#define ACR_MIN_BLOCKS_NEEDED_BY_SIZE(l, s) ((ACR_Block_t)(((l) / (s)) + (((l) % (s)) != 0)))
 
 /** get the minimum number of standard sized blocks needed for the specified memory length.
     to get a more accurate number of blocks and bytes use ACR_LENGTH_TO_BLOCKS
@@ -118,7 +114,7 @@ typedef struct ACR_Blocks_s
     \param l length is bytes
     \param s number of bytes per block
 */
-#define ACR_LENGTH_TO_BLOCKS_BY_SIZE(b, l, s) { b.m_Blocks = (l / s); b.m_Bytes = (l % s); }
+#define ACR_LENGTH_TO_BLOCKS_BY_SIZE(b, l, s) do { b.m_Blocks = ((l) / (s)); b.m_Bytes = ((l) % (s)); } while(0)
 
 /** converts a length to ACR_Blocks_t data to provide the
     exact number of standard sized blocks and bytes needed for the memory length
