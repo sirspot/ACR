@@ -183,13 +183,39 @@
 #if ACR_USE_64BIT == ACR_BOOL_FALSE
     // 32bit
     #define ACR_MAX_LENGTH 4294967295UL // hex value 0xFFFFFFFF
+    #define ACR_LENGTH_BITS 32
 #elif defined(ACR_CONFIG_NO_LIBC)
     // 64bit
     #define ACR_MAX_LENGTH 18446744073709551615ULL // hex value 0xFFFFFFFFFFFFFFFF
+    #define ACR_LENGTH_BITS 64
 #else
     #include <stdint.h>
     #define ACR_MAX_LENGTH SIZE_MAX
+    #define ACR_LENGTH_BITS (sizeof(ACR_Length_t)*8)
 #endif
+
+/** create a bit mask
+    \param bits the number of least significant bits to mask
+    \returns the mask value
+*/
+static inline ACR_Length_t ACR_LENGTH_MASK(ACR_Length_t bits) 
+{
+    ACR_Length_t mask = 0;
+    ACR_Length_t bit = 0;
+
+    if(bits >= ACR_LENGTH_BITS)
+    {
+        return ~((ACR_Length_t)0);
+    }
+
+    while(bit < bits)
+    {
+        mask |= (ACR_Length_t)((ACR_Length_t)1 << bit);
+        bit += 1;
+    }
+
+    return mask;
+}
 
 /*
     ### New to C? ###

@@ -54,6 +54,9 @@
 // included for ACR_USE_64BIT
 #include "ACR/public/public_memory.h"
 
+// included for ACR_BITS_PER_BYTE
+#include "ACR/public/public_bytes_and_flags.h"
+
 ////////////////////////////////////////////////////////////
 //
 // ### New to C? ###
@@ -87,6 +90,29 @@
     typedef unsigned short ACR_Unsigned_16bit_t;
 #endif
 
+/** create a bit mask
+    \param bits the number of least significant bits to mask
+    \returns the mask value
+*/
+static inline ACR_Unsigned_16bit_t ACR_INT_16_MASK(ACR_Unsigned_16bit_t bits) 
+{
+    ACR_Unsigned_16bit_t mask = 0;
+    ACR_Unsigned_16bit_t bit = 0;
+
+    if(bits >= (sizeof(ACR_Unsigned_16bit_t) * ACR_BITS_PER_BYTE))
+    {
+        return ~((ACR_Unsigned_16bit_t)0);
+    }
+
+    while(bit < bits)
+    {
+        mask |= (ACR_Unsigned_16bit_t)((ACR_Unsigned_16bit_t)1 << bit);
+        bit += 1;
+    }
+
+    return mask;
+}
+
 /** 32 bit signed value
 */
 #ifndef ACR_CONFIG_NO_LIBC
@@ -104,6 +130,29 @@
 #else
     typedef unsigned int ACR_Unsigned_32bit_t;
 #endif
+
+/** create a bit mask
+    \param bits the number of least significant bits to mask
+    \returns the mask value
+*/
+static inline ACR_Unsigned_32bit_t ACR_INT_32_MASK(ACR_Unsigned_32bit_t bits) 
+{
+    ACR_Unsigned_32bit_t mask = 0;
+    ACR_Unsigned_32bit_t bit = 0;
+
+    if(bits >= (sizeof(ACR_Unsigned_32bit_t) * ACR_BITS_PER_BYTE))
+    {
+        return ~((ACR_Unsigned_32bit_t)0);
+    }
+
+    while(bit < bits)
+    {
+        mask |= (ACR_Unsigned_32bit_t)((ACR_Unsigned_32bit_t)1 << bit);
+        bit += 1;
+    }
+
+    return mask;
+}
 
 #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
@@ -124,6 +173,29 @@
     #else
         typedef unsigned long long ACR_Unsigned_64bit_t;
     #endif
+
+    /** create a bit mask
+        \param bits the number of least significant bits to mask
+        \returns the mask value
+    */
+    static inline ACR_Unsigned_64bit_t ACR_INT_64_MASK(ACR_Unsigned_64bit_t bits) 
+    {
+        ACR_Unsigned_64bit_t mask = 0;
+        ACR_Unsigned_64bit_t bit = 0;
+
+        if(bits >= (sizeof(ACR_Unsigned_64bit_t) * ACR_BITS_PER_BYTE))
+        {
+            return ~((ACR_Unsigned_64bit_t)0);
+        }
+
+        while(bit < bits)
+        {
+            mask |= (ACR_Unsigned_64bit_t)((ACR_Unsigned_64bit_t)1 << bit);
+            bit += 1;
+        }
+
+        return mask;
+    }
 
 #endif // ACR_USE_64BIT == ACR_BOOL_TRUE
 
