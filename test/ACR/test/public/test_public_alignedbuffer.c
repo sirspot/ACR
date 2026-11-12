@@ -74,12 +74,12 @@ int main(int argc, char** argv)
     char* alignedBufferPointer16 = &alignedBufferPointer[16];
     ACR_Length_t lengthAvailable;
     char* alignedPointer;
-    int bits;
+    int bytes;
 
     ACR_ALIGNED_BUFFER(alignedBuffer);
 
-    bits = 32;
-    ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(alignedBuffer, alignedBufferPointer, lengthForAlignedBuffer, bits);
+    bytes = 1;
+    ACR_ALIGNED_BUFFER_PTR_SET_MEMORY_ALIGNED_TO(&alignedBuffer, alignedBufferPointer, lengthForAlignedBuffer, bytes);
     alignedPointer = (char*)ACR_ALIGNED_BUFFER_GET_MEMORY(alignedBuffer);
     lengthAvailable = ACR_ALIGNED_BUFFER_GET_LENGTH(alignedBuffer);
     if(alignedPointer == alignedBufferPointer0)
@@ -87,20 +87,20 @@ int main(int argc, char** argv)
         ACR_Length_t lengthForAlignedBufferExpected = (ACR_Length_t)(alignedBuffer.m_UnalignedBuffer.m_Length - ((ACR_PointerValue_t)alignedBufferPointer0 - (ACR_PointerValue_t)alignedBuffer.m_UnalignedBuffer.m_Pointer));
         if(lengthAvailable == lengthForAlignedBufferExpected)
         {
-            ACR_DEBUG_PRINT(2, "OK %dbit aligned buffer at %p has length %d", bits, alignedPointer, (int)lengthAvailable);
+            ACR_DEBUG_PRINT(2, "OK %dbit aligned buffer at %p has length %d", (bytes*ACR_BITS_PER_BYTE), alignedPointer, (int)lengthAvailable);
         }
         else
         {
-            ACR_DEBUG_PRINT(3, "ERROR %dbit aligned buffer length is off by %d", bits, (int)(lengthForAlignedBufferExpected - lengthAvailable));
+            ACR_DEBUG_PRINT(3, "ERROR %dbit aligned buffer length is off by %d", (bytes*ACR_BITS_PER_BYTE), (int)(lengthForAlignedBufferExpected - lengthAvailable));
         }
     }
     else
     {
-        ACR_DEBUG_PRINT(4, "ERROR %dbit aligned buffer pointer is %p but expected %p", bits, alignedPointer, alignedBufferPointer0);
+        ACR_DEBUG_PRINT(4, "ERROR %dbit aligned buffer pointer is %p but expected %p", (bytes*ACR_BITS_PER_BYTE), alignedPointer, alignedBufferPointer0);
     }
 
-    bits = 16;
-    ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(alignedBuffer, alignedBufferPointer + 1, lengthForAlignedBuffer - 1, bits);
+    bytes = 4;
+    ACR_ALIGNED_BUFFER_PTR_SET_MEMORY_ALIGNED_TO(&alignedBuffer, alignedBufferPointer + 1, lengthForAlignedBuffer - 1, bytes);
     alignedPointer = (char*)ACR_ALIGNED_BUFFER_GET_MEMORY(alignedBuffer);
     lengthAvailable = ACR_ALIGNED_BUFFER_GET_LENGTH(alignedBuffer);
     if(alignedPointer == alignedBufferPointer16)
@@ -108,16 +108,16 @@ int main(int argc, char** argv)
         ACR_Length_t lengthForAlignedBufferExpected = (ACR_Length_t)(alignedBuffer.m_UnalignedBuffer.m_Length - ((ACR_PointerValue_t)alignedBufferPointer16 - (ACR_PointerValue_t)alignedBuffer.m_UnalignedBuffer.m_Pointer));
         if(lengthAvailable == lengthForAlignedBufferExpected)
         {
-            ACR_DEBUG_PRINT(5, "OK %dbit aligned buffer at %p has length %d", bits, alignedPointer, (int)lengthAvailable);
+            ACR_DEBUG_PRINT(5, "OK %dbit aligned buffer at %p has length %d", (bytes*ACR_BITS_PER_BYTE), alignedPointer, (int)lengthAvailable);
         }
         else
         {
-            ACR_DEBUG_PRINT(6, "ERROR %dbit aligned buffer length is off by %d", bits, (int)(lengthForAlignedBufferExpected - lengthAvailable));
+            ACR_DEBUG_PRINT(6, "ERROR %dbit aligned buffer length is off by %d", (bytes*ACR_BITS_PER_BYTE), (int)(lengthForAlignedBufferExpected - lengthAvailable));
         }
     }
     else
     {
-        ACR_DEBUG_PRINT(7, "ERROR %dbit aligned buffer pointer is %p but expected %p", bits, alignedPointer, alignedBufferPointer0);
+        ACR_DEBUG_PRINT(7, "ERROR %dbit aligned buffer pointer is %p but expected %p", (bytes*ACR_BITS_PER_BYTE), alignedPointer, alignedBufferPointer0);
     }
 
 	ACR_ALIGNED_BUFFER_FREE(alignedBuffer);
