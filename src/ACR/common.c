@@ -239,15 +239,17 @@ ACR_Bool_t ACR_TimerStart(
     {
         #if ACR_HAS_TIMER == ACR_BOOL_TRUE
 
-            ACR_TIMER_START((*me));
-            return ACR_BOOL_TRUE;
+            if(ACR_TIMER_START((*me)))
+            {
+                return ACR_BOOL_TRUE;
+            }
 
         #else
 
             if(g_ACRSimRtcTimeIsSet || g_ACRSimRtcTimeMicroIsSet)
             {
-                me->tv_sec = g_ACRSimRtcTime;
-                me->tv_usec = g_ACRSimRtcTimeMicro;
+                me->tv_sec = g_ACRSimRtcTime + (g_ACRSimRtcTimeMicro / ACR_MICRO_PER_SEC);
+                me->tv_usec = g_ACRSimRtcTimeMicro % ACR_MICRO_PER_SEC;
                 return ACR_BOOL_TRUE;
             }
             else
@@ -440,8 +442,14 @@ ACR_Bool_t ACR_TimeNow(
     {
         #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
-            ACR_TIME_NOW((*me));
-            return ACR_BOOL_TRUE;
+            if(ACR_TIME_NOW((*me)))
+            {
+                return ACR_BOOL_TRUE;
+            }
+
+            // failed to get the current time.
+            // set time to zero seconds.
+            (*me) = 0;
 
         #else
 
@@ -467,6 +475,11 @@ ACR_Bool_t ACR_TimeSet(
     const ACR_Time_t* me)
 {
     ACR_Bool_t result = ACR_BOOL_FALSE;
+
+    if(!me)
+    {
+        return result;
+    }
 
     g_ACRSimRtcTimeIsSet = ACR_BOOL_TRUE;
     g_ACRSimRtcTime = (*me);
@@ -497,6 +510,7 @@ ACR_Bool_t ACR_TimeSet(
 void ACR_TimeProcessSecondTick(
     ACR_Time_t seconds)
 {
+    g_ACRSimRtcTimeIsSet = ACR_BOOL_TRUE;
     g_ACRSimRtcTime += seconds;
 }
 
@@ -515,12 +529,14 @@ ACR_Bool_t ACR_DateTimeFromTime(
     {
         if(time)
         {
-            if((*time) > 0)
+            if((*time) >= 0)
             {
                 #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
-                    ACR_DATETIME_FROM_TIME((*me), (*time));
-                    return ACR_BOOL_TRUE;
+                    if(ACR_DATETIME_FROM_TIME((*me), (*time)))
+                    {
+                        return ACR_BOOL_TRUE;
+                    }
 
                 #else
 
@@ -548,24 +564,22 @@ ACR_Bool_t ACR_DateTimeFromTime(
                     // tempTime contains at least the number of seconds necessary for the
                     // the current value of the tempYear variable
                     //
-                    // subtract the seconds for each year until less than a year of seconds remains
-                    do
+                    // subtract complete years until less than a year of seconds remains
+                    while(1)
                     {
                         ACR_Time_t secondsInYear = (ACR_SEC_PER_DAY * ACR_DAYS_PER_YEAR(tempYear));
-                        if(secondsInYear >= tempTime)
+                        if(tempTime >= secondsInYear)
                         {
-                            tempYear++;
                             tempTime -= secondsInYear;
+                            tempYear++;
                         }
                         else
                         {
                             // found the year
                             me->tm_year = (tempYear-1900);
-                            // break out of this loop.
                             break;
                         }
                     }
-                    while (tempTime >= ACR_SEC_PER_STANDARD_YEAR);
 
                     //
                     // calculate the day of the year from the tempTime
@@ -606,7 +620,7 @@ ACR_Bool_t ACR_DateTimeFromTime(
                     //
                     {
                         static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-                        tempYear -= ((me->tm_mon-1) < 3);
+                        tempYear -= (me->tm_mon < 2);
                         me->tm_wday = (tempYear + tempYear/4 - tempYear/100 + tempYear/400 + t[me->tm_mon] + me->tm_mday) % 7;
                     }
 
@@ -621,6 +635,7 @@ ACR_Bool_t ACR_DateTimeFromTime(
                     me->tm_sec = (int)tempTime;
 
                     // indicate using UTC time
+                    me->tm_isdst = 0;
                     me->tm_gmtoff = 0;
                     me->tm_zone = "UTC";
                     

@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -62,6 +62,12 @@
 // included for ACR_COMPILER_CLANG, ACR_COMPILER_GCC, ACR_COMPILER_VS2017
 #include "ACR/public/public_config.h"
 
+// included for ACR_USE_64BIT
+#include "ACR/public/public_memory.h"
+
+// included for ACR_64bit_t and ACR_32bit_t
+#include "ACR/public/public_int.h"
+
 // defines ACR_HAS_RTC and includes time()
 // functions if desired
 #ifndef ACR_CONFIG_NO_RTC
@@ -70,15 +76,15 @@
             // included for time(), gmtime_r()
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
+            #define ACR_TIME_NOW(name) (time(&(name)) != (time_t)-1)
+            #define ACR_DATETIME_FROM_TIME(name,time) (gmtime_r(&(time),&(name)) != NULL)
         #endif
         #ifdef ACR_COMPILER_GCC
             // included for time(), gmtime_r()
             #include <time.h>
             #ifdef _WIN32
-                // gmtime_r is not available on most windows platforms.
-                // use an inline function to simulate it instead
+                // gmtime_r() is not available on most windows platforms.
+                // use an inline function to simulate it with gmtime() instead
                 static inline struct tm* gmtime_r(const time_t* t, struct tm* name)
                 {
                     struct tm* tm = gmtime(t);
@@ -91,16 +97,16 @@
                 }
             #endif
             #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_r(&time,&name)
+            #define ACR_TIME_NOW(name) (time(&(name)) != (time_t)-1)
+            #define ACR_DATETIME_FROM_TIME(name,time) (gmtime_r(&(time),&(name)) != NULL)
         #endif
         #ifdef ACR_COMPILER_VS2017
             // Note: disable warning C4820: '_timespec64': '4' bytes padding added after data member 'tv_nsec'
             // included for time(), gmtime_s()
             #include <time.h>
             #define ACR_HAS_RTC ACR_BOOL_TRUE
-            #define ACR_TIME_NOW(name) time(&name)
-            #define ACR_DATETIME_FROM_TIME(name,time) gmtime_s(&name,&time)
+            #define ACR_TIME_NOW(name) (time(&(name)) != (time_t)-1)
+            #define ACR_DATETIME_FROM_TIME(name,time) (gmtime_s(&(name),&(time)) == 0)
         #endif
     #endif // #ifndef ACR_CONFIG_NO_LIBC
 #endif // #ifndef ACR_CONFIG_NO_RTC
@@ -125,10 +131,10 @@
     */
     #if ACR_USE_64BIT == ACR_BOOL_TRUE
         // 64bit
-        typedef unsigned long long ACR_Time_t;
+        typedef ACR_64bit_t ACR_Time_t;
     #else
         // 32bit
-        typedef unsigned long ACR_Time_t;
+        typedef ACR_32bit_t ACR_Time_t;
     #endif // #if ACR_USE_64BIT == ACR_BOOL_TRUE
 
     /** standard date time structure
@@ -156,15 +162,27 @@
     //       that wishes to use ACR/common.h
     #include "ACR/common.h"
 
-    #define ACR_TIME_NOW(name) ACR_TimeNow(&name)
-    #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&name,&time)
+    #define ACR_TIME_NOW(name) ACR_TimeNow(&(name))
+    #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&(name),&(time))
 
 #endif // #if ACR_HAS_RTC == ACR_BOOL_TRUE
 
 /** get the current date and time
     \param name any ACR_DateTime_t variable
 */
-#define ACR_DATETIME_NOW(name) {ACR_Time_t temp; ACR_TIME_NOW(temp); ACR_DATETIME_FROM_TIME(name,temp);}
+#define ACR_DATETIME_NOW(name)\
+    do {\
+        ACR_Time_t temp;\
+        if(ACR_TIME_NOW(temp))\
+        {\
+            ACR_DATETIME_FROM_TIME(name,temp);\
+        }\
+        else\
+        {\
+            temp = 0;
+        }\
+    }\
+    while(0)
 
 /** values that represent whether in day light savings time or not
     see tm_isdst in ACR_DateTime_t
