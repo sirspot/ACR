@@ -89,6 +89,59 @@ void ACR_StringInit(
 void ACR_StringDeInit(
 	ACR_String_t* me);
 
+/** get a reference to a null-terminated string in memory
+    with support for UTF8 encoding
+    \param src a pointer to a null-terminated string in
+           memory
+    \param srcLength the max number of bytes from src this
+           function will search. use ACR_MAX_LENGTH if
+           unsure
+    \param maxCharacters the max number of characters this
+           function will count. use ACR_MAX_COUNT if unsure
+    \returns a string reference
+*/
+ACR_String_t ACR_StringFromMemory(
+    ACR_Byte_t* src,
+    ACR_Length_t srcLength,
+    ACR_Count_t maxCharacters);
+
+/** \see ACR_StringFromMemory()
+
+    the string returned will have the read only flag set
+*/
+ACR_String_t ACR_StringFromReadOnlyMemory(
+    const ACR_Byte_t* src,
+    ACR_Length_t srcLength,
+    ACR_Count_t maxCharacters);
+
+/** compare a string to a null-terminated string in memory
+    with support for UTF8 encoding
+    \param string the known string to compare to
+    \param src a pointer to a null-terminated string in
+           memory
+    \param srcLength the max number of bytes from mem this
+           function will search. use ACR_MAX_LENGTH if
+           unsure
+    \param maxCharacters the max number of characters this
+           function will compare. use ACR_MAX_COUNT if
+           unsure
+    \param caseSensitive set to ACR_INFO_YES for
+           case-sensitive comparison (faster) or ACR_INFO_NO
+           for case-insensitive (slower)
+    \returns - ACR_INFO_EQUAL if the strings are equal up
+               to maxCharacters
+             - ACR_INFO_LESS if src has less characters or
+               is less than string
+             - ACR_INFO_GREATER if src has more characters
+               or is greater than string
+             - ACR_INFO_INVALID if src is invalid
+*/
+ACR_Info_t ACR_StringCompareToMemory(
+    ACR_String_t string,
+    const ACR_Byte_t* src,
+    ACR_Length_t srcLength,
+    ACR_Count_t maxCharacters,
+    ACR_Info_t caseSensitive);
 
 
 ////////////////////////////////////////////////////////////

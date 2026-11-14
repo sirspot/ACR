@@ -63,6 +63,10 @@ int HeapTest(void);
 */
 int LowLevelTest(void);
 
+/** test prepending data to a variable length buffer
+*/
+int PrependTest(void);
+
 /** test edge cases for low-level variable buffer macros
 */
 int MacroEdgeCasesTest(void);
@@ -86,6 +90,7 @@ int main(int argc, char** argv)
 	result |= StackTest();
 	result |= HeapTest();
 	result |= LowLevelTest();
+	result |= PrependTest();
 	result |= MacroEdgeCasesTest();
 
 	result |= VerboseTest();
@@ -189,6 +194,110 @@ int LowLevelTest(void)
 	}
 
 	return ACR_SUCCESS;
+}
+
+/**********************************************************/
+int PrependTest(void)
+{
+	ACR_VarBuffer_t varbuffer;
+	const char expected[] = "predata";
+	ACR_Length_t i;
+	ACR_Info_t appendResult;
+	ACR_Info_t prependResult = ACR_INFO_ERROR;
+	int result = ACR_SUCCESS;
+
+	ACR_VarBufferInit(&varbuffer);
+	if(ACR_VarBufferAllocate(&varbuffer, 12) != ACR_INFO_OK)
+	{
+		ACR_DEBUG_PRINT(20, "FAIL allocate buffer for prepend");
+		ACR_VarBufferDeInit(&varbuffer);
+		return ACR_FAILURE;
+	}
+
+	appendResult = ACR_VarBufferAppend(&varbuffer, (void*)"data", 4);
+	if(appendResult == ACR_INFO_OK)
+	{
+		prependResult = ACR_VarBufferPrepend(&varbuffer, (void*)"pre", 3);
+	}
+
+	if(appendResult != ACR_INFO_OK || prependResult != ACR_INFO_OK)
+	{
+		ACR_DEBUG_PRINT(21, "FAIL prepend data before existing contents");
+		result = ACR_FAILURE;
+	}
+	else
+	{
+		for(i = 0; i < sizeof(expected) - 1; i++)
+		{
+			if(((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[i] != (ACR_Byte_t)expected[i])
+			{
+				ACR_DEBUG_PRINT(21, "FAIL prepend data before existing contents");
+				result = ACR_FAILURE;
+				break;
+			}
+		}
+
+		if(result == ACR_SUCCESS && varbuffer.m_Buffer.m_Length == sizeof(expected) - 1)
+		{
+			ACR_DEBUG_PRINT(22, "PASS prepend data before existing contents");
+		}
+		else if(result == ACR_SUCCESS)
+		{
+			ACR_DEBUG_PRINT(21, "FAIL prepend data updates buffer length");
+			result = ACR_FAILURE;
+		}
+	}
+
+	prependResult = ACR_VarBufferPrepend(&varbuffer, ACR_NULL, 2);
+	if(prependResult != ACR_INFO_OK || varbuffer.m_Buffer.m_Length != 9)
+	{
+		ACR_DEBUG_PRINT(23, "FAIL prepend without source shifts data and updates length");
+		result = ACR_FAILURE;
+	}
+	else
+	{
+		for(i = 0; i < sizeof(expected) - 1; i++)
+		{
+			if(((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[i + 2] != (ACR_Byte_t)expected[i])
+			{
+				ACR_DEBUG_PRINT(23, "FAIL prepend without source shifts data and updates length");
+				result = ACR_FAILURE;
+				break;
+			}
+		}
+
+		if(result == ACR_SUCCESS)
+		{
+			ACR_DEBUG_PRINT(24, "PASS prepend without source shifts data and updates length");
+		}
+	}
+
+	prependResult = ACR_VarBufferPrepend(&varbuffer, (void*)"more", 4);
+	if(prependResult != ACR_INFO_ERROR || varbuffer.m_Buffer.m_Length != 9)
+	{
+		ACR_DEBUG_PRINT(25, "FAIL oversized prepend leaves buffer length unchanged");
+		result = ACR_FAILURE;
+	}
+	else
+	{
+		for(i = 0; i < sizeof(expected) - 1; i++)
+		{
+			if(((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[i + 2] != (ACR_Byte_t)expected[i])
+			{
+				ACR_DEBUG_PRINT(25, "FAIL oversized prepend leaves buffer contents unchanged");
+				result = ACR_FAILURE;
+				break;
+			}
+		}
+
+		if(result == ACR_SUCCESS)
+		{
+			ACR_DEBUG_PRINT(26, "PASS oversized prepend leaves buffer unchanged");
+		}
+	}
+
+	ACR_VarBufferDeInit(&varbuffer);
+	return result;
 }
 
 /**********************************************************/

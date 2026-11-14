@@ -41,7 +41,11 @@
 */
 #include "ACR/test/test_common.h"
 
-#include "ACR/common.h"
+#include "ACR/counter.h"
+#include "ACR/datetime.h"
+#include "ACR/info.h"
+#include "ACR/string.h"
+#include "ACR/timer.h"
 
 // included for NAN to test undefined decimal comparisons
 #include <math.h>

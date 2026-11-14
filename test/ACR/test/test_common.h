@@ -40,7 +40,7 @@
 
 /** \file test_common.h
  
-    Defines test functions for common.h
+    Defines tests for common library functionality
 */
 #ifndef _ACR_TEST_COMMON_H_
 #define _ACR_TEST_COMMON_H_

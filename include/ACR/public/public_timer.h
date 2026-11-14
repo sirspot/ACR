@@ -67,6 +67,9 @@
 // included for ACR_Time_t
 #include "ACR/public/public_clock.h"
 
+// included for ACR_Info_t and comparison values
+#include "ACR/public/public_info.h"
+
 // defines ACR_HAS_TIMER and includes timer functions if desired
 #ifndef ACR_CONFIG_NO_TIMER
     #ifndef ACR_CONFIG_NO_LIBC
@@ -256,6 +259,6 @@
     #undef ACR_CONFIG_INTERNAL_TIMER_WIN_NATIVE
 #endif
 
-#include "ACR/common.h"
+#include "ACR/timer.h"
 
 #endif

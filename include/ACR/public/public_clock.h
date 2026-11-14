@@ -158,9 +158,9 @@
     // operating system's real-time clock.
     // see ACR_TimeProcessSecondTick() for how to simulate
     // a real-time clock
-    // Note: src/ACR/common.c must be added to any project
-    //       that wishes to use ACR/common.h
-    #include "ACR/common.h"
+    // Note: src/ACR/datetime.c must be added to any project
+    //       that uses ACR_TimeNow() or ACR_DateTimeFromTime().
+    #include "ACR/datetime.h"
 
     #define ACR_TIME_NOW(name) ACR_TimeNow(&(name))
     #define ACR_DATETIME_FROM_TIME(name,time) ACR_DateTimeFromTime(&(name),&(time))

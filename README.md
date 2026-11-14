@@ -20,7 +20,9 @@ Using your favorite IDE and C compiler, you can call the same test function as t
 ## Project Settings
 - Add "ACR/include" to your include paths
 - Add "ACR/test" to your include paths
-- Add "ACR/src/ACR/common.c" to your project
+- Add "ACR/src/ACR/counter.c", "ACR/src/ACR/datetime.c",
+  "ACR/src/ACR/info.c", "ACR/src/ACR/string.c",
+  "ACR/src/ACR/timer.c", and "ACR/src/ACR/unicode.c" to your project
 - Add "ACR/test/ACR/test/test_common.c" to your project
 
 ## Code

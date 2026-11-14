@@ -38,7 +38,8 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "ACR/common.h"
+#include "ACR/datetime.h"
+#include "ACR/timer.h"
 
 static void TestDateConversion(void)
 {

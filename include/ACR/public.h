@@ -528,7 +528,7 @@
 
     If your platform doesn't have an RTC, define ACR_CONFIG_NO_RTC
     in your project settings and see ACR_TimeProcessSecondTick()
-    in "ACR/common.h" for how to simulate a real-time clock
+    in "ACR/datetime.h" for how to simulate a real-time clock
 
     ### New to C? ###
 
@@ -556,7 +556,7 @@
 
     If your platform doesn't have a timer, define ACR_CONFIG_NO_TIMER
     in your project settings and see ACR_TimeProcessMicroTick() in
-    "ACR/common.h" for how to simulate a timer
+    "ACR/timer.h" for how to simulate a timer
 
     ### New to C? ###
 
@@ -646,7 +646,7 @@
 
     These values are most useful as function parameters and
     as return values. The include file "ACR/public/public_unique_strings.h"
-    defines unique strings to match each value. The include file "ACR/common.h"
+    defines unique strings to match each value. The include file "ACR/info.h"
     has functions ACR_InfoToString() and ACR_InfoFromString() that use
     a lookup table to make for fast and easy conversions between the
     value and the string.
@@ -766,7 +766,7 @@
     ACR_String_t, ACR_Unicode_t, ACR_UTF8_BYTE_COUNT(), and more
 
     This provides very rudimentary storage and access to string data.
-    For easier methods to work with string data see "ACR/common.h"
+    For easier methods to work with string data see "ACR/unicode.h"
     and "ACR/string.h"
 
     ### New to C? ###
@@ -813,9 +813,10 @@
     Include the file "ACR/public/public_unique_strings.h" to define
     ACR_MONTH_STR_JANUARY, ACR_INFO_STR_TRUE, and more
 
-    These defines are used by lookup tables in "ACR/common.c"
-    to provide string representations of ACR_Info_t, ACR_Month_t,
-    and more enum data type values. See "ACR/common.h" for details.
+    These defines are used by lookup tables in "ACR/info.c" and
+    "ACR/datetime.c" to provide string representations of ACR_Info_t,
+    ACR_Month_t, and more enum data type values. See "ACR/info.h" and
+    "ACR/datetime.h" for details.
 */
 #include "ACR/public/public_unique_strings.h"
 

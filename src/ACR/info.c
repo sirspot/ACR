@@ -6,7 +6,7 @@
 #include "ACR/info.h"
 
 // included for ACR_StringCompareToMemory and ACR_StringFromReadOnlyMemory
-#include "ACR/common.h"
+#include "ACR/string.h"
 
 // included for ACR_INFO_STR_*
 #include "ACR/public/public_unique_strings.h"
