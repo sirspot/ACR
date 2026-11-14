@@ -103,26 +103,38 @@ static inline void ACR_ALIGNED_BUFFER_PTR_SET_MEMORY_ALIGNED_TO(ACR_AlignedBuffe
         return;
     }
 
-    ACR_BUFFER_SET_DATA(me->m_UnalignedBuffer, memory, length);
-    if((me->m_UnalignedBuffer.m_Pointer != ACR_NULL) && (alignmentBytes > ACR_ZERO_LENGTH))
+    ACR_BUFFER_PTR_SET_DATA(&me->m_UnalignedBuffer, memory, length);
+    if(alignmentBytes < 1)
+    {
+        // cannot align to less than 1 byte
+        ACR_BUFFER_PTR_SET_DATA(&me->m_AlignedBuffer, ACR_NULL, ACR_ZERO_LENGTH);
+    }
+    else if(alignmentBytes == 1)
+    {
+        // align to 1 byte is the same as using the pointer as-is
+        ACR_BUFFER_PTR_SET_DATA(&me->m_AlignedBuffer, memory, length);
+    }
+    else if(ACR_BUFFER_PTR_IS_VALID(&me->m_UnalignedBuffer))
     {
         ACR_PointerValue_t pointerValue = (ACR_PointerValue_t)me->m_UnalignedBuffer.m_Pointer;
         ACR_Length_t remainder = (ACR_Length_t)(pointerValue % alignmentBytes);
         ACR_Length_t offset = (remainder == ACR_ZERO_LENGTH) ? ACR_ZERO_LENGTH : (alignmentBytes - remainder);
-        if((offset < me->m_UnalignedBuffer.m_Length) && (length > ACR_ZERO_LENGTH))
+        if(offset < me->m_UnalignedBuffer.m_Length)
         {
-            char* alignedPointer = (char*)me->m_UnalignedBuffer.m_Pointer + offset;
+            char* alignedPointer = ((char*)me->m_UnalignedBuffer.m_Pointer) + offset;
             ACR_Length_t alignedLength = (me->m_UnalignedBuffer.m_Length - offset);
-            ACR_BUFFER_SET_DATA(me->m_AlignedBuffer, alignedPointer, alignedLength);
+            ACR_BUFFER_PTR_SET_DATA(&me->m_AlignedBuffer, alignedPointer, alignedLength);
         }
         else
         {
-            ACR_BUFFER_SET_DATA(me->m_AlignedBuffer, ACR_NULL, ACR_ZERO_LENGTH);
+            // there is not enough memory to align to the requested number of bytes
+            ACR_BUFFER_PTR_SET_DATA(&me->m_AlignedBuffer, ACR_NULL, ACR_ZERO_LENGTH);
         }
     }
     else
     {
-        ACR_BUFFER_SET_DATA(me->m_AlignedBuffer, ACR_NULL, ACR_ZERO_LENGTH);
+        // cannot align to an invalid buffer
+        ACR_BUFFER_PTR_SET_DATA(&me->m_AlignedBuffer, ACR_NULL, ACR_ZERO_LENGTH);
     }
 }
 #define ACR_ALIGNED_BUFFER_SET_MEMORY_ALIGNED_TO(name, memory, length, alignmentBytes) ACR_ALIGNED_BUFFER_PTR_SET_MEMORY_ALIGNED_TO(&(name), (memory), (length), (alignmentBytes))
@@ -142,9 +154,7 @@ static inline void ACR_ALIGNED_BUFFER_PTR_SET_MEMORY_ALIGNED_TO(ACR_AlignedBuffe
 /** free memory used by the buffer
 */
 #define ACR_ALIGNED_BUFFER_FREE(name) \
-        ACR_BUFFER_FREE(name.m_UnalignedBuffer); \
-		name.m_AlignedBuffer.m_Pointer = ACR_NULL; \
-		name.m_AlignedBuffer.m_Length = ACR_ZERO_LENGTH; \
-        ACR_REMOVE_FLAGS(name.m_AlignedBuffer.m_Flags, ACR_BUFFER_IS_REF)
+        ACR_BUFFER_PTR_FREE(&name.m_UnalignedBuffer); \
+        ACR_BUFFER_PTR_FREE(&name.m_AlignedBuffer);
 
 #endif

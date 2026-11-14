@@ -1,11 +1,17 @@
 {
     "debug.allowBreakpointsEverywhere": true,
-    "C_Cpp.default.includePath": [
+    "C_Cpp.default.includePath":
+    [
         "${workspaceFolder}/include",
         "${workspaceFolder}/test"
     ],
-    "C_Cpp.default.defines": [
-        "ACR_CONFIG_NO_LIBC"
+    "C_Cpp.default.defines":
+    [
+        //"ACR_CONFIG_NO_LIBC"
+        //"ACR_CONFIG_DEBUG"
+        "ACR_PLATFORM_MAC",
+        "ACR_COMPILER_CLANG",
+        "ACR_IDE_VSCODE"
     ],
-    "C_Cpp.default.compilerPath": "c:\\Qt\\Tools\\mingw1310_64\\bin\\gcc.exe"
+    "C_Cpp.commentContinuationPatterns": ["//"]
 }

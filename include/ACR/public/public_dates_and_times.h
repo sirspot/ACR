@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -98,7 +98,7 @@ typedef enum ACR_Month_e
 #define ACR_MONTH_UNKNOWN (ACR_MONTH_COUNT+1)
 #define ACR_MONTHS_PER_YEAR ACR_MONTH_COUNT
 
-#define ACR_YEAR_IS_LEAP_YEAR(fourDigitYear) ((fourDigitYear % 400 == 0) || ((fourDigitYear % 100 != 0) && (fourDigitYear % 4 == 0)))
+#define ACR_YEAR_IS_LEAP_YEAR(fourDigitYear) ((((fourDigitYear) % 400) == 0) || ((((fourDigitYear) % 100) != 0) && (((fourDigitYear) % 4) == 0)))
 
 /** days of the week
 */
@@ -126,7 +126,7 @@ typedef enum ACR_DayOfWeek_e
 // MINUTES
 #define ACR_MIN_PER_HOUR 60
 #define ACR_MIN_PER_DAY (ACR_MIN_PER_HOUR*ACR_HOUR_PER_DAY)
-#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAY_PER_WEEK)
+#define ACR_MIN_PER_WEEK (ACR_MIN_PER_DAY*ACR_DAYS_PER_WEEK)
 
 // SECONDS
 #define ACR_SEC_PER_MIN 60
@@ -136,8 +136,8 @@ typedef enum ACR_DayOfWeek_e
 #define ACR_SEC_PER_LEAP_YEAR (ACR_SEC_PER_DAY*ACR_DAYS_PER_LEAP_YEAR)
 #define ACR_SEC_FROM_1601_TO_1970 11644473600UL
 #define ACR_SEC_FROM_1900_TO_1970 2208988800UL
-#define ACR_SEC_FROM_1970_TO_2000 946684800UL
-#define ACR_SEC_FROM_1970_TO_2020 1577836800UL
+#define ACR_SEC_FROM_1970_TO_2000 946684800
+#define ACR_SEC_FROM_1970_TO_2020 1577836800
 
 // MILLISECONDS
 #define ACR_MILLI_PER_SEC 1000
@@ -160,6 +160,6 @@ typedef enum ACR_DayOfWeek_e
     this will convert NTP time to UNIX timestamp by subtracting
     seventy years in seconds
 */
-#define ACR_TIME_FROM_NTP(ntpTime) (ntpTime - ACR_SEC_FROM_1900_TO_1970)
+#define ACR_TIME_FROM_NTP(ntpTime) ((ntpTime) - ACR_SEC_FROM_1900_TO_1970)
 
 #endif

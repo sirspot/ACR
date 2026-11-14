@@ -123,7 +123,12 @@
 /* determine which version of the C standard is in use.
    and store it as ACR_C_VERSION for easy reference
 */
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if defined(__cplusplus)
+    // C++ does not define __STDC_VERSION__; use the C99 compatibility baseline.
+    // Note: since ACR is designed to be used as a C library, it is better to
+    //       compile it with a C compiler and link it to your C++ program instead
+    #define ACR_C_VERSION ACR_C_VERSION_99
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
     #define ACR_C_VERSION ACR_C_VERSION_23
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201710L
     #define ACR_C_VERSION ACR_C_VERSION_17
