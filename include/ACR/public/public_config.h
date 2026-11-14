@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -79,11 +79,6 @@
             ACR_COMPILER_MINGW      compiling with mingw
 
             ACR_CONFIG_WIN_NATIVE   define this to include the native Windows headers
-
-        ACR_PLATFORM_GITPOD         Gitpod
-        
-                                    using Visual Studio Code
-                                    compiling with gcc
 
     For additional control over the configuration or if using an
     alternate development environment, the following options can
@@ -208,23 +203,20 @@
             #define ACR_COMPILER_NAME "msvc"
         #endif // ACR_COMPILER_MSVC
     #endif // ACR_IDE_VS2017
+    #ifdef ACR_IDE_VSCODE
+        #define ACR_HAS_IDE ACR_BOOL_TRUE
+        #define ACR_IDE_NAME "vscode"
+        #ifdef ACR_COMPILER_CLANG
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "clang"
+        #endif // ACR_COMPILER_CLANG
+        #ifdef ACR_COMPILER_MINGW
+            #define ACR_HAS_COMPILER ACR_BOOL_TRUE
+            #define ACR_COMPILER_NAME "mingw"
+        #endif // ACR_COMPILER_MINGW
+    #endif // ACR_IDE_VSCODE
 
 #endif // ACR_PLATFORM_WIN
-
-/** GITPOD (LINUX)
-*/
-#ifdef ACR_PLATFORM_GITPOD
-
-    #define ACR_HAS_PLATFORM ACR_BOOL_TRUE
-    #define ACR_PLATFORM_NAME "gitpod"
-    #define ACR_HAS_IDE ACR_BOOL_TRUE
-    #define ACR_IDE_VSCODE
-    #define ACR_IDE_NAME "vscode"
-    #define ACR_HAS_COMPILER ACR_BOOL_TRUE
-    #define ACR_COMPILER_GCC
-    #define ACR_COMPILER_NAME "gcc"
-
-#endif // ACR_PLATFORM_GITPOD
 
 /** LINUX
 */

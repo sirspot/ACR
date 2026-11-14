@@ -63,6 +63,10 @@ int HeapTest(void);
 */
 int LowLevelTest(void);
 
+/** test edge cases for low-level variable buffer macros
+*/
+int MacroEdgeCasesTest(void);
+
 /** a more complex test that takes into account malloc
     option and prints debug messages as the test is run
 */
@@ -82,6 +86,7 @@ int main(int argc, char** argv)
 	result |= StackTest();
 	result |= HeapTest();
 	result |= LowLevelTest();
+	result |= MacroEdgeCasesTest();
 
 	result |= VerboseTest();
 
@@ -184,6 +189,73 @@ int LowLevelTest(void)
 	}
 
 	return ACR_SUCCESS;
+}
+
+/**********************************************************/
+int MacroEdgeCasesTest(void)
+{
+#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
+	int result = ACR_SUCCESS;
+	char reference[] = "data";
+	ACR_VAR_BUFFER(varbuffer);
+	ACR_Length_t tooLargeLength = ~((ACR_Length_t)0);
+
+	ACR_VAR_BUFFER_SET_MEMORY(varbuffer, reference, 4);
+	ACR_VAR_BUFFER_SET_LENGTH(varbuffer, 4);
+	ACR_VAR_BUFFER_CHANGE_MAX_LENGTH(varbuffer, 8);
+	if(varbuffer.m_MaxLength != 8
+		|| varbuffer.m_Buffer.m_Length != 4
+		|| varbuffer.m_Buffer.m_Pointer == reference
+		|| ((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[0] != 'd'
+		|| ((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[1] != 'a'
+		|| ((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[2] != 't'
+		|| ((ACR_Byte_t*)varbuffer.m_Buffer.m_Pointer)[3] != 'a')
+	{
+		ACR_DEBUG_PRINT(9, "FAIL resizing a reference preserves its data");
+		result = ACR_FAILURE;
+	}
+	else
+	{
+		ACR_DEBUG_PRINT(10, "PASS resizing a reference preserves its data");
+	}
+
+	{
+		void* originalPointer = varbuffer.m_Buffer.m_Pointer;
+		ACR_VAR_BUFFER_CHANGE_MAX_LENGTH(varbuffer, tooLargeLength);
+		if(varbuffer.m_Buffer.m_Pointer != originalPointer
+			|| varbuffer.m_MaxLength != 8
+			|| varbuffer.m_Buffer.m_Length != 4)
+		{
+			ACR_DEBUG_PRINT(11, "FAIL oversized resize leaves the buffer unchanged");
+			result = ACR_FAILURE;
+		}
+		else
+		{
+			ACR_DEBUG_PRINT(12, "PASS oversized resize leaves the buffer unchanged");
+		}
+	}
+
+	{
+		void* originalPointer = varbuffer.m_Buffer.m_Pointer;
+		ACR_VAR_BUFFER_ALLOC(varbuffer, tooLargeLength);
+		if(varbuffer.m_Buffer.m_Pointer != originalPointer
+			|| varbuffer.m_MaxLength != 8
+			|| varbuffer.m_Buffer.m_Length != 4)
+		{
+			ACR_DEBUG_PRINT(13, "FAIL oversized allocation leaves the buffer unchanged");
+			result = ACR_FAILURE;
+		}
+		else
+		{
+			ACR_DEBUG_PRINT(14, "PASS oversized allocation leaves the buffer unchanged");
+		}
+	}
+
+	ACR_VAR_BUFFER_FREE(varbuffer);
+	return result;
+#else
+	return ACR_SUCCESS;
+#endif
 }
 
 /**********************************************************/
