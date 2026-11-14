@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -48,16 +48,16 @@
 #ifndef _ACR_PUBLIC_UNITS_H_
 #define _ACR_PUBLIC_UNITS_H_
 
-#define ACR_TEMPERATURE_C_TO_F(c) ((c*1.8)+32.0)
-#define ACR_TEMPERATURE_F_TO_C(f) ((f-32.0)/1.8)
+#define ACR_TEMPERATURE_C_TO_F(c) (((c)*1.8)+32.0)
+#define ACR_TEMPERATURE_F_TO_C(f) (((f)-32.0)/1.8)
 
-#define ACR_MEASURE_CM_TO_INCHES(cm) (cm/2.54)
-#define ACR_MEASURE_INCHES_TO_CM(i) (i*2.54)
+#define ACR_MEASURE_CM_TO_INCHES(cm) ((cm)/2.54)
+#define ACR_MEASURE_INCHES_TO_CM(i) ((i)*2.54)
 
-#define ACR_WEIGHT_KILOGRAMS_TO_POUNDS(kg) (kg*2.20462262)
-#define ACR_WEIGHT_POUNDS_TO_KILOGRAMS(lbs) (lbs*0.45359237)
+#define ACR_WEIGHT_KILOGRAMS_TO_POUNDS(kg) ((kg)*2.20462262)
+#define ACR_WEIGHT_POUNDS_TO_KILOGRAMS(lbs) ((lbs)*0.45359237)
 
-#define ACR_LIQUID_LITERS_TO_GALLONS(l) (l*0.26417205)
-#define ACR_LIQUID_GALLONS_TO_LITERS(g) (g*3.78541178)
+#define ACR_LIQUID_LITERS_TO_GALLONS(l) ((l)*0.26417205)
+#define ACR_LIQUID_GALLONS_TO_LITERS(g) ((g)*3.78541178)
 
 #endif

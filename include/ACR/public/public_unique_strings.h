@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -133,8 +133,8 @@
 #define ACR_INFO_STR_OFF "off"
 #define ACR_INFO_STR_OK "ok"
 #define ACR_INFO_STR_OLD "old"
-#define ACR_INFO_STR_OPEN "open"
 #define ACR_INFO_STR_ON "on"
+#define ACR_INFO_STR_OPEN "open"
 
 // *** P ***
 #define ACR_INFO_STR_PREVIOUS "previous"

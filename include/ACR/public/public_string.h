@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -83,10 +83,30 @@ typedef struct ACR_String_s
 */
 typedef unsigned long ACR_Unicode_t;
 
-/** given the first UTF8 byte value determine the number of
-    bytes uses to encode the character
+/** determine the number of bytes used to encode a character
+    based on its first UTF8 byte
+    \param firstByte the first byte of a UTF8 character
 */
-#define ACR_UTF8_BYTE_COUNT(c) (((c & 0x80) != 0)?((c & 0x40) != 0)?((c & 0x20) != 0)?((c & 0x10) != 0)?4:3:2:1:1)
+static inline ACR_Length_t ACR_UTF8_BYTE_COUNT(ACR_Byte_t firstByte)
+{
+    if((firstByte & 0x80) == 0)
+    {
+        return 1;
+    }
+    if((firstByte & 0x40) == 0)
+    {
+        return 1;
+    }
+    if((firstByte & 0x20) == 0)
+    {
+        return 2;
+    }
+    if((firstByte & 0x10) == 0)
+    {
+        return 3;
+    }
+    return 4;
+}
 
 /** mark the string as read only
 */
