@@ -179,7 +179,7 @@
         }\
         else\
         {\
-            temp = 0;
+            temp = 0;\
         }\
     }\
     while(0)

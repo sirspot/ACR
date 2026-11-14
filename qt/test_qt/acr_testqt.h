@@ -3,9 +3,10 @@
 
 #include <QWidget>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class ACR_TestQt; }
-QT_END_NAMESPACE
+class QLabel;
+class QPushButton;
+class QTextEdit;
+class QTreeWidget;
 
 class ACR_TestQt : public QWidget
 {
@@ -16,6 +17,12 @@ public:
     ~ACR_TestQt();
 
 private:
-    Ui::ACR_TestQt *ui;
+    void runSuite(int suiteIndex);
+    void runAllSuites();
+
+    QTreeWidget *m_testTree;
+    QTextEdit *m_output;
+    QLabel *m_summary;
+    QPushButton *m_runSelected;
 };
 #endif // ACR_TESTQT_H

@@ -1,6 +1,4 @@
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui widgets
 
 CONFIG += c++11
 
@@ -15,7 +13,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-DEFINES += ACR_PLATFORM_MAC ACR_IDE_QTCREATOR ACR_COMPILER_CLANG
+win32 {
+    DEFINES += ACR_PLATFORM_WIN ACR_IDE_QTCREATOR ACR_COMPILER_MINGW
+}
+unix:!macx {
+    DEFINES += ACR_PLATFORM_LINUX ACR_IDE_QTCREATOR ACR_COMPILER_GCC
+}
+macx {
+    DEFINES += ACR_PLATFORM_MAC ACR_IDE_QTCREATOR ACR_COMPILER_CLANG
+}
 
 SOURCES += \
     main.cpp \
@@ -24,16 +30,32 @@ SOURCES += \
 HEADERS += \
     acr_testqt.h
 
-FORMS += \
-    acr_testqt.ui
-
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-INCLUDEPATH += \
-    $$PWD/../../include
+INCLUDEPATH += $$PWD/../../include
 
-macx: LIBS += -L$$PWD/../build-libACR-Desktop_Qt_5_12_7_clang_64bit-Debug/ -llibACR
-macx: DEPENDPATH += $$PWD/../build-libACR-Desktop_Qt_5_12_7_clang_64bit-Debug
+CONFIG(debug, debug|release) {
+    ACR_BUILD_CONFIGURATION = debug
+} else {
+    ACR_BUILD_CONFIGURATION = release
+}
+ACR_LIBRARY_DIR = $$clean_path($$PWD/../libACR/build/$$[QT_VERSION]/$$ACR_BUILD_CONFIGURATION)
+
+DESTDIR = $$OUT_PWD/$$ACR_BUILD_CONFIGURATION
+LIBS += -L$$ACR_LIBRARY_DIR -lACR
+
+win32 {
+    PRE_TARGETDEPS += $$ACR_LIBRARY_DIR/libACR.a
+    QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$system_path($$ACR_LIBRARY_DIR/ACR.dll)) $$quote($$system_path($$DESTDIR))
+}
+macx {
+    PRE_TARGETDEPS += $$ACR_LIBRARY_DIR/libACR.dylib
+    QMAKE_POST_LINK += $$QMAKE_COPY $$ACR_LIBRARY_DIR/libACR.dylib $$DESTDIR
+}
+unix:!macx {
+    PRE_TARGETDEPS += $$ACR_LIBRARY_DIR/libACR.so
+    QMAKE_POST_LINK += $$QMAKE_COPY $$ACR_LIBRARY_DIR/libACR.so $$DESTDIR
+}
