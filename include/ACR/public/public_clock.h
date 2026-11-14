@@ -196,7 +196,12 @@ enum ACR_DST_e
 
 /** define an empty date time on the stack
 */
+// C++'s empty aggregate initializer avoids GCC warnings that do not affect library behavior.
+#ifdef __cplusplus
+#define ACR_DATETIME(name) ACR_DateTime_t name = {};
+#else
 #define ACR_DATETIME(name) ACR_DateTime_t name = {0};
+#endif
 
 /** determine if the specified date time has the time data set
 

@@ -80,9 +80,63 @@ struct MemoryFile
     ACR_Length_t position;
 };
 
+struct CallbackFileState
+{
+    QByteArray expectedPath;
+    QByteArray writtenData;
+    ACR_Info_t mode;
+    ACR_Info_t openResult;
+    ACR_Info_t closeResult;
+    ACR_Info_t writeResult;
+    bool pathMatched;
+};
+
 static TestCase check(const QString &name, const std::function<bool()> &run)
 {
     return TestCase{name, run};
+}
+
+static ACR_Info_t callbackFileOpen(ACR_String_t path, ACR_Info_t mode, void *userData)
+{
+    CallbackFileState *state = static_cast<CallbackFileState *>(userData);
+    state->mode = mode;
+    state->pathMatched =
+        ACR_StringCompareToMemory(
+            path,
+            reinterpret_cast<const ACR_Byte_t *>(state->expectedPath.constData()),
+            static_cast<ACR_Length_t>(state->expectedPath.size()),
+            ACR_MAX_COUNT,
+            ACR_INFO_YES) == ACR_INFO_EQUAL;
+    return state->openResult;
+}
+
+static ACR_Info_t callbackFileClose(void *userData)
+{
+    CallbackFileState *state = static_cast<CallbackFileState *>(userData);
+    return state->closeResult;
+}
+
+static ACR_Info_t callbackFileWrite(ACR_VarBuffer_t *source, void *userData)
+{
+    CallbackFileState *state = static_cast<CallbackFileState *>(userData);
+    if (!source || !source->m_Buffer.m_Pointer)
+    {
+        return ACR_INFO_ERROR;
+    }
+
+    const ACR_Length_t length = source->m_Buffer.m_Length;
+    state->writtenData = QByteArray(
+        static_cast<const char *>(source->m_Buffer.m_Pointer),
+        static_cast<int>(length));
+    if (state->writeResult == ACR_INFO_OK)
+    {
+        source->m_Buffer.m_Length = length;
+    }
+    else
+    {
+        source->m_Buffer.m_Length = 0;
+    }
+    return state->writeResult;
 }
 
 static ACR_Length_t memoryFilePosition(void *userData)
@@ -285,6 +339,13 @@ static std::vector<TestSuite> &testSuites()
                     return ACR_HAS_FLAG(flags, ACR_FLAG_FOUR) &&
                            !ACR_HAS_FLAG(flags, ACR_FLAG_ONE) &&
                            ACR_MAX_BYTE == 255;
+                }),
+                check(QStringLiteral("Matches exact flag sets, including no flags"), [] {
+                    const ACR_Flags_t flags = ACR_FLAG_ONE | ACR_FLAG_FOUR;
+                    return ACR_HAS_EXACT_FLAGS(flags, (ACR_FLAG_ONE | ACR_FLAG_FOUR)) &&
+                           !ACR_HAS_EXACT_FLAGS(flags, ACR_FLAG_ONE) &&
+                           ACR_HAS_EXACT_FLAGS(ACR_NO_FLAGS, ACR_NO_FLAGS) &&
+                           !ACR_HAS_EXACT_FLAGS(ACR_NO_FLAGS, ACR_FLAG_ONE);
                 })
             }
         },
@@ -310,6 +371,32 @@ static std::vector<TestSuite> &testSuites()
                            ACR_DATETIME_HOUR(date) == 12 &&
                            ACR_DATETIME_MIN(date) == 34 &&
                            ACR_DATETIME_SEC(date) == 56;
+                }),
+                check(QStringLiteral("Converts the Unix epoch to UTC date and time"), [] {
+                    ACR_Time_t epoch = 0;
+                    ACR_DateTime_t date = {};
+                    ACR_DATETIME_FROM_TIME(date, epoch);
+                    return ACR_DATETIME_YEAR(date) == 1970 &&
+                           ACR_DATETIME_MONTH(date) == ACR_MONTH_JANUARY &&
+                           ACR_DATETIME_DAY(date) == 1 &&
+                           ACR_DATETIME_DAY_OF_WEEK(date) == ACR_DAY_THURSDAY &&
+                           ACR_DATETIME_HOUR(date) == 0 &&
+                           ACR_DATETIME_MIN(date) == 0 &&
+                           ACR_DATETIME_SEC(date) == 0;
+                }),
+                check(QStringLiteral("Reads current date and time when an RTC is configured"), [] {
+#if ACR_HAS_RTC == ACR_BOOL_TRUE
+                    ACR_Time_t now = 0;
+                    ACR_DateTime_t date = {};
+                    ACR_TIME_NOW(now);
+                    ACR_DATETIME_NOW(date);
+                    return now > 0 &&
+                           ACR_DATETIME_HAS_DATE(date) &&
+                           ACR_DATETIME_HAS_TIME(date) &&
+                           ACR_DATETIME_YEAR(date) >= 1970;
+#else
+                    return ACR_HAS_RTC == ACR_BOOL_FALSE;
+#endif
                 })
             }
         },
@@ -348,6 +435,33 @@ static std::vector<TestSuite> &testSuites()
                     ACR_COUNTER_NEXT(counter, current, hasNext);
                     return startsAtTwo && advances &&
                            hasNext == ACR_BOOL_FALSE && current == 2;
+                }),
+                check(QStringLiteral("Sets up a counter with its requested bounds and value"), [] {
+                    ACR_COUNTER(counter, 0, 0, 0);
+                    ACR_COUNTER_SETUP(counter, 3, 5, 4);
+                    ACR_Count_t current = 0;
+                    ACR_COUNTER_CURRENT(counter, current);
+                    return ACR_COUNTER_IS_VALID(counter) &&
+                           counter.m_Start == 3 &&
+                           counter.m_End == 5 &&
+                           current == 4;
+                }),
+                check(QStringLiteral("Resets a counter to its start value"), [] {
+                    ACR_COUNTER(counter, 0, 0, 0);
+                    ACR_COUNTER_SETUP(counter, 3, 5, 4);
+                    ACR_COUNTER_RESET(counter);
+                    ACR_Count_t current = 0;
+                    ACR_COUNTER_CURRENT(counter, current);
+                    return current == 3 && ACR_COUNTER_IS_VALID(counter);
+                }),
+                check(QStringLiteral("Rejects counters whose start is after their end"), [] {
+                    ACR_COUNTER(invalidCounter, 0, 0, 0);
+                    ACR_COUNTER_SETUP(invalidCounter, 5, 4, 5);
+                    const ACR_Bool_t isValid = ACR_COUNTER_IS_VALID(invalidCounter);
+                    return invalidCounter.m_Start == 5 &&
+                           invalidCounter.m_End == 4 &&
+                           invalidCounter.m_Current == 5 &&
+                           isValid == ACR_BOOL_FALSE;
                 })
             }
         },
@@ -424,6 +538,53 @@ static std::vector<TestSuite> &testSuites()
                         std::memcmp(buffer.m_Pointer, memoryFile.data.constData(), buffer.m_Length) == 0;
                     ACR_BUFFER_FREE(buffer);
                     return readAll;
+                }),
+                check(QStringLiteral("Invokes open, close and write callbacks with success and failure results"), [] {
+                    ACR_Byte_t pathBytes[] = {'m', 'e', 'm', '\0'};
+                    const ACR_String_t path =
+                        ACR_StringFromMemory(pathBytes, sizeof(pathBytes), ACR_MAX_COUNT);
+                    CallbackFileState state = {
+                        QByteArray(reinterpret_cast<const char *>(pathBytes), sizeof(pathBytes)),
+                        QByteArray(),
+                        ACR_INFO_UNKNOWN,
+                        ACR_INFO_OK,
+                        ACR_INFO_OK,
+                        ACR_INFO_OK,
+                        false
+                    };
+                    ACR_FILE_INTERFACE(file);
+                    file.m_User = &state;
+                    file.m_Open = callbackFileOpen;
+                    file.m_Close = callbackFileClose;
+                    file.m_Write = callbackFileWrite;
+
+                    const bool opened =
+                        file.m_Open(path, ACR_INFO_WRITE, file.m_User) == ACR_INFO_OK &&
+                        state.pathMatched &&
+                        state.mode == ACR_INFO_WRITE;
+                    const bool closed = file.m_Close(file.m_User) == ACR_INFO_OK;
+
+                    const ACR_Byte_t contents[] = {0x41, 0x43, 0x52};
+                    ACR_VAR_BUFFER(source);
+                    ACR_VAR_BUFFER_SET_MEMORY(source, contents, sizeof(contents));
+                    ACR_VAR_BUFFER_SET_LENGTH(source, sizeof(contents));
+                    const bool wrote =
+                        file.m_Write(&source, file.m_User) == ACR_INFO_OK &&
+                        source.m_Buffer.m_Length == sizeof(contents) &&
+                        state.writtenData == QByteArray(
+                            reinterpret_cast<const char *>(contents), sizeof(contents));
+
+                    state.openResult = ACR_INFO_ERROR;
+                    state.closeResult = ACR_INFO_ERROR;
+                    state.writeResult = ACR_INFO_ERROR;
+                    ACR_VAR_BUFFER_SET_LENGTH(source, sizeof(contents));
+                    const bool errors =
+                        file.m_Open(path, ACR_INFO_READ, file.m_User) == ACR_INFO_ERROR &&
+                        file.m_Close(file.m_User) == ACR_INFO_ERROR &&
+                        file.m_Write(&source, file.m_User) == ACR_INFO_ERROR &&
+                        source.m_Buffer.m_Length == 0;
+                    ACR_VAR_BUFFER_FREE(source);
+                    return opened && closed && wrote && errors;
                 })
             }
         },
@@ -442,25 +603,65 @@ static std::vector<TestSuite> &testSuites()
                     const QByteArray path = QFile::encodeName(
                         temporaryDirectory.filePath(QStringLiteral("acr_public_header_test.bin")));
                     const ACR_Byte_t contents[] = {0x41, 0x43, 0x52, 0x00, 0x7f};
+                    const ACR_Byte_t appended[] = {0x31, 0x32, 0x33};
                     ACR_BUFFER(source);
                     ACR_BUFFER_SET_DATA(source, contents, sizeof(contents));
 
                     ACR_Length_t written = 0;
                     ACR_FILESYSTEM_FILE_WRITE(path.constData(), written, source, ACR_BOOL_FALSE);
+                    ACR_BUFFER_SET_DATA(source, appended, sizeof(appended));
+                    ACR_Length_t appendedLength = 0;
+                    ACR_FILESYSTEM_FILE_WRITE(
+                        path.constData(), appendedLength, source, ACR_BOOL_TRUE);
                     ACR_Length_t fileLength = 0;
                     ACR_FILESYSTEM_FILE_LENGTH(path.constData(), fileLength);
+                    if (written != sizeof(contents) ||
+                        appendedLength != sizeof(appended) ||
+                        fileLength < 2)
+                    {
+                        ACR_BUFFER_FREE(source);
+                        return false;
+                    }
 
                     ACR_BUFFER(destination);
-                    ACR_BUFFER_ALLOC(destination, fileLength);
+                    ACR_BUFFER_ALLOC(destination, fileLength - 2);
                     ACR_Length_t read = 0;
-                    ACR_FILESYSTEM_FILE_READ(path.constData(), read, destination, 0);
+                    ACR_FILESYSTEM_FILE_READ(path.constData(), read, destination, 2);
+                    const ACR_Byte_t expectedTail[] = {
+                        contents[2], contents[3], contents[4],
+                        appended[0], appended[1], appended[2]
+                    };
                     const bool matches = written == sizeof(contents) &&
-                        fileLength == sizeof(contents) &&
-                        read == sizeof(contents) &&
-                        std::memcmp(destination.m_Pointer, contents, sizeof(contents)) == 0;
+                        appendedLength == sizeof(appended) &&
+                        fileLength == sizeof(contents) + sizeof(appended) &&
+                        read == sizeof(expectedTail) &&
+                        std::memcmp(destination.m_Pointer, expectedTail, sizeof(expectedTail)) == 0;
+
+                    ACR_BUFFER(endBuffer);
+                    ACR_BUFFER_ALLOC(endBuffer, 1);
+                    ACR_Length_t readAtEnd = 99;
+                    ACR_FILESYSTEM_FILE_READ(
+                        path.constData(), readAtEnd, endBuffer, fileLength);
+
+                    const QByteArray missingPath = QFile::encodeName(
+                        temporaryDirectory.filePath(QStringLiteral("missing/file.bin")));
+                    ACR_Length_t missingLength = 99;
+                    ACR_FILESYSTEM_FILE_LENGTH(missingPath.constData(), missingLength);
+                    ACR_Length_t missingRead = 99;
+                    ACR_FILESYSTEM_FILE_READ(
+                        missingPath.constData(), missingRead, endBuffer, 0);
+                    ACR_Length_t failedWrite = 99;
+                    ACR_FILESYSTEM_FILE_WRITE(
+                        missingPath.constData(), failedWrite, source, ACR_BOOL_FALSE);
+
+                    const bool edgeCases = readAtEnd == 0 &&
+                        missingLength == 0 &&
+                        missingRead == 0 &&
+                        failedWrite == 0;
                     ACR_BUFFER_FREE(destination);
+                    ACR_BUFFER_FREE(endBuffer);
                     ACR_BUFFER_FREE(source);
-                    return matches;
+                    return matches && edgeCases;
 #else
                     return ACR_HAS_FILESYSTEM == ACR_BOOL_FALSE;
 #endif
@@ -496,6 +697,34 @@ static std::vector<TestSuite> &testSuites()
                     }
                     ACR_DELETE(values);
                     return allocated && values == ACR_NULL;
+#else
+                    return ACR_HAS_MALLOC == ACR_BOOL_FALSE;
+#endif
+                }),
+                check(QStringLiteral("Supports pointer helpers without freeing borrowed memory"), [] {
+                    ACR_Byte_t memory[] = {4, 5, 6};
+                    ACR_BUFFER(buffer);
+                    ACR_BUFFER_PTR_SET_DATA(&buffer, memory, sizeof(memory));
+                    const bool referenced =
+                        ACR_BUFFER_PTR_IS_VALID(&buffer) &&
+                        ACR_BUFFER_PTR_GET_LENGTH(&buffer) == sizeof(memory) &&
+                        buffer.m_Pointer == memory;
+                    ACR_BUFFER_PTR_FREE(&buffer);
+                    return referenced &&
+                           !ACR_BUFFER_PTR_IS_VALID(&buffer) &&
+                           buffer.m_Pointer == ACR_NULL &&
+                           memory[0] == 4 &&
+                           memory[2] == 6;
+                }),
+                check(QStringLiteral("Force-frees an allocator-owned buffer"), [] {
+#if ACR_HAS_MALLOC == ACR_BOOL_TRUE
+                    ACR_BUFFER(buffer);
+                    ACR_BUFFER_ALLOC(buffer, 4);
+                    const bool allocated = ACR_BUFFER_IS_VALID(buffer);
+                    ACR_BUFFER_FORCE_FREE(buffer);
+                    return allocated &&
+                           buffer.m_Pointer == ACR_NULL &&
+                           buffer.m_Length == 0;
 #else
                     return ACR_HAS_MALLOC == ACR_BOOL_FALSE;
 #endif
@@ -600,6 +829,17 @@ static std::vector<TestSuite> &testSuites()
                     const bool readOnly = ACR_STRING_IS_READ_ONLY(string);
                     ACR_BUFFER_FREE(string.m_Buffer);
                     return readAndCompared && readOnly;
+                }),
+                check(QStringLiteral("Sets string data and its supplied character count"), [] {
+                    ACR_Byte_t text[] = {'c', 'a', 'f', 0xc3, 0xa9, '\0'};
+                    ACR_String_t string = {};
+                    ACR_STRING_SET_DATA(string, text, sizeof(text), 4);
+                    const bool assigned =
+                        string.m_Buffer.m_Pointer == text &&
+                        string.m_Buffer.m_Length == sizeof(text) &&
+                        string.m_Count == 4;
+                    ACR_BUFFER_FREE(string.m_Buffer);
+                    return assigned && text[0] == 'c' && text[4] == 0xa9;
                 })
             }
         },
@@ -681,6 +921,36 @@ static std::vector<TestSuite> &testSuites()
 #else
                     return ACR_HAS_MALLOC == ACR_BOOL_FALSE;
 #endif
+                }),
+                check(QStringLiteral("Sets memory, bounds length changes, resets and rejects append overflow"), [] {
+                    ACR_Byte_t memory[] = {1, 2, 3, 4};
+                    const ACR_Byte_t overflow[] = {8, 9, 10};
+                    ACR_VAR_BUFFER(buffer);
+                    ACR_VAR_BUFFER_SET_MEMORY(buffer, memory, sizeof(memory));
+                    const bool initialized =
+                        ACR_VAR_BUFFER_IS_VALID(buffer) &&
+                        ACR_VAR_BUFFER_GET_LENGTH(buffer) == 0 &&
+                        ACR_VAR_BUFFER_GET_MAX_LENGTH(buffer) == sizeof(memory);
+
+                    ACR_VAR_BUFFER_SET_LENGTH(buffer, 2);
+                    const bool setWithinBounds = ACR_VAR_BUFFER_GET_LENGTH(buffer) == 2;
+                    ACR_VAR_BUFFER_SET_LENGTH(buffer, sizeof(memory) + 1);
+                    const bool retainedOnInvalidLength = ACR_VAR_BUFFER_GET_LENGTH(buffer) == 2;
+                    ACR_VAR_BUFFER_APPEND(buffer, overflow, sizeof(overflow));
+                    const bool unchangedOnOverflow =
+                        ACR_VAR_BUFFER_GET_LENGTH(buffer) == 2 &&
+                        memory[0] == 1 &&
+                        memory[1] == 2;
+                    ACR_VAR_BUFFER_RESET(buffer);
+                    const bool reset = ACR_VAR_BUFFER_GET_LENGTH(buffer) == 0 &&
+                        memory[0] == 1 &&
+                        memory[3] == 4;
+                    ACR_VAR_BUFFER_FREE(buffer);
+                    return initialized &&
+                           setWithinBounds &&
+                           retainedOnInvalidLength &&
+                           unchangedOnOverflow &&
+                           reset;
                 })
             }
         },
