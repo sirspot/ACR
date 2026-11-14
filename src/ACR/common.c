@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -42,9 +42,6 @@
 */
 #include "ACR/common.h"
 
-// included for ACR_UNUSED
-#include "ACR/public/public_functions.h"
-
 // included for ACR_INFO_STR_*, ACR_DAY_STR_*, and ACR_MONTH_STR_*
 #include "ACR/public/public_unique_strings.h"
 
@@ -60,82 +57,6 @@
 // included for setlocale
 #include <locale.h>
 #endif
-
-/** info string lookup table
-*/
-static const char* g_ACRInfoStringLookup[ACR_INFO_COUNT+1] =
-{
-    //
-    // COMPARISON
-    //
-    ACR_INFO_STR_EQUAL,     // ACR_INFO_EQUAL
-    ACR_INFO_STR_NOT_EQUAL, // ACR_INFO_NOT_EQUAL
-    ACR_INFO_STR_LESS,      // ACR_INFO_LESS
-    ACR_INFO_STR_GREATER,   // ACR_INFO_GREATER
-    ACR_INFO_STR_UNKNOWN,   // ACR_INFO_UNKNOWN
-    ACR_INFO_STR_UNDEFINED, // ACR_INFO_UNDEFINED
-
-    //
-    // POSITIVE, NEGATIVE
-    //
-    ACR_INFO_STR_TRUE,      // ACR_INFO_TRUE
-    ACR_INFO_STR_FALSE,     // ACR_INFO_FALSE
-    ACR_INFO_STR_OK,        // ACR_INFO_OK
-    ACR_INFO_STR_ERROR,     // ACR_INFO_ERROR
-    ACR_INFO_STR_ENABLED,   // ACR_INFO_ENABLED
-    ACR_INFO_STR_DISABLED,  // ACR_INFO_DISABLED
-    ACR_INFO_STR_YES,       // ACR_INFO_YES
-    ACR_INFO_STR_NO,        // ACR_INFO_NO
-    ACR_INFO_STR_ON,        // ACR_INFO_ON
-    ACR_INFO_STR_OFF,       // ACR_INFO_OFF
-    ACR_INFO_STR_START,     // ACR_INFO_START
-    ACR_INFO_STR_STOP,      // ACR_INFO_STOP
-    ACR_INFO_STR_ACCEPT,    // ACR_INFO_ACCEPT
-    ACR_INFO_STR_IGNORE,    // ACR_INFO_IGNORE
-    ACR_INFO_STR_VALID,     // ACR_INFO_VALID
-    ACR_INFO_STR_INVALID,   // ACR_INFO_INVALID
-    ACR_INFO_STR_ALL,       // ACR_INFO_ALL
-    ACR_INFO_STR_NONE,      // ACR_INFO_NONE
-    ACR_INFO_STR_FULL,      // ACR_INFO_FULL
-    ACR_INFO_STR_EMPTY,     // ACR_INFO_EMPTY
-    ACR_INFO_STR_OPEN,      // ACR_INFO_OPEN
-    ACR_INFO_STR_CLOSED,    // ACR_INFO_CLOSED
-
-    //
-    // POSITION
-    //
-    ACR_INFO_STR_TOP,       // ACR_INFO_TOP
-    ACR_INFO_STR_BOTTOM,    // ACR_INFO_BOTTOM
-    ACR_INFO_STR_FIRST,     // ACR_INFO_FIRST
-    ACR_INFO_STR_LAST,      // ACR_INFO_LAST
-    ACR_INFO_STR_PREVIOUS,  // ACR_INFO_PREVIOUS
-    ACR_INFO_STR_NEXT,      // ACR_INFO_NEXT
-    ACR_INFO_STR_CURRENT,   // ACR_INFO_CURRENT
-
-    // DIRECTION
-    ACR_INFO_STR_UP,        // ACR_INFO_UP
-    ACR_INFO_STR_DOWN,      // ACR_INFO_DOWN
-    ACR_INFO_STR_LEFT,      // ACR_INFO_LEFT
-    ACR_INFO_STR_RIGHT,     // ACR_INFO_RIGHT
-
-    // AGE
-    ACR_INFO_STR_OLD,       // ACR_INFO_OLD
-    ACR_INFO_STR_NEW,       // ACR_INFO_NEW
-
-    // INSTRUCTION
-    ACR_INFO_STR_BEGIN,     // ACR_INFO_BEGIN
-    ACR_INFO_STR_READY,     // ACR_INFO_READY
-    ACR_INFO_STR_WAIT,      // ACR_INFO_WAIT
-    ACR_INFO_STR_GO,        // ACR_INFO_GO
-    ACR_INFO_STR_END,       // ACR_INFO_END
-
-    // MODE
-    ACR_INFO_STR_READ,      // ACR_INFO_READ
-    ACR_INFO_STR_WRITE,     // ACR_INFO_WRITE
-    ACR_INFO_STR_READ_WRITE,// ACR_INFO_READ_WRITE
-
-    ""                      // ACR_INFO_COUNT
-};
 
 /** day of week string lookup table
 */
@@ -193,38 +114,6 @@ ACR_Bool_t g_ACRSimRtcTimeIsSet = ACR_BOOL_FALSE;
 ACR_Time_t g_ACRSimRtcTime = 0;
 ACR_Bool_t g_ACRSimRtcTimeMicroIsSet = ACR_BOOL_FALSE;
 ACR_Time_t g_ACRSimRtcTimeMicro = 0;
-
-ACR_COUNTER(g_ACRGlobalCounter, ACR_ZERO_COUNT, (ACR_MAX_COUNT-1), ACR_ZERO_COUNT);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - COMMON INFORMATIONAL VALUES
-//
-////////////////////////////////////////////////////////////
-
-ACR_String_t ACR_InfoToString(
-    ACR_Info_t info)
-{
-    return ACR_StringFromReadOnlyMemory((const ACR_Byte_t*)g_ACRInfoStringLookup[info], ACR_MAX_LENGTH, ACR_MAX_COUNT);
-}
-
-ACR_Info_t ACR_InfoFromString(
-    ACR_String_t src)
-{
-    ACR_Count_t i = 0;
-    ACR_Info_t x;
-    do
-    {
-        x = ACR_StringCompareToMemory(src, (const ACR_Byte_t*)g_ACRInfoStringLookup[i], ACR_MAX_LENGTH, ACR_MAX_COUNT, ACR_INFO_NO);
-        if(x == ACR_INFO_EQUAL)
-        {
-            return (ACR_Info_t)i;
-        }
-        i++;
-    }
-    while(i < ACR_INFO_COUNT);
-    return ACR_INFO_UNKNOWN;
-}
 
 ////////////////////////////////////////////////////////////
 //
@@ -295,73 +184,6 @@ ACR_Time_t ACR_TimerElapse(
 
 ////////////////////////////////////////////////////////////
 //
-// PUBLIC FUNCTIONS - COUNTER
-//
-////////////////////////////////////////////////////////////
-
-ACR_Count_t ACR_GlobalCounter(void)
-{
-    ACR_Count_t value;
-    ACR_COUNTER_CURRENT(g_ACRGlobalCounter, value);
-    return value;
-}
-
-ACR_Bool_t ACR_GlobalCounterNext(
-    ACR_Count_t* value)
-{
-    ACR_Bool_t ok;
-    ACR_COUNTER_NEXT(g_ACRGlobalCounter, (*value), ok);
-    return ok;
-}
-
-ACR_Bool_t ACR_CounterFirst(
-    ACR_Counter_t* me,
-    ACR_Count_t* value)
-{
-    ACR_Bool_t ok;
-    if(me)
-    {
-        if(ACR_COUNTER_IS_VALID((*me)))
-        {
-            ACR_COUNTER_RESET((*me));
-            if(value)
-            {
-                ACR_COUNTER_CURRENT((*me), (*value));
-            }
-            ok = ACR_BOOL_TRUE;
-        }
-        else
-        {
-            ok = ACR_BOOL_FALSE;
-        }
-    }
-    else
-    {
-        ok = ACR_BOOL_FALSE;
-    }
-    return ok;
-}
-
-ACR_Bool_t ACR_CounterNext(
-    ACR_Counter_t* me,
-    ACR_Count_t* value)
-{
-    ACR_Bool_t ok;
-    if(value)
-    {
-        ACR_COUNTER_NEXT((*me), (*value), ok);
-    }
-    else
-    {
-        ACR_Count_t tempValue;
-        ACR_COUNTER_NEXT((*me), tempValue, ok);
-        ACR_UNUSED(tempValue);
-    }
-    return ok;
-}
-
-////////////////////////////////////////////////////////////
-//
 // PUBLIC FUNCTIONS - DATE AND TIME VALUES
 //
 ////////////////////////////////////////////////////////////
@@ -401,7 +223,7 @@ ACR_DayOfWeek_t ACR_DayOfWeekFromString(
         }
         i++;
     }
-    while(i < ACR_INFO_COUNT);
+    while(i < ACR_DAY_COUNT);
     return ACR_DAY_OF_WEEK_UNKNOWN;
 }
 
@@ -425,7 +247,7 @@ ACR_Month_t ACR_MonthFromString(
         }
         i++;
     }
-    while(i < ACR_INFO_COUNT);
+    while(i < ACR_MONTH_COUNT);
     return ACR_MONTH_UNKNOWN;
 }
 

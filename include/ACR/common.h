@@ -3,7 +3,7 @@
     ********** DO NOT REMOVE THIS INFORMATION ************
 
     ACR - A set of C functions in a git Repository
-    Copyright (C) 2018 - 2022 Adam C. Rosenberg
+    Copyright (C) 2018 - 2026 Adam C. Rosenberg
 
     Please read LICENSE before using this code
 
@@ -77,6 +77,12 @@
 // included for ACR_Count_t
 #include "ACR/public/public_count.h"
 
+// included for ACR_InfoToString() and ACR_InfoFromString()
+#include "ACR/info.h"
+
+// included for ACR_GlobalCounter() and counter functions
+#include "ACR/counter.h"
+
 ////////////////////////////////////////////////////////////
 // ALLOW FUNCTIONS TO BE CALLED FROM C++                  //
 ////////////////////////////////////////////////////////////
@@ -84,27 +90,6 @@
 extern "C" {                                              //
 #endif                                                    //
 ////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - COMMON INFORMATIONAL VALUES
-//
-////////////////////////////////////////////////////////////
-
-/** get the info value as a string
-    \param info the info value \see enum ACR_Info_e
-    \returns a reference to a string
-*/
-ACR_String_t ACR_InfoToString(
-    ACR_Info_t info);
-
-/** get the info value from a string
-    \param src a reference to a string
-    \returns an info value from \see enum ACR_Info_e or
-             ACR_INFO_UNKNOWN if not found
-*/
-ACR_Info_t ACR_InfoFromString(
-    ACR_String_t src);
 
 ////////////////////////////////////////////////////////////
 //
@@ -125,47 +110,6 @@ ACR_Bool_t ACR_TimerStart(
 */
 ACR_Time_t ACR_TimerElapse(
     ACR_Timer_t* me);
-
-////////////////////////////////////////////////////////////
-//
-// PUBLIC FUNCTIONS - COUNTER
-//
-////////////////////////////////////////////////////////////
-
-/** get the current global counter
-    \returns a value ACR_ZERO_COUNT to (ACR_MAX_COUNT-1)
-*/
-ACR_Count_t ACR_GlobalCounter(void);
-
-/** get the next global counter value
-    \param value location to store the value
-    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
-             no more values exist, which means value has been set
-             back to the first value
-*/
-ACR_Bool_t ACR_GlobalCounterNext(
-    ACR_Count_t* value);
-
-/** get the first counter value
-    \param me the counter
-    \param value location to store the value
-    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
-             no values exist which means the counter is invalid
-*/
-ACR_Bool_t ACR_CounterFirst(
-    ACR_Counter_t* me,
-    ACR_Count_t* value);
-
-/** get the next counter value
-    \param me the counter
-    \param value location to store the value
-    \returns ACR_BOOL_TRUE if the value is ok or ACR_BOOL_FALSE if
-             no more values exist, which means value has been set
-             back to the first value
-*/
-ACR_Bool_t ACR_CounterNext(
-    ACR_Counter_t* me,
-    ACR_Count_t* value);
 
 ////////////////////////////////////////////////////////////
 //
